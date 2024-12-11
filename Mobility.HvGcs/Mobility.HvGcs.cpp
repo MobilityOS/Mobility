@@ -11,8 +11,14 @@
 #include <Uefi.h>
 #include <Protocol/GraphicsOutput.h>
 
+#include <Mile.Project.Version.h>
+
 #include <sal.h>
 #include <string.h>
+
+#define MOBILITY_HVGCS_VERSION_STRING \
+    MILE_PROJECT_VERSION_STRING L" (Build " \
+    MILE_PROJECT_MACRO_TO_STRING(MILE_PROJECT_VERSION_BUILD) L")"
 
 namespace
 {
@@ -40,10 +46,18 @@ EFI_STATUS EFIAPI UefiMain(
 {
     ::OutputWideString(
         SystemTable->ConOut,
-        L"Mobility Hyper-V Guest Compatibility Shim\r\n"
-        L"================================================================\r\n"
-        L"Hello World!\r\n"
-        L"================================================================\r\n"
+        L"Mobility Hyper-V Guest Compatibility Shim"
+        L" " MOBILITY_HVGCS_VERSION_STRING L"\r\n"
+        L"(c) Kenji Mouri. All rights reserved.\r\n"
+        L"\r\n");
+
+    ::OutputWideString(
+        SystemTable->ConOut,
+        L"Hello World!\r\n");
+
+    ::OutputWideString(
+        SystemTable->ConOut,
+        L"\r\n"
         L"Press any key to return to the boot menu...\r\n");
     {
         UINTN Index = 0;
