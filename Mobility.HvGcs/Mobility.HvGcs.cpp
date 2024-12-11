@@ -12,6 +12,8 @@
 
 #include <Uefi.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Guid/Acpi.h>
+#include <IndustryStandard/Acpi20.h>
 
 #include <Mile.HyperV.VMBus.h>
 
@@ -124,6 +126,138 @@ extern "C" uint8_t MoCalculateChecksum8(
     return static_cast<uint8_t>(0x100 - ::MoCalculateSum8(Buffer, Size));
 }
 
+typedef struct _MO_ACPI_DESCRIPTION_TABLES
+{
+    EFI_ACPI_DESCRIPTION_HEADER* XsdtHeader;
+    EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER* MadtHeader;
+    EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE* Fadt;
+} MO_ACPI_DESCRIPTION_TABLES, *PMO_ACPI_DESCRIPTION_TABLES;
+
+/**
+ * @brief Retrieves the ACPI description tables information structure from the
+ *        UEFI system table.
+ * @param SystemTable Pointer to the UEFI system table.
+ * @param DescriptionTables Pointer to the ACPI description tables information
+ *                          structure which will be initialized to zero at the
+ *                          beginning.
+ */
+extern "C" void MoAcpiGetDescriptionTables(
+    _In_ EFI_SYSTEM_TABLE* SystemTable,
+    _Out_ PMO_ACPI_DESCRIPTION_TABLES DescriptionTables)
+{
+    if (!DescriptionTables)
+    {
+        return;
+    }
+    ::memset(DescriptionTables, 0, sizeof(MO_ACPI_DESCRIPTION_TABLES));
+
+    for (UINTN i = 0; i < SystemTable->NumberOfTableEntries; ++i)
+    {
+        if (0 != ::memcmp(
+            &SystemTable->ConfigurationTable[i].VendorGuid,
+            &gEfiAcpiTableGuid,
+            sizeof(EFI_GUID)))
+        {
+            continue;
+        }
+
+        EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER* RsdpCandidate =
+            reinterpret_cast<EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER*>(
+                SystemTable->ConfigurationTable[i].VendorTable);
+        if (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE
+            != RsdpCandidate->Signature)
+        {
+            continue;
+        }
+        if (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION
+            != RsdpCandidate->Revision)
+        {
+            continue;
+        }
+        if (0 != ::MoCalculateSum8(
+            reinterpret_cast<uint8_t*>(RsdpCandidate),
+            OFFSET_OF(EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER, Length)))
+        {
+            continue;
+        }
+        if (0 != ::MoCalculateSum8(
+            reinterpret_cast<uint8_t*>(RsdpCandidate),
+            RsdpCandidate->Length))
+        {
+            continue;
+        }
+
+        EFI_ACPI_DESCRIPTION_HEADER* XsdtHeaderCandidate =
+            reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(
+                RsdpCandidate->XsdtAddress);
+        if (EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE
+            != XsdtHeaderCandidate->Signature)
+        {
+            continue;
+        }
+        if (XsdtHeaderCandidate->Revision
+            < EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION)
+        {
+            continue;
+        }
+        if (0 != ::MoCalculateSum8(
+            reinterpret_cast<uint8_t*>(XsdtHeaderCandidate),
+            XsdtHeaderCandidate->Length))
+        {
+            continue;
+        }
+
+        DescriptionTables->XsdtHeader = XsdtHeaderCandidate;
+        break;
+    }
+
+    if (!DescriptionTables->XsdtHeader)
+    {
+        return;
+    }
+
+    uint64_t* XsdtEntryArray = reinterpret_cast<uint64_t*>(
+        &DescriptionTables->XsdtHeader[1]);
+    size_t XsdtEntryArraySize = DescriptionTables->XsdtHeader->Length;
+    XsdtEntryArraySize -= sizeof(EFI_ACPI_DESCRIPTION_HEADER);
+    XsdtEntryArraySize /= sizeof(uint64_t);
+    for (size_t i = 0; i < XsdtEntryArraySize; ++i)
+    {
+        EFI_ACPI_DESCRIPTION_HEADER* EntryCandidate =
+            reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(XsdtEntryArray[i]);
+        if (0 != ::MoCalculateSum8(
+            reinterpret_cast<uint8_t*>(EntryCandidate),
+            EntryCandidate->Length))
+        {
+            break;
+        }
+
+        switch (EntryCandidate->Signature)
+        {
+        case EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE:
+            if (EntryCandidate->Revision
+                >= EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION)
+            {
+                DescriptionTables->MadtHeader =
+                    reinterpret_cast<EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER*>(
+                        EntryCandidate);
+            }
+            break;
+        case EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE:
+            if (EntryCandidate->Revision
+                >= EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION)
+            {
+                DescriptionTables->Fadt =
+                    reinterpret_cast<EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE*>(
+                        EntryCandidate);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 #define MOBILITY_HVGCS_VERSION_STRING \
     MILE_PROJECT_VERSION_STRING L" (Build " \
     MILE_PROJECT_MACRO_TO_STRING(MILE_PROJECT_VERSION_BUILD) L")"
@@ -164,6 +298,19 @@ EFI_STATUS EFIAPI UefiMain(
         ::OutputWideString(
             SystemTable->ConOut,
             L"Yolo!\r\n");
+
+        MO_ACPI_DESCRIPTION_TABLES DescriptionTables;
+        ::MoAcpiGetDescriptionTables(SystemTable, &DescriptionTables);
+
+        if (DescriptionTables.MadtHeader)
+        {
+            if (!(EFI_ACPI_2_0_PCAT_COMPAT & DescriptionTables.MadtHeader->Flags))
+            {
+                ::OutputWideString(
+                    SystemTable->ConOut,
+                    L"Not Yolo!\r\n");
+            }
+        }
     }
 
     ::OutputWideString(
