@@ -44,7 +44,7 @@ EFI_STATUS EFIAPI UefiMain(
         L"================================================================\r\n"
         L"Hello World!\r\n"
         L"================================================================\r\n"
-        L"Press any key to return to the boot menu...");
+        L"Press any key to return to the boot menu...\r\n");
     {
         UINTN Index = 0;
         SystemTable->BootServices->WaitForEvent(
