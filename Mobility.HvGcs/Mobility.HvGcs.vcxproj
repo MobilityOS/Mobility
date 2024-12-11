@@ -10,7 +10,7 @@
     <MileProjectFileDescription>Mobility Hyper-V Guest Compatibility Shim</MileProjectFileDescription>
     <MileProjectInternalName>Mobility.HvGcs</MileProjectInternalName>
     <MileProjectLegalCopyright>© Kenji Mouri. All rights reserved.</MileProjectLegalCopyright>
-    <MileProjectOriginalFilename>Mobility.HvGcs.efi</MileProjectOriginalFilename>
+    <MileProjectOriginalFilename>MoHvGcs.efi</MileProjectOriginalFilename>
     <MileProjectProductName>Mobility</MileProjectProductName>
     <MileProjectVersion>1.0.$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse('2024-11-04'))).TotalDays).0</MileProjectVersion>
     <MileProjectVersionTag Condition="false">Alpha 1</MileProjectVersionTag>
