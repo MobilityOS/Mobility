@@ -1,0 +1,36 @@
+﻿{
+  "NanaBox": {
+    "ComPorts": {
+      "ComPort1": "\\\\.\\pipe\\Mobility.TestVM.ComPortPipe.1",
+      "ComPort2": "\\\\.\\pipe\\Mobility.TestVM.ComPortPipe.2",
+      "UefiConsole": "ComPort1"
+    },
+    "Gpu": {
+      "AssignmentMode": "Disabled"
+    },
+    "GuestStateFile": "Mobility.TestVM.vmgs",
+    "GuestType": "Windows",
+    "MemorySize": 32,
+    "Name": "Mobility.TestVM",
+    "NetworkAdapters": [
+      {
+        "Connected": true,
+        "EndpointId": "edbece97-5241-4a75-88d2-47b6c8f1b5c6",
+        "MacAddress": "00-15-5D-05-F9-FB"
+      }
+    ],
+    "ProcessorCount": 1,
+    "RuntimeStateFile": "Mobility.TestVM.vmrs",
+    "ScsiDevices": [
+      {
+        "Type": "VirtualImage"
+      },
+      {
+        "Path": "Mobility.TestVM.vhd",
+        "Type": "VirtualDisk"
+      }
+    ],
+    "Type": "VirtualMachine",
+    "Version": 1
+  }
+}
