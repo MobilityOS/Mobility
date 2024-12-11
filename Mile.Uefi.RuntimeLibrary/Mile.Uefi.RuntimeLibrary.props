@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PROJECT:   Mouri Internal Library Essentials
+  FILE:      Mile.Uefi.RuntimeLibrary.props
+  PURPOSE:   Property sheet for UEFI Runtime Library project
+
+  LICENSE:   The MIT License
+
+  DEVELOPER: Mouri_Naruto (Mouri_Naruto AT Outlook.com)
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <IncludePath>$(MSBuildThisFileDirectory)Include\$(UefiPlatform)\;$(IncludePath)</IncludePath>
+    <IncludePath>$(MSBuildThisFileDirectory)Include\crt\;$(IncludePath)</IncludePath>
+    <IncludePath>$(MSBuildThisFileDirectory)Include\shared\;$(IncludePath)</IncludePath>
+    <IncludePath>$(MSBuildThisFileDirectory)Include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildThisFileDirectory)Source\$(UefiPlatform)\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>UefiCrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="'$(Platform)'=='Win32'">
+      <AdditionalDependencies>ftol.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ftol2.obj;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="MileUefiRuntimeLibraryBuildSource" BeforeTargets="BeforeClCompile">
+    <ItemGroup>
+      <ClCompile Include="$(MSBuildThisFileDirectory)Source\msvc_support.c" />   
+    </ItemGroup>
+  </Target>
+</Project>
