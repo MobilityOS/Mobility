@@ -8,10 +8,10 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+#include <Mile.Project.Version.h>
+
 #include <Uefi.h>
 #include <Protocol/GraphicsOutput.h>
-
-#include <Mile.Project.Version.h>
 
 #include <Mile.HyperV.VMBus.h>
 
@@ -91,6 +91,37 @@ extern "C" bool MoHvCheckAvailability()
     }
 
     return true;
+}
+
+/**
+ * @brief Calculates the 8-bit sum for the requested region.
+ * @param Buffer Pointer to buffer containing byte data of component.
+ * @param Size Size of the buffer.
+ * @return The 8-bit checksum value needed.
+ */
+extern "C" uint8_t MoCalculateSum8(
+    _In_ uint8_t* Buffer,
+    _In_ size_t Size)
+{
+    uint8_t Result = 0;
+    for (size_t i = 0; i < Size; ++i)
+    {
+        Result += Buffer[i];
+    }
+    return Result;
+}
+
+/**
+ * @brief Calculates the value needed for a valid 8-bit checksum.
+ * @param Buffer Pointer to buffer containing byte data of component.
+ * @param Size Size of the buffer.
+ * @return The 8-bit checksum value needed.
+ */
+extern "C" uint8_t MoCalculateChecksum8(
+    _In_ uint8_t* Buffer,
+    _In_ size_t Size)
+{
+    return static_cast<uint8_t>(0x100 - ::MoCalculateSum8(Buffer, Size));
 }
 
 #define MOBILITY_HVGCS_VERSION_STRING \
