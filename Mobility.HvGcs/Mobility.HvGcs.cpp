@@ -11,7 +11,6 @@
 #include <Mile.Project.Version.h>
 
 #include <Uefi.h>
-#include <Protocol/GraphicsOutput.h>
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
 #include <IndustryStandard/Acpi30.h>
@@ -308,7 +307,8 @@ EFI_STATUS EFIAPI UefiMain(
     {
         ::OutputWideString(
             SystemTable->ConOut,
-            L"Yolo!\r\n");
+            L"Hyper-V Generation 2 Virtual Machine detected, "
+            L"starting to patch ACPI description tables...\r\n");
 
         MO_ACPI_DESCRIPTION_TABLES DescriptionTables;
         ::MoAcpiGetDescriptionTables(SystemTable, &DescriptionTables);
@@ -321,12 +321,10 @@ EFI_STATUS EFIAPI UefiMain(
                 ::MoCalculateChecksum8(
                     reinterpret_cast<uint8_t*>(DescriptionTables.MadtHeader),
                     DescriptionTables.MadtHeader->Header.Length);
-            /*if (!(EFI_ACPI_2_0_PCAT_COMPAT & DescriptionTables.MadtHeader->Flags))
-            {
-                ::OutputWideString(
-                    SystemTable->ConOut,
-                    L"Not Yolo!\r\n");
-            }*/
+
+            ::OutputWideString(
+                SystemTable->ConOut,
+                L"ACPI MADT PC-AT Compatibility flags bit is applied.\r\n");
         }
 
         if (DescriptionTables.Fadt)
@@ -338,6 +336,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Pm1aEvtBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1aEvtBlk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Pm1aEvtBlk workaround is applied.\r\n");
                 }
             }
 
@@ -348,6 +350,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Pm1bEvtBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1bEvtBlk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Pm1bEvtBlk workaround is applied.\r\n");
                 }
             }
 
@@ -358,6 +364,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Pm1aCntBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1aCntBlk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Pm1aCntBlk workaround is applied.\r\n");
                 }
             }
 
@@ -368,6 +378,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Pm1bCntBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1bCntBlk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Pm1bCntBlk workaround is applied.\r\n");
                 }
             }
 
@@ -378,6 +392,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Pm2CntBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm2CntBlk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Pm2CntBlk workaround is applied.\r\n");
                 }
             }
 
@@ -388,6 +406,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->PmTmrBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPmTmrBlk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT PmTmrBlk workaround is applied.\r\n");
                 }
             }
 
@@ -398,6 +420,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Gpe0Blk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XGpe0Blk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Gpe0Blk workaround is applied.\r\n");
                 }
             }
 
@@ -408,6 +434,10 @@ EFI_STATUS EFIAPI UefiMain(
                 {
                     DescriptionTables.Fadt->Gpe1Blk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XGpe1Blk.Address);
+
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"ACPI FADT Gpe1Blk workaround is applied.\r\n");
                 }
             }
 
@@ -436,11 +466,6 @@ EFI_STATUS EFIAPI UefiMain(
                     AddressBase |= CandidateItem->AddressBaseLow;
                     if (AddressBase >= 0x20000000000ULL)
                     {
-                        /*CandidateItem->ProximityDomain = 0;
-                        CandidateItem->AddressBaseLow = 0;
-                        CandidateItem->AddressBaseHigh = 0;
-                        CandidateItem->LengthLow = 0;
-                        CandidateItem->LengthHigh = 0;*/
                         CandidateItem->Flags = 0;
                     }
                 }
@@ -448,34 +473,21 @@ EFI_STATUS EFIAPI UefiMain(
                 CurrentSratItemEntry += CandidateItem->Length;
             }
 
-            //DescriptionTables.SratHeader->Header.Length = ProcessedSize;
             DescriptionTables.SratHeader->Header.Checksum = 0;
             DescriptionTables.SratHeader->Header.Checksum =
                 ::MoCalculateChecksum8(
                     reinterpret_cast<uint8_t*>(DescriptionTables.SratHeader),
                     DescriptionTables.SratHeader->Header.Length);
+
+            ::OutputWideString(
+                SystemTable->ConOut,
+                L"ACPI SRAT workaround is applied.\r\n");
         }
+
+        ::OutputWideString(
+            SystemTable->ConOut,
+            L"All needed ACPI description tables are patched.\r\n");
     }
-
-    ::OutputWideString(
-        SystemTable->ConOut,
-        L"Patched!\r\n");
-
-    /*::OutputWideString(
-        SystemTable->ConOut,
-        L"Hello World!\r\n");
-
-    ::OutputWideString(
-        SystemTable->ConOut,
-        L"\r\n"
-        L"Press any key to return to the boot menu...\r\n");
-    {
-        UINTN Index = 0;
-        SystemTable->BootServices->WaitForEvent(
-            1,
-            &SystemTable->ConIn->WaitForKey,
-            &Index);
-    }*/
 
     return EFI_SUCCESS;
 }
