@@ -417,6 +417,44 @@ EFI_STATUS EFIAPI UefiMain(
                     reinterpret_cast<uint8_t*>(DescriptionTables.Fadt),
                     DescriptionTables.Fadt->Header.Length);
         }
+
+        if (DescriptionTables.SratHeader)
+        {
+            uint8_t* CurrentSratItemEntry = reinterpret_cast<uint8_t*>(
+                &DescriptionTables.SratHeader[1]);
+            uint32_t ProcessedSize =
+                sizeof(EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER);
+            while (ProcessedSize < DescriptionTables.SratHeader->Header.Length)
+            {
+                EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE* CandidateItem =
+                    reinterpret_cast<EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE*>(
+                        CurrentSratItemEntry);
+                if (EFI_ACPI_3_0_MEMORY_AFFINITY == CandidateItem->Type)
+                {
+                    uint64_t AddressBase = CandidateItem->AddressBaseHigh;
+                    AddressBase <<= 32;
+                    AddressBase |= CandidateItem->AddressBaseLow;
+                    if (AddressBase >= 0x20000000000ULL)
+                    {
+                        /*CandidateItem->ProximityDomain = 0;
+                        CandidateItem->AddressBaseLow = 0;
+                        CandidateItem->AddressBaseHigh = 0;
+                        CandidateItem->LengthLow = 0;
+                        CandidateItem->LengthHigh = 0;*/
+                        CandidateItem->Flags = 0;
+                    }
+                }
+                ProcessedSize += CandidateItem->Length;
+                CurrentSratItemEntry += CandidateItem->Length;
+            }
+
+            //DescriptionTables.SratHeader->Header.Length = ProcessedSize;
+            DescriptionTables.SratHeader->Header.Checksum = 0;
+            DescriptionTables.SratHeader->Header.Checksum =
+                ::MoCalculateChecksum8(
+                    reinterpret_cast<uint8_t*>(DescriptionTables.SratHeader),
+                    DescriptionTables.SratHeader->Header.Length);
+        }
     }
 
     ::OutputWideString(
