@@ -304,16 +304,115 @@ EFI_STATUS EFIAPI UefiMain(
 
         if (DescriptionTables.MadtHeader)
         {
-            if (!(EFI_ACPI_2_0_PCAT_COMPAT & DescriptionTables.MadtHeader->Flags))
+            DescriptionTables.MadtHeader->Flags |= EFI_ACPI_2_0_PCAT_COMPAT;
+            DescriptionTables.MadtHeader->Header.Checksum = 0;
+            DescriptionTables.MadtHeader->Header.Checksum =
+                ::MoCalculateChecksum8(
+                    reinterpret_cast<uint8_t*>(DescriptionTables.MadtHeader),
+                    DescriptionTables.MadtHeader->Header.Length);
+            /*if (!(EFI_ACPI_2_0_PCAT_COMPAT & DescriptionTables.MadtHeader->Flags))
             {
                 ::OutputWideString(
                     SystemTable->ConOut,
                     L"Not Yolo!\r\n");
+            }*/
+        }
+
+        if (DescriptionTables.Fadt)
+        {
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XPm1aEvtBlk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Pm1aEvtBlk)
+                {
+                    DescriptionTables.Fadt->Pm1aEvtBlk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XPm1aEvtBlk.Address);
+                }
             }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XPm1bEvtBlk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Pm1bEvtBlk)
+                {
+                    DescriptionTables.Fadt->Pm1bEvtBlk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XPm1bEvtBlk.Address);
+                }
+            }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XPm1aCntBlk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Pm1aCntBlk)
+                {
+                    DescriptionTables.Fadt->Pm1aCntBlk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XPm1aCntBlk.Address);
+                }
+            }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XPm1bCntBlk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Pm1bCntBlk)
+                {
+                    DescriptionTables.Fadt->Pm1bCntBlk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XPm1bCntBlk.Address);
+                }
+            }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XPm2CntBlk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Pm2CntBlk)
+                {
+                    DescriptionTables.Fadt->Pm2CntBlk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XPm2CntBlk.Address);
+                }
+            }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XPmTmrBlk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->PmTmrBlk)
+                {
+                    DescriptionTables.Fadt->PmTmrBlk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XPmTmrBlk.Address);
+                }
+            }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XGpe0Blk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Gpe0Blk)
+                {
+                    DescriptionTables.Fadt->Gpe0Blk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XGpe0Blk.Address);
+                }
+            }
+
+            if (EFI_ACPI_2_0_SYSTEM_IO
+                == DescriptionTables.Fadt->XGpe1Blk.AddressSpaceId)
+            {
+                if (!DescriptionTables.Fadt->Gpe1Blk)
+                {
+                    DescriptionTables.Fadt->Gpe1Blk = static_cast<UINT32>(
+                        DescriptionTables.Fadt->XGpe1Blk.Address);
+                }
+            }
+
+            DescriptionTables.Fadt->Header.Checksum = 0;
+            DescriptionTables.Fadt->Header.Checksum =
+                ::MoCalculateChecksum8(
+                    reinterpret_cast<uint8_t*>(DescriptionTables.Fadt),
+                    DescriptionTables.Fadt->Header.Length);
         }
     }
 
     ::OutputWideString(
+        SystemTable->ConOut,
+        L"Patched!\r\n");
+
+    /*::OutputWideString(
         SystemTable->ConOut,
         L"Hello World!\r\n");
 
@@ -327,7 +426,7 @@ EFI_STATUS EFIAPI UefiMain(
             1,
             &SystemTable->ConIn->WaitForKey,
             &Index);
-    }
+    }*/
 
     return EFI_SUCCESS;
 }
