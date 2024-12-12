@@ -14,6 +14,7 @@
 #include <Protocol/GraphicsOutput.h>
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
+#include <IndustryStandard/Acpi30.h>
 
 #include <Mile.HyperV.VMBus.h>
 
@@ -131,6 +132,7 @@ typedef struct _MO_ACPI_DESCRIPTION_TABLES
     EFI_ACPI_DESCRIPTION_HEADER* XsdtHeader;
     EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER* MadtHeader;
     EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE* Fadt;
+    EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER* SratHeader;
 } MO_ACPI_DESCRIPTION_TABLES, *PMO_ACPI_DESCRIPTION_TABLES;
 
 /**
@@ -249,6 +251,15 @@ extern "C" void MoAcpiGetDescriptionTables(
             {
                 DescriptionTables->Fadt =
                     reinterpret_cast<EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE*>(
+                        EntryCandidate);
+            }
+            break;
+        case EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE:
+            if (EntryCandidate->Revision
+                >= EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION)
+            {
+                DescriptionTables->SratHeader =
+                    reinterpret_cast<EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER*>(
                         EntryCandidate);
             }
             break;
