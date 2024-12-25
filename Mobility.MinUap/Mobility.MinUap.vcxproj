@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A158BB1B-480D-4622-B0F1-517D8F366BC1}</ProjectGuid>
+    <RootNamespace>Mobility.MinUap</RootNamespace>
+    <MileProjectType>UefiApplication</MileProjectType>
+    <TargetName>MoMinUap</TargetName>
+    <MileProjectUseProjectProperties>true</MileProjectUseProjectProperties>
+    <MileProjectCompanyName>Mobility</MileProjectCompanyName>
+    <MileProjectFileDescription>Mobility Minimum UEFI Application Project</MileProjectFileDescription>
+    <MileProjectInternalName>Mobility.MinUap</MileProjectInternalName>
+    <MileProjectLegalCopyright>© Kenji Mouri. All rights reserved.</MileProjectLegalCopyright>
+    <MileProjectOriginalFilename>MoMinUap.efi</MileProjectOriginalFilename>
+    <MileProjectProductName>Mobility</MileProjectProductName>
+    <MileProjectVersion>1.0.$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse('2024-11-04'))).TotalDays).0</MileProjectVersion>
+    <MileProjectVersionTag Condition="false">Alpha 1</MileProjectVersionTag>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Platform.ARM64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.props" />
+  <Import Project="..\Mile.Uefi\Mile.Uefi.props" />
+  <ItemGroup>
+    <ClCompile Include="Mobility.MinUap.cpp" />
+  </ItemGroup>
+  <Import Project="..\Mile.Uefi\Mile.Uefi.targets" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.targets" />
+</Project>
