@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{049B9A7F-7074-41FB-8779-FBEBEDD302F6}</ProjectGuid>
+    <RootNamespace>Mobility.OneCent</RootNamespace>
+    <MileProjectType>UefiApplication</MileProjectType>
+    <TargetName>MoOcKrnl</TargetName>
+    <MileProjectUseProjectProperties>true</MileProjectUseProjectProperties>
+    <MileProjectCompanyName>Mobility</MileProjectCompanyName>
+    <MileProjectFileDescription>Mobility OneCent</MileProjectFileDescription>
+    <MileProjectInternalName>Mobility.OneCent</MileProjectInternalName>
+    <MileProjectLegalCopyright>© Kenji Mouri. All rights reserved.</MileProjectLegalCopyright>
+    <MileProjectOriginalFilename>MoOcKrnl.efi</MileProjectOriginalFilename>
+    <MileProjectProductName>Mobility</MileProjectProductName>
+    <MileProjectVersion>1.0.$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse('2024-11-04'))).TotalDays).0</MileProjectVersion>
+    <MileProjectVersionTag Condition="false">Alpha 1</MileProjectVersionTag>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.props" />
+  <Import Project="..\Mile.Uefi\Mile.Uefi.props" />
+  <ItemGroup>
+    <ClCompile Include="Mobility.OneCent.cpp" />
+  </ItemGroup>
+  <Import Project="..\Mile.Uefi\Mile.Uefi.targets" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.targets" />
+</Project>

@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.HvGcs", "Mobility.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.MinUap", "Mobility.MinUap\Mobility.MinUap.vcxproj", "{A158BB1B-480D-4622-B0F1-517D8F366BC1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.OneCent", "Mobility.OneCent\Mobility.OneCent.vcxproj", "{049B9A7F-7074-41FB-8779-FBEBEDD302F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -29,6 +31,12 @@ Global
 		{A158BB1B-480D-4622-B0F1-517D8F366BC1}.Release|ARM64.Build.0 = Release|ARM64
 		{A158BB1B-480D-4622-B0F1-517D8F366BC1}.Release|x64.ActiveCfg = Release|x64
 		{A158BB1B-480D-4622-B0F1-517D8F366BC1}.Release|x64.Build.0 = Release|x64
+		{049B9A7F-7074-41FB-8779-FBEBEDD302F6}.Debug|ARM64.ActiveCfg = Debug|x64
+		{049B9A7F-7074-41FB-8779-FBEBEDD302F6}.Debug|x64.ActiveCfg = Debug|x64
+		{049B9A7F-7074-41FB-8779-FBEBEDD302F6}.Debug|x64.Build.0 = Debug|x64
+		{049B9A7F-7074-41FB-8779-FBEBEDD302F6}.Release|ARM64.ActiveCfg = Release|x64
+		{049B9A7F-7074-41FB-8779-FBEBEDD302F6}.Release|x64.ActiveCfg = Release|x64
+		{049B9A7F-7074-41FB-8779-FBEBEDD302F6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
