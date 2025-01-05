@@ -48,10 +48,6 @@ extern "C" {
 #ifndef _CRT_MEMORY_DEFINED
 #define _CRT_MEMORY_DEFINED
 
-#if defined(_KERNEL_MODE) && defined(__SANITIZE_ADDRESS__)
-#define memcmp          AsanWrapperMemcmp
-#endif
-
 _CRTIMP void *  __cdecl _memccpy( _Out_writes_bytes_opt_(_MaxCount) void * _Dst, _In_ const void * _Src, _In_ int _Val, _In_ size_t _MaxCount);
 _Must_inspect_result_ _CRTIMP _CONST_RETURN void *  __cdecl memchr( _In_reads_bytes_opt_(_MaxCount) const void * _Buf , _In_ int _Val, _In_ size_t _MaxCount);
 _Must_inspect_result_ _CRTIMP int     __cdecl _memicmp(_In_reads_bytes_opt_(_Size) const void * _Buf1, _In_reads_bytes_opt_(_Size) const void * _Buf2, _In_ size_t _Size);
@@ -66,6 +62,8 @@ _CRTIMP_ALT errno_t  __ALTDECL memcpy_s(_Out_writes_bytes_to_opt_(_DstSize, _Max
 #endif
 #if defined(_M_ARM) || defined(_M_ARM64)
 void _memcpy_strict_align(_Out_writes_bytes_all_(_MaxCount) void * _Dst, _In_reads_bytes_(_MaxCount) const void * _Src, _In_ size_t _MaxCount);
+_Must_inspect_result_ int __cdecl _memcmp_strict_align(_In_reads_bytes_(_Size) const void * _Buf1, _In_reads_bytes_(_Size) const void * _Buf2, _In_ size_t _Size);
+void *  __cdecl _memset_strict_align(_Out_writes_bytes_all_(_Size) void * _Dst, _In_ int _Val, _In_ size_t _Size);
 #endif
 
 _Post_equal_to_(_Dst)

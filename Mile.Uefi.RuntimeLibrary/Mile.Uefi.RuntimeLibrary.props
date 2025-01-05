@@ -10,24 +10,14 @@
 -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <IncludePath>$(MSBuildThisFileDirectory)Include\$(UefiPlatform)\;$(IncludePath)</IncludePath>
     <IncludePath>$(MSBuildThisFileDirectory)Include\crt\;$(IncludePath)</IncludePath>
     <IncludePath>$(MSBuildThisFileDirectory)Include\shared\;$(IncludePath)</IncludePath>
     <IncludePath>$(MSBuildThisFileDirectory)Include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildThisFileDirectory)Source\$(UefiPlatform)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(MSBuildThisFileDirectory)Source\$(PlatformShortName)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>UefiCrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <Link Condition="'$(Platform)'=='Win32'">
-      <AdditionalDependencies>ftol.obj;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies>ftol2.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Mile.NtCrt.Uefi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <Target Name="MileUefiRuntimeLibraryBuildSource" BeforeTargets="BeforeClCompile">
-    <ItemGroup>
-      <ClCompile Include="$(MSBuildThisFileDirectory)Source\msvc_support.c" />   
-    </ItemGroup>
-  </Target>
 </Project>
