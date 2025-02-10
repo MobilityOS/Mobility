@@ -46,3 +46,5 @@ Work In Progress
   developers do the Web-based development scenarios. Also, WebAssembly is
   broadly used in Cloud (FaaS) and IoT (Embedded), which matches the designed
   scenario for him.
+- Kenji Mouri also wants to use this project as the external extension
+  infrastructure in NanaZip and AptxZip (NanaZip for POSIX).
