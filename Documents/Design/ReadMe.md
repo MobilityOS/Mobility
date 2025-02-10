@@ -48,3 +48,12 @@ Work In Progress
   scenario for him.
 - Kenji Mouri also wants to use this project as the external extension
   infrastructure in NanaZip and AptxZip (NanaZip for POSIX).
+
+## Why Mobility also has a bare-metal legacy x86-32 emulator flavor?
+
+- Kenji Mouri hopes to have an immersive experience for legacy x86-32 operating
+  systems on modern hardware with the UEFI Class 3 firmware.
+- Kenji Mouri hopes to push the limits for ultra-lightweight emulators.
+- Kenji Mouri hopes to provide a fallback solution that can make hardware
+  vendors reduce legacy things easier and more reasonably, which he thinks can
+  help the industry.
