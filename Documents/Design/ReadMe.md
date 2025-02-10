@@ -19,8 +19,9 @@ Work In Progress
   third-party lightweight XAML-based out-of-box-experience oriented Hyper-V
   virtualization software based on Host Compute System API, Remote Desktop
   ActiveX control, and XAML Islands.
-- Kenji Mouri wants to write a technical book about the Hyper-V guest
-  interfaces, which needs a comprehensive, practical bare-metal example.
+- Kenji Mouri plans to write a technical book about the Hyper-V guest
+  interfaces in the recent years, which needs a comprehensive, practical
+  bare-metal example.
 - Kenji Mouri is also a proud Microsoft MVP, he needs some Microsoft-related
   community contributions to help him continue to be in this role in the next
   years.
