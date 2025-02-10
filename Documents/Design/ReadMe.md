@@ -22,6 +22,7 @@ Work In Progress
 - Kenji Mouri plans to write a technical book about the Hyper-V guest
   interfaces in the recent years, which needs a comprehensive, practical
   bare-metal example.
+- Kenji Mouri has already made an out-of-box UEFI SDK for Visual Studio.
 - Kenji Mouri is also a proud Microsoft MVP, he needs some Microsoft-related
   community contributions to help him continue to be in this role in the next
   years.
