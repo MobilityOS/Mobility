@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{049B9A7F-7074-41FB-8779-FBEBEDD302F6}</ProjectGuid>
@@ -19,6 +19,7 @@
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.Default.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.props" />
   <Import Project="..\Mile.Uefi\Mile.Uefi.props" />
+  <Import Project="..\Mile.Uefi.RuntimeLibrary\Mile.Uefi.RuntimeLibrary.props" />
   <ItemGroup>
     <ClCompile Include="Mobility.OneCent.cpp" />
   </ItemGroup>
