@@ -8,17 +8,12 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
+#include <Mile.Mobility.Portable.Types.h>
+
 #include <Mile.Project.Version.h>
 
 #include <Uefi.h>
-
-#ifndef _In_
-#define _In_
-#endif // !_In_
-
-#ifndef _Out_
-#define _Out_
-#endif // !_Out_
 
 #define MOBILITY_RETROVISOR_VERSION_STRING \
     MILE_PROJECT_VERSION_STRING L" (Build " \

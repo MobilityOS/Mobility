@@ -8,6 +8,8 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+#include <Mile.Mobility.Portable.Types.h>
+
 #include <Mile.Project.Version.h>
 
 #include <Uefi.h>
