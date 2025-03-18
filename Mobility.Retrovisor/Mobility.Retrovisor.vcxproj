@@ -22,6 +22,11 @@
   <ItemGroup>
     <ClCompile Include="Mobility.Retrovisor.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mile.Mobility">
+      <Version>1.0.135</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="..\Mile.Uefi\Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.targets" />
 </Project>
