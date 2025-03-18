@@ -11,7 +11,7 @@
 #define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
-static const MO_UINT8 MobilityConsoleLaffStdGlyphs[] =
+EXTERN_C CONST MO_UINT8 MoConsoleLaffStdGlyphs[] =
 {
     /* Unicode glyphs from 0x20 to 0x7e are the same as ASCII characters 0x20 to 0x7e */
 
