@@ -21,7 +21,7 @@
   <Import Project="..\Mile.Uefi\Mile.Uefi.props" />
   <Import Project="..\Mile.Uefi.RuntimeLibrary\Mile.Uefi.RuntimeLibrary.props" />
   <ItemGroup>
-    <ClCompile Include="Mobility.Console.LaffStd.c" />
+    <ClCompile Include="Mobility.BitmapFont.LaffStd.c" />
     <ClCompile Include="Mobility.OneCent.cpp" />
   </ItemGroup>
   <ItemGroup>

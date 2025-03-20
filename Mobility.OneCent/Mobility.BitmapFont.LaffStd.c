@@ -1,6 +1,6 @@
 ﻿/*
  * PROJECT:   Mobility
- * FILE:      Mobility.Console.LaffStd.c
+ * FILE:      Mobility.BitmapFont.LaffStd.c
  * PURPOSE:   Implementation for LaffStd, the UEFI console default font
  *
  * LICENSE:   The MIT License
