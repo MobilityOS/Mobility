@@ -14,7 +14,7 @@
 /**
  * @brief The LaffStd 8x19 font glyph data.
  */
-EXTERN_C CONST MO_UINT8 MoConsoleLaffStdGlyphs[] =
+static MO_UINT8 LaffStdGlyphs[] =
 {
     /* Basic Latin (ASCII) (U+0020 to U+007E) */
 
@@ -1006,3 +1006,155 @@ EXTERN_C CONST MO_UINT8 MoConsoleLaffStdGlyphs[] =
     0x3E, 0xFE, 0x3E, 0x1E, 0x0E, 0x06, 0x00, 0x00,
     0x00, 0x00, 0x00,
 };
+
+#define LAFFSTD_WIDTH 8
+#define LAFFSTD_HEIGHT 19
+
+#define LAFFSTD_BASIC_LATIN_GLYPH_COUNT 95
+#define LAFFSTD_BASIC_LATIN_START 0x0020
+#define LAFFSTD_BASIC_LATIN_END 0x007E
+
+#define LAFFSTD_LATIN_1_SUPPLEMENT_GLYPH_COUNT 96
+#define LAFFSTD_LATIN_1_SUPPLEMENT_START 0x00A0
+#define LAFFSTD_LATIN_1_SUPPLEMENT_END 0x00FF
+
+#define LAFFSTD_ARROWS_GLYPH_COUNT 4
+#define LAFFSTD_ARROWS_START 0x2190
+#define LAFFSTD_ARROWS_END 0x2193
+
+#define LAFFSTD_BOX_DRAWING_GLYPH_COUNT 11
+#define LAFFSTD_BOX_DRAWING_START 0x2500
+#define LAFFSTD_BOX_DRAWING_END 0x253C
+
+#define LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_COUNT 29
+#define LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_START 0x2550
+#define LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_END 0x256C
+
+#define LAFFSTD_BLOCK_ELEMENTS_GLYPH_COUNT 3
+
+#define LAFFSTD_GEOMETRIC_SHAPES_GLYPH_COUNT 4
+
+#define LAFFSTD_GLYPH_END 0x25C4
+
+EXTERN_C MO_UINT8 MoBitmapFontLaffStdGetWidth()
+{
+    return LAFFSTD_WIDTH;
+}
+
+EXTERN_C MO_UINT8 MoBitmapFontLaffStdGetHeight()
+{
+    return LAFFSTD_HEIGHT;
+}
+
+EXTERN_C CONST PMO_UINT8 MoBitmapFontLaffStdQueryGlyph(
+    _In_ MO_WIDE_CHAR Character)
+{
+    if (Character > LAFFSTD_GLYPH_END)
+    {
+        return nullptr;
+    }
+
+    MO_UINTN BaseOffset = 0;
+
+    if (Character < LAFFSTD_BASIC_LATIN_START)
+    {
+        return nullptr;
+    }
+    if (Character < LAFFSTD_BASIC_LATIN_END + 1)
+    {
+        MO_UINTN Index = Character - LAFFSTD_BASIC_LATIN_START;
+        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
+    }
+    BaseOffset += LAFFSTD_BASIC_LATIN_GLYPH_COUNT;
+
+    if (Character < LAFFSTD_LATIN_1_SUPPLEMENT_START)
+    {
+        return nullptr;
+    }
+    if (Character < LAFFSTD_LATIN_1_SUPPLEMENT_END + 1)
+    {
+        MO_UINTN Index = Character - LAFFSTD_LATIN_1_SUPPLEMENT_START;
+        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
+    }
+    BaseOffset += LAFFSTD_LATIN_1_SUPPLEMENT_GLYPH_COUNT;
+
+    if (Character < LAFFSTD_ARROWS_START)
+    {
+        return nullptr;
+    }
+    if (Character < LAFFSTD_ARROWS_END + 1)
+    {
+        MO_UINTN Index = Character - LAFFSTD_ARROWS_START;
+        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
+    }
+    BaseOffset += LAFFSTD_ARROWS_GLYPH_COUNT;
+
+    if (Character < LAFFSTD_BOX_DRAWING_START)
+    {
+        return nullptr;
+    }
+    if (Character < LAFFSTD_BOX_DRAWING_END + 1)
+    {
+        switch (Character)
+        {
+        case 0x2500:
+            return &LaffStdGlyphs[(BaseOffset + 0) * LAFFSTD_HEIGHT];
+        case 0x2502:
+            return &LaffStdGlyphs[(BaseOffset + 1) * LAFFSTD_HEIGHT];
+        case 0x250C:
+            return &LaffStdGlyphs[(BaseOffset + 2) * LAFFSTD_HEIGHT];
+        case 0x2510:
+            return &LaffStdGlyphs[(BaseOffset + 3) * LAFFSTD_HEIGHT];
+        case 0x2514:
+            return &LaffStdGlyphs[(BaseOffset + 4) * LAFFSTD_HEIGHT];
+        case 0x2518:
+            return &LaffStdGlyphs[(BaseOffset + 5) * LAFFSTD_HEIGHT];
+        case 0x251C:
+            return &LaffStdGlyphs[(BaseOffset + 6) * LAFFSTD_HEIGHT];
+        case 0x2524:
+            return &LaffStdGlyphs[(BaseOffset + 7) * LAFFSTD_HEIGHT];
+        case 0x252C:
+            return &LaffStdGlyphs[(BaseOffset + 8) * LAFFSTD_HEIGHT];
+        case 0x2534:
+            return &LaffStdGlyphs[(BaseOffset + 9) * LAFFSTD_HEIGHT];
+        case 0x253C:
+            return &LaffStdGlyphs[(BaseOffset + 10) * LAFFSTD_HEIGHT];
+        default:
+            return nullptr;
+        }
+    }
+    BaseOffset += LAFFSTD_BOX_DRAWING_GLYPH_COUNT;
+
+    if (Character < LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_START)
+    {
+        return nullptr;
+    }
+    if (Character < LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_END + 1)
+    {
+        MO_UINTN Index = Character - LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_START;
+        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
+    }
+    BaseOffset += LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_COUNT;
+
+    switch (Character)
+    {
+    case 0x2581:
+        return &LaffStdGlyphs[(BaseOffset + 0) * LAFFSTD_HEIGHT];
+    case 0x2588:
+        return &LaffStdGlyphs[(BaseOffset + 1) * LAFFSTD_HEIGHT];
+    case 0x2591:
+        return &LaffStdGlyphs[(BaseOffset + 2) * LAFFSTD_HEIGHT];
+    case 0x25B2:
+        return &LaffStdGlyphs[(BaseOffset + 3) * LAFFSTD_HEIGHT];
+    case 0x25BA:
+        return &LaffStdGlyphs[(BaseOffset + 4) * LAFFSTD_HEIGHT];
+    case 0x25BC:
+        return &LaffStdGlyphs[(BaseOffset + 5) * LAFFSTD_HEIGHT];
+    case 0x25C4:
+        return &LaffStdGlyphs[(BaseOffset + 6) * LAFFSTD_HEIGHT];
+    default:
+        break;
+    }
+
+    return nullptr;
+}
