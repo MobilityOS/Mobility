@@ -11,6 +11,8 @@
 #define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
+#include "Mobility.BitmapFont.LaffStd.h"
+
 #include <Mile.Project.Version.h>
 
 #undef NULL

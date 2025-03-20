@@ -29,6 +29,9 @@
       <Version>1.0.137</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
+  </ItemGroup>
   <Import Project="..\Mile.Uefi\Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.targets" />
 </Project>
