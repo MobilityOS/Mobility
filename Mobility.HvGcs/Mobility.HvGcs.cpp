@@ -12,6 +12,7 @@
 
 #include <Mile.Project.Version.h>
 
+#undef NULL
 #include <Uefi.h>
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>

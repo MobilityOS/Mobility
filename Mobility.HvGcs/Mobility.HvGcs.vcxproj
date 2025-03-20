@@ -28,7 +28,7 @@
       <Version>1.1.419</Version>
     </PackageReference>
     <PackageReference Include="Mile.Mobility">
-      <Version>1.0.136</Version>
+      <Version>1.0.137</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="..\Mile.Uefi\Mile.Uefi.targets" />

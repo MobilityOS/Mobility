@@ -13,6 +13,7 @@
 
 #include <Mile.Project.Version.h>
 
+#undef NULL
 #include <Uefi.h>
 
 #define MOBILITY_ONECENT_VERSION_STRING \
