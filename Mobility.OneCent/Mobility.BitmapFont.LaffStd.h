@@ -18,13 +18,13 @@
  * @brief Gets the width of the LaffStd font.
  * @return The width of the LaffStd font.
  */
-EXTERN_C MO_UINT8 MoBitmapFontLaffStdGetWidth();
+EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetWidth();
 
 /**
  * @brief Gets the height of the LaffStd font.
  * @return The height of the LaffStd font.
  */
-EXTERN_C MO_UINT8 MoBitmapFontLaffStdGetHeight();
+EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight();
 
 /**
  * @brief Queries the glyph data of the LaffStd font.
@@ -32,7 +32,7 @@ EXTERN_C MO_UINT8 MoBitmapFontLaffStdGetHeight();
  * @return The glyph data of the LaffStd font. If the character is not found,
  *         the return value is nullptr.
  */
-EXTERN_C CONST PMO_UINT8 MoBitmapFontLaffStdQueryGlyph(
+EXTERN_C CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
     _In_ MO_WIDE_CHAR Character);
 
 #endif // !MOBILITY_BITMAPFONT_LAFFSTD
