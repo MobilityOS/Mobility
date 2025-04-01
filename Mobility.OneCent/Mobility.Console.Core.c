@@ -13,6 +13,59 @@
 #include "Mobility.BitmapFont.LaffStd.h"
 
 /**
+ * @brief Gets the background color from the console color lookup table.
+ * @param ColorLookupTable The console color lookup table you want to query, the
+ *                         caller must ensure the memory address of the lookup
+ *                         table is valid.
+ * @return The background color from the console color lookup table.
+ */
+EXTERN_C MO_UINT32 MOAPI MoConsoleCoreInternalGetBackgroundColor(
+    _In_ MO_CONSOLE_COLORLUT ColorLookupTable)
+{
+    return ColorLookupTable[0][0];
+}
+
+/**
+ * @brief Gets the foreground color from the console color lookup table.
+ * @param ColorLookupTable The console color lookup table you want to query, the
+ *                         caller must ensure the memory address of the lookup
+ *                         table is valid.
+ * @return The foreground color from the console color lookup table.
+ */
+EXTERN_C MO_UINT32 MOAPI MoConsoleCoreInternalGetForegroundColor(
+    _In_ MO_CONSOLE_COLORLUT ColorLookupTable)
+{
+    return ColorLookupTable[8][0];
+}
+
+/**
+ * @brief Updates the color settings in the console color lookup table.
+ *
+ * @param ColorLookupTable The console color lookup table you want to update,
+ *                         the caller must ensure the memory address of the
+ *                         lookup table is valid.
+ * @param BackgroundColor The new background color.
+ * @param ForegroundColor The new foreground color.
+ */
+EXTERN_C VOID MOAPI MoConsoleCoreInternalUpdateColorSettings(
+    _Out_ MO_CONSOLE_COLORLUT ColorLookupTable,
+    _In_ MO_UINT32 BackgroundColor,
+    _In_ MO_UINT32 ForegroundColor)
+{
+    for (MO_UINT8 Index = 0; Index < MO_CONSOLE_COLORLUT_ITEMS; ++Index)
+    {
+        ColorLookupTable[Index][0] =
+            (Index & 0x08) ? ForegroundColor : BackgroundColor;
+        ColorLookupTable[Index][1] =
+            (Index & 0x04) ? ForegroundColor : BackgroundColor;
+        ColorLookupTable[Index][2] =
+            (Index & 0x02) ? ForegroundColor : BackgroundColor;
+        ColorLookupTable[Index][3] =
+            (Index & 0x01) ? ForegroundColor : BackgroundColor;
+    }
+}
+
+/**
  * @brief Draws a character to the frame buffer.
  *
  * @param FrameBuffer The frame buffer to draw.
