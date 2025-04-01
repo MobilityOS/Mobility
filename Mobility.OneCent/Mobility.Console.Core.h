@@ -38,4 +38,18 @@ typedef MO_UINT32 MO_CONSOLE_COLORLUT_ITEM[MO_CONSOLE_COLORLUT_BITS];
  */
 typedef MO_CONSOLE_COLORLUT_ITEM MO_CONSOLE_COLORLUT[MO_CONSOLE_COLORLUT_ITEMS];
 
+/**
+ * @brief Defines the coordinates of the specific character cell in the specific
+ *        console screen buffer. The origin of the coordinate system (0,0) is at
+ *        the top, left cell of the buffer.
+ */
+typedef struct _MO_CONSOLE_COORDINATE
+{
+    MO_UINT16 X;
+    MO_UINT16 Y;
+} MO_CONSOLE_COORDINATE, *PMO_CONSOLE_COORDINATE;
+
+#define MO_CONSOLE_MAKE_COORDINATE(X, Y) \
+    ((MO_CONSOLE_COORDINATE){ X, Y })
+
 #endif // !MOBILITY_CONSOLE_CORE

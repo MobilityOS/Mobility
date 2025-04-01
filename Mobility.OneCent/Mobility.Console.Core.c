@@ -80,19 +80,19 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     _Out_ PMO_UINT32 FrameBuffer,
     _In_ MO_UINT32 HorizontalResolution,
     _In_ MO_UINT32 VerticalResolution,
-    _In_ MO_UINT32 DestinationColumn,
-    _In_ MO_UINT32 DestinationRow,
+    _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
     _In_ MO_WIDE_CHAR Character,
     _In_ MO_CONSOLE_COLORLUT ColorLookupTable)
 {
     MO_UINT8 FontWidth = MoBitmapFontLaffStdGetWidth();
     MO_UINT8 FontHeight = MoBitmapFontLaffStdGetHeight();
 
-    MO_UINT32 MaximumColumn = HorizontalResolution / FontWidth;
-    MO_UINT32 MaximumRow = VerticalResolution / FontHeight;
+    MO_CONSOLE_COORDINATE MaximumSize = MO_CONSOLE_MAKE_COORDINATE(
+        (MO_UINT16)(HorizontalResolution / FontWidth),
+        (MO_UINT16)(VerticalResolution / FontHeight));
 
-    if (DestinationColumn >= MaximumColumn ||
-        DestinationRow >= MaximumRow)
+    if (DestinationCoordinate.X >= MaximumSize.X ||
+        DestinationCoordinate.Y >= MaximumSize.Y)
     {
         return;
     }
@@ -112,8 +112,8 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
         }
     }
 
-    MO_UINT32 ScreenX = DestinationColumn * FontWidth;
-    MO_UINT32 ScreenY = DestinationRow * FontHeight;
+    MO_UINT32 ScreenX = DestinationCoordinate.X * FontWidth;
+    MO_UINT32 ScreenY = DestinationCoordinate.Y * FontHeight;
     for (MO_UINT8 GlyphY = 0; GlyphY < FontHeight; ++GlyphY)
     {
         MO_UINTN Start = ((ScreenY + GlyphY) * HorizontalResolution) + ScreenX;
