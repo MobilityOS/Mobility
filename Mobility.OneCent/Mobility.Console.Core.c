@@ -74,8 +74,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreInternalUpdateColorSettings(
  * @param DestinationColumn The destination character column to draw.
  * @param DestinationRow The destination character row to draw.
  * @param Character The character to draw.
- * @param BackgroundColor The background color of the character.
- * @param ForegroundColor The foreground color of the character.
+ * @param ColorLookupTable The console color lookup table for color settings.
  */
 EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     _Out_ PMO_UINT32 FrameBuffer,
@@ -84,8 +83,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     _In_ MO_UINT32 DestinationColumn,
     _In_ MO_UINT32 DestinationRow,
     _In_ MO_WIDE_CHAR Character,
-    _In_ MO_UINT32 BackgroundColor,
-    _In_ MO_UINT32 ForegroundColor)
+    _In_ MO_CONSOLE_COLORLUT ColorLookupTable)
 {
     MO_UINT8 FontWidth = MoBitmapFontLaffStdGetWidth();
     MO_UINT8 FontHeight = MoBitmapFontLaffStdGetHeight();
@@ -116,17 +114,18 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
 
     MO_UINT32 ScreenX = DestinationColumn * FontWidth;
     MO_UINT32 ScreenY = DestinationRow * FontHeight;
-
     for (MO_UINT8 GlyphY = 0; GlyphY < FontHeight; ++GlyphY)
     {
-        for (MO_UINT8 GlyphX = 0; GlyphX < FontWidth; ++GlyphX)
-        {
-            MO_UINT32 CurrentX = ScreenX + GlyphX;
-            MO_UINT32 CurrentY = ScreenY + GlyphY;
-            FrameBuffer[CurrentY * HorizontalResolution + CurrentX] =
-                (GlyphData[GlyphY] & (1 << (FontWidth - GlyphX - 1)))
-                ? ForegroundColor
-                : BackgroundColor;
-        }
+        MO_UINTN Start = ((ScreenY + GlyphY) * HorizontalResolution) + ScreenX;
+        MO_UINT8 Low = GlyphData[GlyphY] & 0x0F;
+        MO_UINT8 High = (GlyphData[GlyphY] & 0xF0) >> 4;
+        FrameBuffer[Start + 0] = ColorLookupTable[High][0];
+        FrameBuffer[Start + 1] = ColorLookupTable[High][1];
+        FrameBuffer[Start + 2] = ColorLookupTable[High][2];
+        FrameBuffer[Start + 3] = ColorLookupTable[High][3];
+        FrameBuffer[Start + 4] = ColorLookupTable[Low][0];
+        FrameBuffer[Start + 5] = ColorLookupTable[Low][1];
+        FrameBuffer[Start + 6] = ColorLookupTable[Low][2];
+        FrameBuffer[Start + 7] = ColorLookupTable[Low][3];
     }
 }
