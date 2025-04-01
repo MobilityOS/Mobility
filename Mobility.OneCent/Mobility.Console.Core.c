@@ -134,34 +134,34 @@ EXTERN_C VOID MOAPI MoConsoleCoreInternalUpdateColorSettings(
     }
 }
 
-/**
- * @brief Draws a character to the frame buffer.
- *
- * @param FrameBuffer The frame buffer to draw.
- * @param HorizontalResolution The horizontal resolution of the frame buffer.
- * @param VerticalResolution The vertical resolution of the frame buffer.
- * @param DestinationColumn The destination character column to draw.
- * @param DestinationRow The destination character row to draw.
- * @param Character The character to draw.
- * @param ColorLookupTable The console color lookup table for color settings.
- */
 EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     _Out_ PMO_UINT32 FrameBuffer,
     _In_ MO_UINT32 HorizontalResolution,
     _In_ MO_UINT32 VerticalResolution,
+    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
     _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
-    _In_ MO_WIDE_CHAR Character,
-    _In_ MO_CONSOLE_COLORLUT ColorLookupTable)
+    _In_ MO_WIDE_CHAR Character)
 {
+    if (!ConsoleScreenBuffer)
+    {
+        return;
+    }
+
+    if (DestinationCoordinate.X >= ConsoleScreenBuffer->ScreenBufferSize.X ||
+        DestinationCoordinate.Y >= ConsoleScreenBuffer->ScreenBufferSize.Y)
+    {
+        return;
+    }
+
     MO_UINT8 FontWidth = MoBitmapFontLaffStdGetWidth();
     MO_UINT8 FontHeight = MoBitmapFontLaffStdGetHeight();
 
-    MO_CONSOLE_COORDINATE MaximumSize = MO_CONSOLE_MAKE_COORDINATE(
-        (MO_UINT16)(HorizontalResolution / FontWidth),
-        (MO_UINT16)(VerticalResolution / FontHeight));
+    MO_CONSOLE_COORDINATE MaximumScreenBufferSize;
+    MaximumScreenBufferSize.X = (MO_UINT16)(HorizontalResolution / FontWidth);
+    MaximumScreenBufferSize.Y = (MO_UINT16)(VerticalResolution / FontHeight);
 
-    if (DestinationCoordinate.X >= MaximumSize.X ||
-        DestinationCoordinate.Y >= MaximumSize.Y)
+    if (DestinationCoordinate.X >= MaximumScreenBufferSize.X ||
+        DestinationCoordinate.Y >= MaximumScreenBufferSize.Y)
     {
         return;
     }
@@ -188,13 +188,13 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
         MO_UINTN Start = ((ScreenY + GlyphY) * HorizontalResolution) + ScreenX;
         MO_UINT8 Low = GlyphData[GlyphY] & 0x0F;
         MO_UINT8 High = (GlyphData[GlyphY] & 0xF0) >> 4;
-        FrameBuffer[Start + 0] = ColorLookupTable[High][0];
-        FrameBuffer[Start + 1] = ColorLookupTable[High][1];
-        FrameBuffer[Start + 2] = ColorLookupTable[High][2];
-        FrameBuffer[Start + 3] = ColorLookupTable[High][3];
-        FrameBuffer[Start + 4] = ColorLookupTable[Low][0];
-        FrameBuffer[Start + 5] = ColorLookupTable[Low][1];
-        FrameBuffer[Start + 6] = ColorLookupTable[Low][2];
-        FrameBuffer[Start + 7] = ColorLookupTable[Low][3];
+        FrameBuffer[Start + 0] = ConsoleScreenBuffer->ColorLookupTable[High][0];
+        FrameBuffer[Start + 1] = ConsoleScreenBuffer->ColorLookupTable[High][1];
+        FrameBuffer[Start + 2] = ConsoleScreenBuffer->ColorLookupTable[High][2];
+        FrameBuffer[Start + 3] = ConsoleScreenBuffer->ColorLookupTable[High][3];
+        FrameBuffer[Start + 4] = ConsoleScreenBuffer->ColorLookupTable[Low][0];
+        FrameBuffer[Start + 5] = ConsoleScreenBuffer->ColorLookupTable[Low][1];
+        FrameBuffer[Start + 6] = ConsoleScreenBuffer->ColorLookupTable[Low][2];
+        FrameBuffer[Start + 7] = ConsoleScreenBuffer->ColorLookupTable[Low][3];
     }
 }

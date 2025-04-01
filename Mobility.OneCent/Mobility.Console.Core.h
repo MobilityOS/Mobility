@@ -107,7 +107,12 @@ EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
  * @param MaximumRow The maximum row of the console screen buffer.
  * @param BackgroundColor The background color of the console screen buffer.
  * @param ForegroundColor The foreground color of the console screen buffer.
- * @param CharacterBuffer The character buffer of the console screen buffer.
+ * @param CharacterBuffer The character buffer of the console screen buffer. The
+ *                        caller must ensure the memory address of the character
+ *                        buffer is valid with the size which is satisfied with
+ *                        the MaximumColumn and the MaximumRow. Also, the caller
+ *                        must ensure the content in the character buffer is
+ *                        properly initialized.
  */
 EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
     _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
@@ -116,5 +121,24 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
     _In_ MO_UINT32 BackgroundColor,
     _In_ MO_UINT32 ForegroundColor,
     _In_ PMO_WIDE_CHAR CharacterBuffer);
+
+/**
+ * @brief Draws a character to the frame buffer.
+ * @param FrameBuffer The frame buffer to draw.
+ * @param HorizontalResolution The horizontal resolution of the frame buffer.
+ * @param VerticalResolution The vertical resolution of the frame buffer.
+ * @param ConsoleScreenBuffer The console screen buffer you want to draw. This
+ *                            function will do nothing if the memory address of
+ *                            the console screen buffer is invalid.
+ * @param DestinationCoordinate The destination coordinate you want to draw.
+ * @param Character The character to draw.
+ */
+EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
+    _Out_ PMO_UINT32 FrameBuffer,
+    _In_ MO_UINT32 HorizontalResolution,
+    _In_ MO_UINT32 VerticalResolution,
+    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
+    _In_ MO_WIDE_CHAR Character);
 
 #endif // !MOBILITY_CONSOLE_CORE
