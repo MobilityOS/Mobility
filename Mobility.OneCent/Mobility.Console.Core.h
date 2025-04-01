@@ -52,4 +52,15 @@ typedef struct _MO_CONSOLE_COORDINATE
 #define MO_CONSOLE_MAKE_COORDINATE(X, Y) \
     ((MO_CONSOLE_COORDINATE){ X, Y })
 
+/**
+ * @brief Contains the information of the console screen buffer.
+ */
+typedef struct _MO_CONSOLE_SCREEN_BUFFER
+{
+    MO_CONSOLE_COORDINATE ScreenSize;
+    MO_CONSOLE_COORDINATE CursorPosition;
+    MO_CONSOLE_COLORLUT ColorLookupTable;
+    PMO_WIDE_CHAR Buffer;
+} MO_CONSOLE_SCREEN_BUFFER, *PMO_CONSOLE_SCREEN_BUFFER;
+
 #endif // !MOBILITY_CONSOLE_CORE
