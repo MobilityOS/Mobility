@@ -8,8 +8,7 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
-#include <Mile.Mobility.Portable.Types.h>
+#include "Mobility.Console.Core.h"
 
 #include "Mobility.BitmapFont.LaffStd.h"
 
