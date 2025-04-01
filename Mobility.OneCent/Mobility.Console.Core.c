@@ -12,6 +12,51 @@
 
 #include "Mobility.BitmapFont.LaffStd.h"
 
+EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
+    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
+{
+    if (!ConsoleScreenBuffer)
+    {
+        return MO_CONSOLE_DEFAULT_BACKGROUND_COLOR;
+    }
+
+    return ConsoleScreenBuffer->ColorLookupTable[0][0];
+}
+
+EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
+    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
+{
+    if (!ConsoleScreenBuffer)
+    {
+        return MO_CONSOLE_DEFAULT_FOREGROUND_COLOR;
+    }
+
+    return ConsoleScreenBuffer->ColorLookupTable[8][0];
+}
+
+EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
+    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _In_ MO_UINT32 BackgroundColor,
+    _In_ MO_UINT32 ForegroundColor)
+{
+    if (!ConsoleScreenBuffer)
+    {
+        return;
+    }
+
+    for (MO_UINT8 Index = 0; Index < MO_CONSOLE_COLORLUT_ITEMS; ++Index)
+    {
+        ConsoleScreenBuffer->ColorLookupTable[Index][0] =
+            (Index & 0x08) ? ForegroundColor : BackgroundColor;
+        ConsoleScreenBuffer->ColorLookupTable[Index][1] =
+            (Index & 0x04) ? ForegroundColor : BackgroundColor;
+        ConsoleScreenBuffer->ColorLookupTable[Index][2] =
+            (Index & 0x02) ? ForegroundColor : BackgroundColor;
+        ConsoleScreenBuffer->ColorLookupTable[Index][3] =
+            (Index & 0x01) ? ForegroundColor : BackgroundColor;
+    }
+}
+
 /**
  * @brief Gets the background color from the console color lookup table.
  * @param ColorLookupTable The console color lookup table you want to query, the

@@ -63,4 +63,43 @@ typedef struct _MO_CONSOLE_SCREEN_BUFFER
     PMO_WIDE_CHAR Buffer;
 } MO_CONSOLE_SCREEN_BUFFER, *PMO_CONSOLE_SCREEN_BUFFER;
 
+#define MO_CONSOLE_DEFAULT_BACKGROUND_COLOR 0x00000000
+#define MO_CONSOLE_DEFAULT_FOREGROUND_COLOR 0x00FFFFFF
+
+/**
+ * @brief Gets the background color from the console screen buffer.
+ * @param ConsoleScreenBuffer The console screen buffer you want to query. If
+ *                            the memory address of the console screen buffer
+ *                            is invalid, the function will return the default
+ *                            background color a.k.a. black.
+ * @return The background color from the console screen buffer.
+ */
+EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
+    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
+
+/**
+ * @brief Gets the foreground color from the console screen buffer.
+ * @param ConsoleScreenBuffer The console screen buffer you want to query. If
+ *                            the memory address of the console screen buffer
+ *                            is invalid, the function will return the default
+ *                            foreground color a.k.a. white.
+ * @return The foreground color from the console screen buffer.
+ */
+EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
+    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
+
+/**
+ * @brief Updates the color settings for the console screen buffer.
+ *
+ * @param ColorLookupTable The console screen buffer you want to update. This
+ *                         function will do nothing if the memory address of the
+ *                         console screen buffer is invalid.
+ * @param BackgroundColor The new background color.
+ * @param ForegroundColor The new foreground color.
+ */
+EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
+    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _In_ MO_UINT32 BackgroundColor,
+    _In_ MO_UINT32 ForegroundColor);
+
 #endif // !MOBILITY_CONSOLE_CORE
