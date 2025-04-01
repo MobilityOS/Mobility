@@ -49,18 +49,15 @@ typedef struct _MO_CONSOLE_COORDINATE
     MO_UINT16 Y;
 } MO_CONSOLE_COORDINATE, *PMO_CONSOLE_COORDINATE;
 
-#define MO_CONSOLE_MAKE_COORDINATE(X, Y) \
-    ((MO_CONSOLE_COORDINATE){ X, Y })
-
 /**
  * @brief Contains the information of the console screen buffer.
  */
 typedef struct _MO_CONSOLE_SCREEN_BUFFER
 {
-    MO_CONSOLE_COORDINATE ScreenSize;
+    MO_CONSOLE_COORDINATE ScreenBufferSize;
     MO_CONSOLE_COORDINATE CursorPosition;
     MO_CONSOLE_COLORLUT ColorLookupTable;
-    PMO_WIDE_CHAR Buffer;
+    PMO_WIDE_CHAR CharacterBuffer;
 } MO_CONSOLE_SCREEN_BUFFER, *PMO_CONSOLE_SCREEN_BUFFER;
 
 #define MO_CONSOLE_DEFAULT_BACKGROUND_COLOR 0x00000000
@@ -90,10 +87,9 @@ EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
 
 /**
  * @brief Updates the color settings for the console screen buffer.
- *
- * @param ColorLookupTable The console screen buffer you want to update. This
- *                         function will do nothing if the memory address of the
- *                         console screen buffer is invalid.
+ * @param ConsoleScreenBuffer The console screen buffer you want to update. This
+ *                            function will do nothing if the memory address of
+ *                            the console screen buffer is invalid.
  * @param BackgroundColor The new background color.
  * @param ForegroundColor The new foreground color.
  */
@@ -101,5 +97,24 @@ EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
     _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
     _In_ MO_UINT32 BackgroundColor,
     _In_ MO_UINT32 ForegroundColor);
+
+/**
+ * @brief Initializes the console screen buffer.
+ * @param ConsoleScreenBuffer The console screen buffer you want to initialize.
+ *                            This function will do nothing if the memory
+ *                            address of the console screen buffer is invalid.
+ * @param MaximumColumn The maximum column of the console screen buffer.
+ * @param MaximumRow The maximum row of the console screen buffer.
+ * @param BackgroundColor The background color of the console screen buffer.
+ * @param ForegroundColor The foreground color of the console screen buffer.
+ * @param CharacterBuffer The character buffer of the console screen buffer.
+ */
+EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
+    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _In_ MO_UINT32 MaximumColumn,
+    _In_ MO_UINT32 MaximumRow,
+    _In_ MO_UINT32 BackgroundColor,
+    _In_ MO_UINT32 ForegroundColor,
+    _In_ PMO_WIDE_CHAR CharacterBuffer);
 
 #endif // !MOBILITY_CONSOLE_CORE

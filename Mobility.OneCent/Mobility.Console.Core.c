@@ -57,6 +57,30 @@ EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
     }
 }
 
+EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
+    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _In_ MO_UINT32 MaximumColumn,
+    _In_ MO_UINT32 MaximumRow,
+    _In_ MO_UINT32 BackgroundColor,
+    _In_ MO_UINT32 ForegroundColor,
+    _In_ PMO_WIDE_CHAR CharacterBuffer)
+{
+    if (!ConsoleScreenBuffer)
+    {
+        return;
+    }
+
+    ConsoleScreenBuffer->ScreenBufferSize.X = (MO_UINT16)MaximumColumn;
+    ConsoleScreenBuffer->ScreenBufferSize.Y = (MO_UINT16)MaximumRow;
+    ConsoleScreenBuffer->CursorPosition.X = 0;
+    ConsoleScreenBuffer->CursorPosition.Y = 0;
+    MoConsoleCoreUpdateColorSettings(
+        ConsoleScreenBuffer,
+        BackgroundColor,
+        ForegroundColor);
+    ConsoleScreenBuffer->CharacterBuffer = CharacterBuffer;
+}
+
 /**
  * @brief Gets the background color from the console color lookup table.
  * @param ColorLookupTable The console color lookup table you want to query, the
