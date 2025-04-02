@@ -82,14 +82,12 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
 }
 
 EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
-    _Out_ PMO_UINT32 FrameBuffer,
-    _In_ MO_UINT32 HorizontalResolution,
-    _In_ MO_UINT32 VerticalResolution,
+    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
     _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
     _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
     _In_ MO_WIDE_CHAR Character)
 {
-    if (!ConsoleScreenBuffer)
+    if (!DisplayFrameBuffer || !ConsoleScreenBuffer)
     {
         return;
     }
@@ -104,8 +102,10 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     MO_UINT8 FontHeight = MoBitmapFontLaffStdGetHeight();
 
     MO_CONSOLE_COORDINATE MaximumScreenBufferSize;
-    MaximumScreenBufferSize.X = (MO_UINT16)(HorizontalResolution / FontWidth);
-    MaximumScreenBufferSize.Y = (MO_UINT16)(VerticalResolution / FontHeight);
+    MaximumScreenBufferSize.X = (MO_UINT16)(
+        DisplayFrameBuffer->HorizontalResolution / FontWidth);
+    MaximumScreenBufferSize.Y = (MO_UINT16)(
+        DisplayFrameBuffer->VerticalResolution / FontHeight);
 
     if (DestinationCoordinate.X >= MaximumScreenBufferSize.X ||
         DestinationCoordinate.Y >= MaximumScreenBufferSize.Y)
@@ -132,16 +132,26 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     MO_UINT32 ScreenY = DestinationCoordinate.Y * FontHeight;
     for (MO_UINT8 GlyphY = 0; GlyphY < FontHeight; ++GlyphY)
     {
-        MO_UINTN Start = ((ScreenY + GlyphY) * HorizontalResolution) + ScreenX;
-        MO_UINT8 Low = GlyphData[GlyphY] & 0x0F;
-        MO_UINT8 High = (GlyphData[GlyphY] & 0xF0) >> 4;
-        FrameBuffer[Start + 0] = ConsoleScreenBuffer->ColorLookupTable[High][0];
-        FrameBuffer[Start + 1] = ConsoleScreenBuffer->ColorLookupTable[High][1];
-        FrameBuffer[Start + 2] = ConsoleScreenBuffer->ColorLookupTable[High][2];
-        FrameBuffer[Start + 3] = ConsoleScreenBuffer->ColorLookupTable[High][3];
-        FrameBuffer[Start + 4] = ConsoleScreenBuffer->ColorLookupTable[Low][0];
-        FrameBuffer[Start + 5] = ConsoleScreenBuffer->ColorLookupTable[Low][1];
-        FrameBuffer[Start + 6] = ConsoleScreenBuffer->ColorLookupTable[Low][2];
-        FrameBuffer[Start + 7] = ConsoleScreenBuffer->ColorLookupTable[Low][3];
+        MO_UINTN PixelStartOffset = ScreenY + GlyphY;
+        PixelStartOffset *= DisplayFrameBuffer->HorizontalResolution;
+        PixelStartOffset += ScreenX;
+        MO_UINT8 GlyphDataLow = GlyphData[GlyphY] & 0x0F;
+        MO_UINT8 GlyphDataHigh = (GlyphData[GlyphY] & 0xF0) >> 4;
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 0] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][0];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 1] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][1];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 2] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][2];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 3] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][3];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 4] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][0];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 5] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][1];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 6] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][2];
+        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 7] =
+            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][3];
     }
 }

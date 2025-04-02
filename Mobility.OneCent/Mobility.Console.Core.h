@@ -125,9 +125,9 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
 
 /**
  * @brief Draws a character to the frame buffer.
- * @param FrameBuffer The frame buffer to draw.
- * @param HorizontalResolution The horizontal resolution of the frame buffer.
- * @param VerticalResolution The vertical resolution of the frame buffer.
+ * @param DisplayFrameBuffer The frame buffer you want to draw. This function
+ *                           will do nothing if the memory address of the frame
+ *                           buffer is invalid.
  * @param ConsoleScreenBuffer The console screen buffer you want to draw. This
  *                            function will do nothing if the memory address of
  *                            the console screen buffer is invalid.
@@ -135,9 +135,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
  * @param Character The character to draw.
  */
 EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
-    _Out_ PMO_UINT32 FrameBuffer,
-    _In_ MO_UINT32 HorizontalResolution,
-    _In_ MO_UINT32 VerticalResolution,
+    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
     _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
     _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
     _In_ MO_WIDE_CHAR Character);
