@@ -155,3 +155,31 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][3];
     }
 }
+
+EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
+    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
+{
+    if (!DisplayFrameBuffer || !ConsoleScreenBuffer)
+    {
+        return;
+    }
+
+    MO_UINT32 ConsoleScreenBufferSize =
+        ConsoleScreenBuffer->ScreenBufferSize.X *
+        ConsoleScreenBuffer->ScreenBufferSize.Y;
+
+    for (MO_UINT32 i = 0; i < ConsoleScreenBufferSize; ++i)
+    {
+        MO_CONSOLE_COORDINATE CurrentCoordinate;
+        CurrentCoordinate.X = (MO_UINT16)(
+            i % ConsoleScreenBuffer->ScreenBufferSize.X);
+        CurrentCoordinate.Y = (MO_UINT16)(
+            i / ConsoleScreenBuffer->ScreenBufferSize.X);
+        MoConsoleCoreDrawCharacter(
+            DisplayFrameBuffer,
+            ConsoleScreenBuffer,
+            CurrentCoordinate,
+            ConsoleScreenBuffer->CharacterBuffer[i]);
+    }
+}

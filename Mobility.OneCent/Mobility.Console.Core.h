@@ -140,4 +140,17 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
     _In_ MO_WIDE_CHAR Character);
 
+/**
+ * @brief Refreshes the screen with the content in the console screen buffer.
+ * @param DisplayFrameBuffer The frame buffer you want to refresh. This function
+ *                           will do nothing if the memory address of the frame
+ *                           buffer is invalid.
+ * @param ConsoleScreenBuffer The console screen buffer you want to refresh.
+ *                            This function will do nothing if the memory
+ *                            address of the console screen buffer is invalid.
+ */
+EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
+    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
+
 #endif // !MOBILITY_CONSOLE_CORE
