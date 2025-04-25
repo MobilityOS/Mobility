@@ -79,6 +79,10 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
         BackgroundColor,
         ForegroundColor);
     ConsoleScreenBuffer->CharacterBuffer = CharacterBuffer;
+    ConsoleScreenBuffer->CharacterBufferMaximumSize =
+        ConsoleScreenBuffer->ScreenBufferSize.X *
+        ConsoleScreenBuffer->ScreenBufferSize.Y;
+    ConsoleScreenBuffer->CharacterBufferStartOffset = 0;
 }
 
 EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
@@ -165,21 +169,23 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
         return;
     }
 
-    MO_UINT32 ConsoleScreenBufferSize =
-        ConsoleScreenBuffer->ScreenBufferSize.X *
-        ConsoleScreenBuffer->ScreenBufferSize.Y;
+    MO_UINT32 MaximumSize = ConsoleScreenBuffer->CharacterBufferMaximumSize;
+    MO_UINT32 StartOffset = ConsoleScreenBuffer->CharacterBufferStartOffset;
 
-    for (MO_UINT32 i = 0; i < ConsoleScreenBufferSize; ++i)
+    for (MO_UINT32 i = 0; i < MaximumSize; ++i)
     {
         MO_CONSOLE_COORDINATE CurrentCoordinate;
         CurrentCoordinate.X = (MO_UINT16)(
             i % ConsoleScreenBuffer->ScreenBufferSize.X);
         CurrentCoordinate.Y = (MO_UINT16)(
             i / ConsoleScreenBuffer->ScreenBufferSize.X);
+
+        MO_UINT32 CurrentOffset = (StartOffset + i) % MaximumSize;
+
         MoConsoleCoreDrawCharacter(
             DisplayFrameBuffer,
             ConsoleScreenBuffer,
             CurrentCoordinate,
-            ConsoleScreenBuffer->CharacterBuffer[i]);
+            ConsoleScreenBuffer->CharacterBuffer[CurrentOffset]);
     }
 }
