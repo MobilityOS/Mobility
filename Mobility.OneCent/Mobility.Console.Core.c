@@ -189,3 +189,119 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
             ConsoleScreenBuffer->CharacterBuffer[CurrentOffset]);
     }
 }
+
+EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
+    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _In_ MO_CONSTANT_WIDE_STRING String,
+    _In_ MO_UINT32 StringLength)
+{
+    if (!ConsoleScreenBuffer || !String || !StringLength)
+    {
+        return;
+    }
+
+    const MO_UINT16 TabSize = 4;
+
+    MO_UINT16 ScreenWidth = ConsoleScreenBuffer->ScreenBufferSize.X;
+    MO_UINT16 ScreenHeight = ConsoleScreenBuffer->ScreenBufferSize.Y;
+
+    MO_UINT32 MaximumSize = ConsoleScreenBuffer->CharacterBufferMaximumSize;
+    MO_UINT32 StartOffset = ConsoleScreenBuffer->CharacterBufferStartOffset;
+
+    MO_CONSOLE_COORDINATE FinalPosition = ConsoleScreenBuffer->CursorPosition;
+
+    for (MO_UINT32 i = 0; i < StringLength; ++i)
+    {
+        MO_WIDE_CHAR CurrentCharacter = String[i];
+        if (L'\n' == CurrentCharacter)
+        {
+            FinalPosition.X = 0;
+            ++FinalPosition.Y;
+        }
+        else if (L'\r' == CurrentCharacter)
+        {
+            FinalPosition.X = 0;
+        }
+        else if (L'\t' == CurrentCharacter)
+        {
+            MO_UINT16 NewX = (FinalPosition.X + TabSize) & ~(TabSize - 1);
+            if (NewX < ScreenWidth)
+            {
+                FinalPosition.X = NewX;
+            }
+            else
+            {
+                FinalPosition.X = 0;
+                ++FinalPosition.Y;
+            }
+        }
+        else if (L'\b' == CurrentCharacter)
+        {
+            if (FinalPosition.X > 0)
+            {
+                --FinalPosition.X;
+
+                // Clear the character at the current position.
+
+                MO_UINT32 FinalOffset = StartOffset;
+                FinalOffset += (FinalPosition.Y * ScreenWidth) + FinalPosition.X;
+                FinalOffset %= MaximumSize;
+                ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = L'\0';
+            }
+            else if (FinalPosition.Y > 0)
+            {
+                --FinalPosition.Y;
+                FinalPosition.X = ScreenWidth - 1;
+
+                // Clear the character at the current position.
+
+                MO_UINT32 FinalOffset = StartOffset;
+                FinalOffset += (FinalPosition.Y * ScreenWidth) + FinalPosition.X;
+                FinalOffset %= MaximumSize;
+                ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = L'\0';
+            }
+        }
+        else
+        {
+            MO_UINT32 FinalOffset = StartOffset;
+            FinalOffset += (FinalPosition.Y * ScreenWidth) + FinalPosition.X;
+            FinalOffset %= MaximumSize;
+
+            ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = CurrentCharacter;
+            ++FinalPosition.X;
+            if (FinalPosition.X >= ScreenWidth)
+            {
+                FinalPosition.X = 0;
+                ++FinalPosition.Y;
+            }
+        }
+
+        if (FinalPosition.Y >= ScreenHeight)
+        {
+            MO_UINT32 ScrollRows = FinalPosition.Y - ScreenHeight + 1;
+
+            // Scroll the screen buffer up via changing the character buffer
+            // start offset.
+
+            ConsoleScreenBuffer->CharacterBufferStartOffset +=
+                ScrollRows * ScreenWidth;
+            ConsoleScreenBuffer->CharacterBufferStartOffset %= MaximumSize;
+            StartOffset = ConsoleScreenBuffer->CharacterBufferStartOffset;
+
+            // Clear the last row of the screen buffer.
+            for (MO_UINT32 Column = 0; Column < ScreenWidth; ++Column)
+            {
+                MO_UINT32 ClearOffset = StartOffset;
+                ClearOffset += ((ScreenHeight - 1) * ScreenWidth) + Column;
+                ClearOffset %= MaximumSize;
+                ConsoleScreenBuffer->CharacterBuffer[ClearOffset] = L'\0';
+            }
+
+            // Reset the cursor position to the last row.
+            FinalPosition.Y = ScreenHeight - 1;
+        }
+    }
+
+    // Update the cursor position.
+    ConsoleScreenBuffer->CursorPosition = FinalPosition;
+}
