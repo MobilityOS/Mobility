@@ -108,20 +108,6 @@ EFI_STATUS EFIAPI UefiMain(
         DisplayFrameBuffer.VerticalResolution =
             GraphicsOutputProtocol->Mode->Info->VerticalResolution;
 
-        g_CharacterBuffer[10 * 80 + 0] = L'H';
-        g_CharacterBuffer[10 * 80 + 1] = L'e';
-        g_CharacterBuffer[10 * 80 + 2] = L'l';
-        g_CharacterBuffer[10 * 80 + 3] = L'l';
-        g_CharacterBuffer[10 * 80 + 4] = L'o';
-        g_CharacterBuffer[10 * 80 + 5] = L',';
-        g_CharacterBuffer[10 * 80 + 6] = L' ';
-        g_CharacterBuffer[10 * 80 + 7] = L'W';
-        g_CharacterBuffer[10 * 80 + 8] = L'o';
-        g_CharacterBuffer[10 * 80 + 9] = L'r';
-        g_CharacterBuffer[10 * 80 + 10] = L'l';
-        g_CharacterBuffer[10 * 80 + 11] = L'd';
-        g_CharacterBuffer[10 * 80 + 12] = L'!';
-
         MO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer;
         ::MoConsoleCoreInitializeScreenBuffer(
             &ConsoleScreenBuffer,
@@ -131,8 +117,33 @@ EFI_STATUS EFIAPI UefiMain(
             MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
             g_CharacterBuffer);
 
+        const wchar_t LogoString[] =
+            L"Mobility OneCent"
+            L" " MOBILITY_ONECENT_VERSION_STRING L"\r\n"
+            L"(c) Kenji Mouri. All rights reserved.\r\n"
+            L"\r\n"
+            L"Hello World!\r\n"
+            L"\r\n";
+
+        wchar_t StringTemplate[] = L"0\r\n";
+
         for (MO_UINT32 i = 0; i < 0x00FFFFFF; i++)
         {
+            if (0 == i % 10)
+            {
+                MoConsoleCoreWriteString(
+                    &ConsoleScreenBuffer,
+                    LogoString,
+                    MO_ARRAY_SIZE(LogoString) - 1);
+            }
+
+            StringTemplate[0] = L'0' + (i % 10);
+
+            MoConsoleCoreWriteString(
+                &ConsoleScreenBuffer,
+                StringTemplate,
+                MO_ARRAY_SIZE(StringTemplate) - 1);
+
             MoConsoleCoreUpdateColorSettings(
                 &ConsoleScreenBuffer,
                 MO_CONSOLE_DEFAULT_BACKGROUND_COLOR,
