@@ -155,4 +155,22 @@
 #define MO_UNICODE_BLACK_DOWN_POINTING_TRIANGLE 0x25BC
 #define MO_UNICODE_BLACK_LEFT_POINTING_POINTER 0x25C4
 
+/**
+ * @brief Parse a UCS-2 character from a UTF-8 byte sequence.
+ * @param Destination The memory address to store the UCS-2 character. This
+ *                    parameter can be nullptr if you only want to get the
+ *                    number of bytes to parse from the UTF-8 byte sequence.
+ * @param Source The UTF-8 byte sequence to parse.
+ * @param SourceLength The number of bytes to parse from the UTF-8 byte sequence.
+ * @return If Source points to a valid UTF-8 byte sequence, the return value is
+ *         the number of bytes parsed from the UTF-8 byte sequence. If Source is
+ *         nullptr or points to a UCS-2 null character, the return value is 0.
+ *         If Source points to a character out of the UCS-2 range, the return
+ *         value is -1.
+ */
+EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUcs2FromUtf8(
+    _Out_opt_ PMO_WIDE_CHAR Destination,
+    _In_ PMO_CHAR Source,
+    _In_ MO_UINTN SourceLength);
+
 #endif // !MOBILITY_UNICODE_CORE
