@@ -10,6 +10,8 @@
 
 #include "Mobility.BitmapFont.LaffStd.h"
 
+#include "Mobility.Unicode.Core.h"
+
 /**
  * @brief The LaffStd 8x19 font glyph data.
  */
@@ -1096,27 +1098,27 @@ EXTERN_C CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
     {
         switch (Character)
         {
-        case 0x2500:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_HORIZONTAL:
             return &LaffStdGlyphs[(BaseOffset + 0) * LAFFSTD_HEIGHT];
-        case 0x2502:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL:
             return &LaffStdGlyphs[(BaseOffset + 1) * LAFFSTD_HEIGHT];
-        case 0x250C:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_RIGHT:
             return &LaffStdGlyphs[(BaseOffset + 2) * LAFFSTD_HEIGHT];
-        case 0x2510:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_LEFT:
             return &LaffStdGlyphs[(BaseOffset + 3) * LAFFSTD_HEIGHT];
-        case 0x2514:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_RIGHT:
             return &LaffStdGlyphs[(BaseOffset + 4) * LAFFSTD_HEIGHT];
-        case 0x2518:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_LEFT:
             return &LaffStdGlyphs[(BaseOffset + 5) * LAFFSTD_HEIGHT];
-        case 0x251C:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_RIGHT:
             return &LaffStdGlyphs[(BaseOffset + 6) * LAFFSTD_HEIGHT];
-        case 0x2524:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_LEFT:
             return &LaffStdGlyphs[(BaseOffset + 7) * LAFFSTD_HEIGHT];
-        case 0x252C:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_HORIZONTAL:
             return &LaffStdGlyphs[(BaseOffset + 8) * LAFFSTD_HEIGHT];
-        case 0x2534:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_HORIZONTAL:
             return &LaffStdGlyphs[(BaseOffset + 9) * LAFFSTD_HEIGHT];
-        case 0x253C:
+        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_HORIZONTAL:
             return &LaffStdGlyphs[(BaseOffset + 10) * LAFFSTD_HEIGHT];
         default:
             return nullptr;
@@ -1137,19 +1139,19 @@ EXTERN_C CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
 
     switch (Character)
     {
-    case 0x2581:
+    case MO_UNICODE_LOWER_ONE_EIGHTH_BLOCK:
         return &LaffStdGlyphs[(BaseOffset + 0) * LAFFSTD_HEIGHT];
-    case 0x2588:
+    case MO_UNICODE_FULL_BLOCK:
         return &LaffStdGlyphs[(BaseOffset + 1) * LAFFSTD_HEIGHT];
-    case 0x2591:
+    case MO_UNICODE_LIGHT_SHADE:
         return &LaffStdGlyphs[(BaseOffset + 2) * LAFFSTD_HEIGHT];
-    case 0x25B2:
+    case MO_UNICODE_BLACK_UP_POINTING_TRIANGLE:
         return &LaffStdGlyphs[(BaseOffset + 3) * LAFFSTD_HEIGHT];
-    case 0x25BA:
+    case MO_UNICODE_BLACK_RIGHT_POINTING_POINTER:
         return &LaffStdGlyphs[(BaseOffset + 4) * LAFFSTD_HEIGHT];
-    case 0x25BC:
+    case MO_UNICODE_BLACK_DOWN_POINTING_TRIANGLE:
         return &LaffStdGlyphs[(BaseOffset + 5) * LAFFSTD_HEIGHT];
-    case 0x25C4:
+    case MO_UNICODE_BLACK_LEFT_POINTING_POINTER:
         return &LaffStdGlyphs[(BaseOffset + 6) * LAFFSTD_HEIGHT];
     default:
         break;

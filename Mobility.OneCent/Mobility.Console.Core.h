@@ -12,6 +12,7 @@
 #define MOBILITY_CONSOLE_CORE
 
 #include "Mobility.Display.Core.h"
+#include "Mobility.Unicode.Core.h"
 
 #define MO_CONSOLE_COLORLUT_BITS 4
 #define MO_CONSOLE_COLORLUT_ITEMS 16

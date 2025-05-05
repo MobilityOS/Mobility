@@ -120,11 +120,11 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     // Query the glyph data if the character is not null, or query the space
     // character instead.
     PMO_UINT8 GlyphData = MoBitmapFontLaffStdQueryGlyph(
-        Character ? Character : L'\x0020');
+        Character ? Character : MO_UNICODE_SPACE);
     if (!GlyphData)
     {
         // Query the full block character if the glyph data is not found.
-        GlyphData = MoBitmapFontLaffStdQueryGlyph(L'\x2588');
+        GlyphData = MoBitmapFontLaffStdQueryGlyph(MO_UNICODE_FULL_BLOCK);
         if (!GlyphData)
         {
             // Just return if the glyph data is still not found.
