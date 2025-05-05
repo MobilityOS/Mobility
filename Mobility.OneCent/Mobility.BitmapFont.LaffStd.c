@@ -1011,14 +1011,6 @@ static MO_UINT8 LaffStdGlyphs[] =
 #define LAFFSTD_WIDTH 8
 #define LAFFSTD_HEIGHT 19
 
-#define LAFFSTD_BASIC_LATIN_GLYPH_COUNT 95
-#define LAFFSTD_BASIC_LATIN_START 0x0020
-#define LAFFSTD_BASIC_LATIN_END 0x007E
-
-#define LAFFSTD_LATIN_1_SUPPLEMENT_GLYPH_COUNT 96
-#define LAFFSTD_LATIN_1_SUPPLEMENT_START 0x00A0
-#define LAFFSTD_LATIN_1_SUPPLEMENT_END 0x00FF
-
 #define LAFFSTD_ARROWS_GLYPH_COUNT 4
 #define LAFFSTD_ARROWS_START 0x2190
 #define LAFFSTD_ARROWS_END 0x2193
@@ -1057,27 +1049,27 @@ EXTERN_C CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
 
     MO_UINTN BaseOffset = 0;
 
-    if (Character < LAFFSTD_BASIC_LATIN_START)
+    if (Character < MO_UNICODE_BASIC_LATIN_GLYPH_START)
     {
         return nullptr;
     }
-    if (Character < LAFFSTD_BASIC_LATIN_END + 1)
+    if (Character < MO_UNICODE_BASIC_LATIN_GLYPH_END + 1)
     {
-        MO_UINTN Index = Character - LAFFSTD_BASIC_LATIN_START;
+        MO_UINTN Index = Character - MO_UNICODE_BASIC_LATIN_GLYPH_START;
         return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
     }
-    BaseOffset += LAFFSTD_BASIC_LATIN_GLYPH_COUNT;
+    BaseOffset += MO_UNICODE_BASIC_LATIN_GLYPH_COUNT;
 
-    if (Character < LAFFSTD_LATIN_1_SUPPLEMENT_START)
+    if (Character < MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_START)
     {
         return nullptr;
     }
-    if (Character < LAFFSTD_LATIN_1_SUPPLEMENT_END + 1)
+    if (Character < MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_END + 1)
     {
-        MO_UINTN Index = Character - LAFFSTD_LATIN_1_SUPPLEMENT_START;
+        MO_UINTN Index = Character - MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_START;
         return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
     }
-    BaseOffset += LAFFSTD_LATIN_1_SUPPLEMENT_GLYPH_COUNT;
+    BaseOffset += MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_COUNT;
 
     if (Character < LAFFSTD_ARROWS_START)
     {
