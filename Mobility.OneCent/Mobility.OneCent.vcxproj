@@ -25,6 +25,7 @@
     <ClCompile Include="Mobility.Console.Core.c" />
     <ClCompile Include="Mobility.Display.Core.c" />
     <ClCompile Include="Mobility.OneCent.cpp" />
+    <ClCompile Include="Mobility.Unicode.Core.cpp" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mile.Mobility">
@@ -35,6 +36,7 @@
     <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
     <ClInclude Include="Mobility.Console.Core.h" />
     <ClInclude Include="Mobility.Display.Core.h" />
+    <ClInclude Include="Mobility.Unicode.Core.h" />
   </ItemGroup>
   <Import Sdk="Mile.Uefi" Version="1.0.1438" Project="Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1426" Project="Mile.Project.Cpp.targets" />
