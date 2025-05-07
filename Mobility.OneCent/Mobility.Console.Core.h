@@ -157,12 +157,12 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
     _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
 
 /**
- * @brief Writes a wide character string to the console screen buffer.
+ * @brief Writes a UTF-8 string to the console screen buffer.
  * @param ConsoleScreenBuffer The console screen buffer to write to. This
  *                            function will do nothing if the memory address
  *                            of the console screen buffer is invalid.
- * @param String The wide character string to write. This function will do
- *               nothing if the memory address of the string is invalid.
+ * @param String The UTF-8 string to write. This function will do nothing if the
+ *               memory address of the string is invalid.
  * @param StringLength The length of the string to write. This function will do
  *                    nothing if the string length is zero.
  * @remarks This function handles control characters as follows:
@@ -176,7 +176,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
  */
 EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
     _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_CONSTANT_WIDE_STRING String,
+    _In_ MO_CONSTANT_STRING String,
     _In_ MO_UINT32 StringLength);
 
 #endif // !MOBILITY_CONSOLE_CORE

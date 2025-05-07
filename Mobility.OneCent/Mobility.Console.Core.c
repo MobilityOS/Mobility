@@ -192,7 +192,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
 
 EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
     _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_CONSTANT_WIDE_STRING String,
+    _In_ MO_CONSTANT_STRING String,
     _In_ MO_UINT32 StringLength)
 {
     if (!ConsoleScreenBuffer || !String || !StringLength)
@@ -210,19 +210,34 @@ EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
 
     MO_CONSOLE_COORDINATE FinalPosition = ConsoleScreenBuffer->CursorPosition;
 
-    for (MO_UINT32 i = 0; i < StringLength; ++i)
+    for (MO_UINT32 i = 0; i < StringLength;)
     {
-        MO_WIDE_CHAR CurrentCharacter = String[i];
-        if (L'\n' == CurrentCharacter)
+        MO_WIDE_CHAR CurrentCharacter = MO_UNICODE_NULL;
+        MO_INT32 BytesParsed = MoUnicodeCoreParseUcs2FromUtf8(
+            &CurrentCharacter,
+            (PMO_CHAR)(String + i),
+            StringLength - i);
+        if (BytesParsed == 0)
+        {
+            break;
+        }
+        if (BytesParsed == -1)
+        {
+            ++i;
+            continue;
+        }
+        i += BytesParsed;
+
+        if ('\n' == CurrentCharacter)
         {
             FinalPosition.X = 0;
             ++FinalPosition.Y;
         }
-        else if (L'\r' == CurrentCharacter)
+        else if ('\r' == CurrentCharacter)
         {
             FinalPosition.X = 0;
         }
-        else if (L'\t' == CurrentCharacter)
+        else if ('\t' == CurrentCharacter)
         {
             MO_UINT16 NewX = (FinalPosition.X + TabSize) & ~(TabSize - 1);
             if (NewX < ScreenWidth)
@@ -235,7 +250,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
                 ++FinalPosition.Y;
             }
         }
-        else if (L'\b' == CurrentCharacter)
+        else if ('\b' == CurrentCharacter)
         {
             if (FinalPosition.X > 0)
             {
@@ -246,7 +261,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
                 MO_UINT32 FinalOffset = StartOffset;
                 FinalOffset += (FinalPosition.Y * ScreenWidth) + FinalPosition.X;
                 FinalOffset %= MaximumSize;
-                ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = L'\0';
+                ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = '\0';
             }
             else if (FinalPosition.Y > 0)
             {
@@ -258,7 +273,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
                 MO_UINT32 FinalOffset = StartOffset;
                 FinalOffset += (FinalPosition.Y * ScreenWidth) + FinalPosition.X;
                 FinalOffset %= MaximumSize;
-                ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = L'\0';
+                ConsoleScreenBuffer->CharacterBuffer[FinalOffset] = '\0';
             }
         }
         else
@@ -294,7 +309,7 @@ EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
                 MO_UINT32 ClearOffset = StartOffset;
                 ClearOffset += ((ScreenHeight - 1) * ScreenWidth) + Column;
                 ClearOffset %= MaximumSize;
-                ConsoleScreenBuffer->CharacterBuffer[ClearOffset] = L'\0';
+                ConsoleScreenBuffer->CharacterBuffer[ClearOffset] = '\0';
             }
 
             // Reset the cursor position to the last row.

@@ -19,21 +19,23 @@
 #include <Uefi.h>
 #include <Protocol/GraphicsOutput.h>
 
-#define MOBILITY_ONECENT_VERSION_STRING \
-    MILE_PROJECT_VERSION_STRING L" (Build " \
-    MILE_PROJECT_MACRO_TO_STRING(MILE_PROJECT_VERSION_BUILD) L")"
-
-namespace
+EXTERN_C VOID MOAPI MoEfiConsoleWriteAsciiString(
+    _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
+    _In_ MO_CONSTANT_STRING String)
 {
-    static EFI_STATUS OutputWideString(
-        _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
-        _In_ const wchar_t* String)
+    CHAR16 WideStringTemplate[2] = { 0, 0 };
+    while (*String)
     {
-        return Output->OutputString(
-            Output,
-            const_cast<CHAR16*>(reinterpret_cast<const CHAR16*>(String)));
+        WideStringTemplate[0] = *String > MO_UNICODE_DELETE
+            ? MO_UNICODE_SPACE
+            : *String++;
+        Output->OutputString(Output, WideStringTemplate);
     }
 }
+
+#define MOBILITY_ONECENT_VERSION_UTF8_STRING \
+    MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
+    MILE_PROJECT_MACRO_TO_UTF8_STRING(MILE_PROJECT_VERSION_BUILD) ")"
 
 static MO_WIDE_CHAR g_CharacterBuffer[80 * 25];
 
@@ -49,28 +51,12 @@ EFI_STATUS EFIAPI UefiMain(
     _In_ EFI_HANDLE ImageHandle,
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    ::OutputWideString(
+    ::MoEfiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"Mobility OneCent"
-        L" " MOBILITY_ONECENT_VERSION_STRING L"\r\n"
-        L"(c) Kenji Mouri. All rights reserved.\r\n"
-        L"\r\n");
-
-    /*::OutputWideString(
-        SystemTable->ConOut,
-        L"Hello World!\r\n");
-
-    ::OutputWideString(
-        SystemTable->ConOut,
-        L"\r\n"
-        L"Press any key to return to the boot menu...\r\n");
-    {
-        UINTN Index = 0;
-        SystemTable->BootServices->WaitForEvent(
-            1,
-            &SystemTable->ConIn->WaitForKey,
-            &Index);
-    }*/
+        "Mobility OneCent"
+        " " MOBILITY_ONECENT_VERSION_UTF8_STRING "\r\n"
+        "(c) Kenji Mouri. All rights reserved.\r\n"
+        "\r\n");
 
     EFI_BOOT_SERVICES* BootServices = SystemTable->BootServices;
 
@@ -86,10 +72,10 @@ EFI_STATUS EFIAPI UefiMain(
             reinterpret_cast<void**>(&GraphicsOutputProtocol));
         if (EFI_SUCCESS != Status)
         {
-            ::OutputWideString(
+            ::MoEfiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                L"Failed to locate the Graphics Output Protocol.\r\n"
-                L"\r\nPress any key to return to the boot menu...\r\n");
+                "Failed to locate the Graphics Output Protocol.\r\n"
+                "\r\nPress any key to return to the boot menu...\r\n");
             {
                 UINTN Index = 0;
                 BootServices->WaitForEvent(
@@ -117,15 +103,15 @@ EFI_STATUS EFIAPI UefiMain(
             MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
             g_CharacterBuffer);
 
-        const wchar_t LogoString[] =
-            L"Mobility OneCent"
-            L" " MOBILITY_ONECENT_VERSION_STRING L"\r\n"
-            L"(c) Kenji Mouri. All rights reserved.\r\n"
-            L"\r\n"
-            L"Hello World!\r\n"
-            L"\r\n";
+        const char LogoString[] =
+            "Mobility OneCent"
+            " " MOBILITY_ONECENT_VERSION_UTF8_STRING "\r\n"
+            "(c) Kenji Mouri. All rights reserved.\r\n"
+            "\r\n"
+            "Hello World!\r\n"
+            "\r\n";
 
-        wchar_t StringTemplate[] = L"0\r\n";
+        char StringTemplate[] = "0\r\n";
 
         for (MO_UINT32 i = 0; i < 0x00FFFFFF; i++)
         {
@@ -137,7 +123,7 @@ EFI_STATUS EFIAPI UefiMain(
                     MO_ARRAY_SIZE(LogoString) - 1);
             }
 
-            StringTemplate[0] = L'0' + (i % 10);
+            StringTemplate[0] = '0' + (i % 10);
 
             MoConsoleCoreWriteString(
                 &ConsoleScreenBuffer,
