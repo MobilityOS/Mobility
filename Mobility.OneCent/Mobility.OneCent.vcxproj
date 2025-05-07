@@ -25,7 +25,7 @@
     <ClCompile Include="Mobility.Console.Core.c" />
     <ClCompile Include="Mobility.Display.Core.c" />
     <ClCompile Include="Mobility.OneCent.cpp" />
-    <ClCompile Include="Mobility.Unicode.Core.cpp" />
+    <ClCompile Include="Mobility.Unicode.Core.c" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mile.Mobility">
