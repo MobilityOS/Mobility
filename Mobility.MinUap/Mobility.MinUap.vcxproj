@@ -7,7 +7,7 @@
     <TargetName>MoMinUap</TargetName>
     <MileProjectUseProjectProperties>true</MileProjectUseProjectProperties>
     <MileProjectCompanyName>Mobility</MileProjectCompanyName>
-    <MileProjectFileDescription>Mobility Minimum UEFI Application Project</MileProjectFileDescription>
+    <MileProjectFileDescription>Mobility Minimal UEFI Application Project</MileProjectFileDescription>
     <MileProjectInternalName>Mobility.MinUap</MileProjectInternalName>
     <MileProjectLegalCopyright>© Kenji Mouri. All rights reserved.</MileProjectLegalCopyright>
     <MileProjectOriginalFilename>MoMinUap.efi</MileProjectOriginalFilename>

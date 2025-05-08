@@ -1,7 +1,7 @@
 ﻿/*
  * PROJECT:   Mobility
  * FILE:      Mobility.MinUap.cpp
- * PURPOSE:   Implementation for Mobility Minimum UEFI Application Project
+ * PURPOSE:   Implementation for Mobility Minimal UEFI Application Project
  *
  * LICENSE:   The MIT License
  *
@@ -46,7 +46,7 @@ EFI_STATUS EFIAPI UefiMain(
 {
     ::OutputWideString(
         SystemTable->ConOut,
-        L"Mobility Minimum UEFI Application Project"
+        L"Mobility Minimal UEFI Application Project"
         L" " MOBILITY_MINUAP_VERSION_STRING L"\r\n"
         L"(c) Kenji Mouri. All rights reserved.\r\n"
         L"\r\n");
