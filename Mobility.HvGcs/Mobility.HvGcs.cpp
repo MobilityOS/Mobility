@@ -17,12 +17,14 @@
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
 #include <IndustryStandard/Acpi30.h>
+#include <Protocol/LoadedImage.h>
 
 #include <Mile.HyperV.VMBus.h>
 
 #include <intrin.h>
 #include <sal.h>
 #include <string.h>
+#include <stdio.h>
 
 /**
  * @brief Checks the Hyper-V guest support availability.
@@ -285,6 +287,90 @@ namespace
             Output,
             const_cast<CHAR16*>(reinterpret_cast<const CHAR16*>(String)));
     }
+
+    static EFI_DEVICE_PATH_PROTOCOL* GetNextDevicePath(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* DevicePath)
+    {
+        return DevicePath
+            ? reinterpret_cast<EFI_DEVICE_PATH_PROTOCOL*>(
+                reinterpret_cast<UINT8*>(DevicePath)
+                + (static_cast<UINTN>(DevicePath->Length[1]) << 8)
+                + DevicePath->Length[0])
+            : nullptr;
+    }
+
+    static FILEPATH_DEVICE_PATH* DevicePathToFilePath(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* DevicePath)
+    {
+        return (
+            DevicePath &&
+            MEDIA_DEVICE_PATH == DevicePath->Type &&
+            MEDIA_FILEPATH_DP == DevicePath->SubType)
+            ? reinterpret_cast<FILEPATH_DEVICE_PATH*>(DevicePath)
+            : nullptr;
+    }
+
+    static size_t GetFilePathLengthFromDevicePath(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Source)
+    {
+        // Initial length includes the null terminator.
+        size_t Length = 1;
+        while (Source)
+        {
+            FILEPATH_DEVICE_PATH* FilePath = ::DevicePathToFilePath(Source);
+            if (!FilePath)
+            {
+                break;
+            }
+
+            // Add the length of the path separator and the file path string.
+            Length += 1 + ::wcslen(
+                reinterpret_cast<wchar_t*>(FilePath->PathName));
+
+            Source = ::GetNextDevicePath(Source);
+        }
+        return Length;
+    }
+
+    static bool GetFilePathFromEfiDevicePath(
+        _Out_ wchar_t* Destination,
+        _In_ size_t DestinationLength,
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Source)
+    {
+        if (!Destination || !DestinationLength || !Source)
+        {
+            return false;
+        }
+
+        size_t RequiredLength = ::GetFilePathLengthFromDevicePath(Source);
+        if (RequiredLength > DestinationLength)
+        {
+            return false;
+        }
+
+        ::memset(Destination, 0, DestinationLength * sizeof(wchar_t));
+        while (Source)
+        {
+            FILEPATH_DEVICE_PATH* FilePath = ::DevicePathToFilePath(Source);
+            if (!FilePath)
+            {
+                break;
+            }
+
+            wcscat_s(
+                Destination,
+                DestinationLength,
+                L"\\");
+            wcscat_s(
+                Destination,
+                DestinationLength,
+                reinterpret_cast<wchar_t*>(FilePath->PathName));
+
+            Source = ::GetNextDevicePath(Source);
+        }
+
+        return true;
+    }
 }
 
 /**
@@ -305,6 +391,13 @@ EFI_STATUS EFIAPI UefiMain(
         L" " MOBILITY_HVGCS_VERSION_STRING L"\r\n"
         L"(c) Kenji Mouri. All rights reserved.\r\n"
         L"\r\n");
+
+    wchar_t Buffer[256];
+    ::memset(Buffer, 0, 256);
+    ::_snwprintf(Buffer, 256, L"SystemTable = %p\r\n", SystemTable);
+    ::OutputWideString(
+        SystemTable->ConOut,
+        Buffer);
 
     if (::MoHvCheckAvailability())
     {
@@ -492,7 +585,99 @@ EFI_STATUS EFIAPI UefiMain(
             L"All needed ACPI description tables are patched.\r\n");
     }
 
-    return EFI_SUCCESS;
+    EFI_STATUS Status = EFI_SUCCESS;
+
+    EFI_LOADED_IMAGE_PROTOCOL* CurrentImageInformation = nullptr;
+    Status = SystemTable->BootServices->HandleProtocol(
+        ImageHandle,
+        &gEfiLoadedImageProtocolGuid,
+        reinterpret_cast<void**>(&CurrentImageInformation));
+    if (EFI_SUCCESS != Status)
+    {
+        ::OutputWideString(
+            SystemTable->ConOut,
+            L"Failed to open the EFI_LOADED_IMAGE_PROTOCOL.\r\n");
+    }
+    else
+    {
+        wchar_t TargetFileBuffer[260];
+        if (!::GetFilePathFromEfiDevicePath(
+            TargetFileBuffer,
+            sizeof(TargetFileBuffer) / sizeof(*TargetFileBuffer),
+            CurrentImageInformation->FilePath))
+        {
+            ::OutputWideString(
+                SystemTable->ConOut,
+                L"Failed to call GetFilePathFromEfiDevicePath.\r\n");
+        }
+        else
+        {
+            ::OutputWideString(
+                SystemTable->ConOut,
+                L"Current EFI Image Path = ");
+            ::OutputWideString(
+                SystemTable->ConOut,
+                TargetFileBuffer);
+
+            /*EFI_HANDLE NewImageHandle = nullptr;
+            Status = SystemTable->BootServices->LoadImage(
+                TRUE,
+                ImageHandle,
+                CurrentImageInformation->DeviceHandle,
+                nullptr,
+                0,
+                &NewImageHandle);
+            if (EFI_SUCCESS != Status)
+            {
+                ::OutputWideString(
+                    SystemTable->ConOut,
+                    L"Failed to load the EFI image.\r\n");
+            }
+            else
+            {
+                EFI_LOADED_IMAGE_PROTOCOL* NewImageInformation = nullptr;
+                Status = SystemTable->BootServices->HandleProtocol(
+                    NewImageHandle,
+                    &gEfiLoadedImageProtocolGuid,
+                    reinterpret_cast<void**>(&NewImageInformation));
+                if (EFI_SUCCESS != Status ||
+                    EfiLoaderCode != NewImageInformation->ImageCodeType)
+                {
+                    ::OutputWideString(
+                        SystemTable->ConOut,
+                        L"The EFI image is invalid.\r\n");
+                    SystemTable->BootServices->UnloadImage(NewImageHandle);
+                }
+                else
+                {
+                    Status = SystemTable->BootServices->StartImage(
+                        NewImageHandle,
+                        nullptr,
+                        nullptr);
+                    if (EFI_SUCCESS != Status)
+                    {
+                        ::OutputWideString(
+                            SystemTable->ConOut,
+                            L"Failed to start the EFI image.\r\n");
+                    }
+                }
+            }*/
+        }
+    }
+
+    /*::OutputWideString(
+        SystemTable->ConOut,
+        L"\r\n"
+        L"Press any key to return to the boot menu...\r\n");
+    {
+        UINTN Index = 0;
+        SystemTable->BootServices->WaitForEvent(
+            1,
+            &SystemTable->ConIn->WaitForKey,
+            &Index);
+    }*/
+
+    return Status;
 }
 
 #pragma comment(linker, "/entry:UefiMain")
