@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3FBDCF0B-51B2-47D8-990A-381F636ADD5D}</ProjectGuid>
+    <RootNamespace>Mobility.Core.Uefi</RootNamespace>
+    <MileProjectType>StaticLibrary</MileProjectType>
+    <MileProjectEnableVCLTLSupport>true</MileProjectEnableVCLTLSupport>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.ARM64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.props" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1438" Project="Mile.Uefi.props" />
+  <ItemGroup>
+    <None Include="Mobility.Core.Uefi.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mile.Mobility">
+      <Version>1.0.172</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Sdk="Mile.Uefi" Version="1.0.1438" Project="Mile.Uefi.targets" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.targets" />
+</Project>
