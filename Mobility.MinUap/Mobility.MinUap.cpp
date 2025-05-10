@@ -13,24 +13,11 @@
 
 #include <Mile.Project.Version.h>
 
-#undef NULL
-#include <Uefi.h>
+#include <Mobility.Uefi.Core.h>
 
-#define MOBILITY_MINUAP_VERSION_STRING \
-    MILE_PROJECT_VERSION_STRING L" (Build " \
-    MILE_PROJECT_MACRO_TO_STRING(MILE_PROJECT_VERSION_BUILD) L")"
-
-namespace
-{
-    static EFI_STATUS OutputWideString(
-        _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
-        _In_ const wchar_t* String)
-    {
-        return Output->OutputString(
-            Output,
-            const_cast<CHAR16*>(reinterpret_cast<const CHAR16*>(String)));
-    }
-}
+#define MOBILITY_MINUAP_VERSION_UTF8_STRING \
+    MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
+    MILE_PROJECT_MACRO_TO_UTF8_STRING(MILE_PROJECT_VERSION_BUILD) ")"
 
 /**
  * Entry point to UEFI Application.
@@ -44,21 +31,21 @@ EFI_STATUS EFIAPI UefiMain(
     _In_ EFI_HANDLE ImageHandle,
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"Mobility Minimal UEFI Application Project"
-        L" " MOBILITY_MINUAP_VERSION_STRING L"\r\n"
-        L"(c) Kenji Mouri. All rights reserved.\r\n"
-        L"\r\n");
+        "Mobility Minimal UEFI Application Project"
+        " " MOBILITY_MINUAP_VERSION_UTF8_STRING "\r\n"
+        "(c) Kenji Mouri. All rights reserved.\r\n"
+        "\r\n");
 
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"Hello World!\r\n");
+        "Hello World!\r\n");
 
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"\r\n"
-        L"Press any key to return to the boot menu...\r\n");
+        "\r\n"
+        "Press any key to return to the boot menu...\r\n");
     {
         UINTN Index = 0;
         SystemTable->BootServices->WaitForEvent(

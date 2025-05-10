@@ -12,8 +12,9 @@
 
 #include <Mile.Project.Version.h>
 
-#undef NULL
-#include <Uefi.h>
+#include <sal.h>
+
+#include <Mobility.Uefi.Core.h>
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
 #include <IndustryStandard/Acpi30.h>
@@ -22,7 +23,6 @@
 #include <Mile.HyperV.VMBus.h>
 
 #include <intrin.h>
-#include <sal.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -273,21 +273,12 @@ extern "C" void MoAcpiGetDescriptionTables(
     }
 }
 
-#define MOBILITY_HVGCS_VERSION_STRING \
-    MILE_PROJECT_VERSION_STRING L" (Build " \
-    MILE_PROJECT_MACRO_TO_STRING(MILE_PROJECT_VERSION_BUILD) L")"
+#define MOBILITY_HVGCS_VERSION_UTF8_STRING \
+    MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
+    MILE_PROJECT_MACRO_TO_UTF8_STRING(MILE_PROJECT_VERSION_BUILD) ")"
 
 namespace
 {
-    static EFI_STATUS OutputWideString(
-        _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
-        _In_ const wchar_t* String)
-    {
-        return Output->OutputString(
-            Output,
-            const_cast<CHAR16*>(reinterpret_cast<const CHAR16*>(String)));
-    }
-
     static EFI_DEVICE_PATH_PROTOCOL* GetNextDevicePath(
         _In_ EFI_DEVICE_PATH_PROTOCOL* DevicePath)
     {
@@ -385,26 +376,26 @@ EFI_STATUS EFIAPI UefiMain(
     _In_ EFI_HANDLE ImageHandle,
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"Mobility Hyper-V Guest Compatibility Shim"
-        L" " MOBILITY_HVGCS_VERSION_STRING L"\r\n"
-        L"(c) Kenji Mouri. All rights reserved.\r\n"
-        L"\r\n");
+        "Mobility Hyper-V Guest Compatibility Shim"
+        " " MOBILITY_HVGCS_VERSION_UTF8_STRING "\r\n"
+        "(c) Kenji Mouri. All rights reserved.\r\n"
+        "\r\n");
 
-    wchar_t Buffer[256];
+    char Buffer[256];
     ::memset(Buffer, 0, 256);
-    ::_snwprintf(Buffer, 256, L"SystemTable = %p\r\n", SystemTable);
-    ::OutputWideString(
+    ::_snprintf(Buffer, 256, "SystemTable = %p\r\n", SystemTable);
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
         Buffer);
 
     if (::MoHvCheckAvailability())
     {
-        ::OutputWideString(
+        ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            L"Hyper-V Generation 2 Virtual Machine detected, "
-            L"starting to patch ACPI description tables...\r\n");
+            "Hyper-V Generation 2 Virtual Machine detected, "
+            "starting to patch ACPI description tables...\r\n");
 
         MO_ACPI_DESCRIPTION_TABLES DescriptionTables;
         ::MoAcpiGetDescriptionTables(SystemTable, &DescriptionTables);
@@ -418,9 +409,9 @@ EFI_STATUS EFIAPI UefiMain(
                     reinterpret_cast<uint8_t*>(DescriptionTables.MadtHeader),
                     DescriptionTables.MadtHeader->Header.Length);
 
-            ::OutputWideString(
+            ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                L"ACPI MADT PC-AT Compatibility flags bit is applied.\r\n");
+                "ACPI MADT PC-AT Compatibility flags bit is applied.\r\n");
         }
 
         if (DescriptionTables.Fadt)
@@ -433,9 +424,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Pm1aEvtBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1aEvtBlk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Pm1aEvtBlk workaround is applied.\r\n");
+                        "ACPI FADT Pm1aEvtBlk workaround is applied.\r\n");
                 }
             }
 
@@ -447,9 +438,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Pm1bEvtBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1bEvtBlk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Pm1bEvtBlk workaround is applied.\r\n");
+                        "ACPI FADT Pm1bEvtBlk workaround is applied.\r\n");
                 }
             }
 
@@ -461,9 +452,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Pm1aCntBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1aCntBlk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Pm1aCntBlk workaround is applied.\r\n");
+                        "ACPI FADT Pm1aCntBlk workaround is applied.\r\n");
                 }
             }
 
@@ -475,9 +466,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Pm1bCntBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm1bCntBlk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Pm1bCntBlk workaround is applied.\r\n");
+                        "ACPI FADT Pm1bCntBlk workaround is applied.\r\n");
                 }
             }
 
@@ -489,9 +480,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Pm2CntBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPm2CntBlk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Pm2CntBlk workaround is applied.\r\n");
+                        "ACPI FADT Pm2CntBlk workaround is applied.\r\n");
                 }
             }
 
@@ -503,9 +494,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->PmTmrBlk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XPmTmrBlk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT PmTmrBlk workaround is applied.\r\n");
+                        "ACPI FADT PmTmrBlk workaround is applied.\r\n");
                 }
             }
 
@@ -517,9 +508,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Gpe0Blk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XGpe0Blk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Gpe0Blk workaround is applied.\r\n");
+                        "ACPI FADT Gpe0Blk workaround is applied.\r\n");
                 }
             }
 
@@ -531,9 +522,9 @@ EFI_STATUS EFIAPI UefiMain(
                     DescriptionTables.Fadt->Gpe1Blk = static_cast<UINT32>(
                         DescriptionTables.Fadt->XGpe1Blk.Address);
 
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"ACPI FADT Gpe1Blk workaround is applied.\r\n");
+                        "ACPI FADT Gpe1Blk workaround is applied.\r\n");
                 }
             }
 
@@ -575,14 +566,14 @@ EFI_STATUS EFIAPI UefiMain(
                     reinterpret_cast<uint8_t*>(DescriptionTables.SratHeader),
                     DescriptionTables.SratHeader->Header.Length);
 
-            ::OutputWideString(
+            ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                L"ACPI SRAT workaround is applied.\r\n");
+                "ACPI SRAT workaround is applied.\r\n");
         }
 
-        ::OutputWideString(
+        ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            L"All needed ACPI description tables are patched.\r\n");
+            "All needed ACPI description tables are patched.\r\n");
     }
 
     EFI_STATUS Status = EFI_SUCCESS;
@@ -594,9 +585,9 @@ EFI_STATUS EFIAPI UefiMain(
         reinterpret_cast<void**>(&CurrentImageInformation));
     if (EFI_SUCCESS != Status)
     {
-        ::OutputWideString(
+        ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            L"Failed to open the EFI_LOADED_IMAGE_PROTOCOL.\r\n");
+            "Failed to open the EFI_LOADED_IMAGE_PROTOCOL.\r\n");
     }
     else
     {
@@ -606,16 +597,16 @@ EFI_STATUS EFIAPI UefiMain(
             sizeof(TargetFileBuffer) / sizeof(*TargetFileBuffer),
             CurrentImageInformation->FilePath))
         {
-            ::OutputWideString(
+            ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                L"Failed to call GetFilePathFromEfiDevicePath.\r\n");
+                "Failed to call GetFilePathFromEfiDevicePath.\r\n");
         }
         else
         {
-            ::OutputWideString(
+            ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                L"Current EFI Image Path = ");
-            ::OutputWideString(
+                "Current EFI Image Path = ");
+            ::MoUefiConsoleWriteUcs2String(
                 SystemTable->ConOut,
                 TargetFileBuffer);
 

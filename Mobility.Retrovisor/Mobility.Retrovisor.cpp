@@ -13,12 +13,11 @@
 
 #include <Mile.Project.Version.h>
 
-#undef NULL
-#include <Uefi.h>
+#include <Mobility.Uefi.Core.h>
 
-#define MOBILITY_RETROVISOR_VERSION_STRING \
-    MILE_PROJECT_VERSION_STRING L" (Build " \
-    MILE_PROJECT_MACRO_TO_STRING(MILE_PROJECT_VERSION_BUILD) L")"
+#define MOBILITY_RETROVISOR_VERSION_UTF8_STRING \
+    MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
+    MILE_PROJECT_MACRO_TO_UTF8_STRING(MILE_PROJECT_VERSION_BUILD) ")"
 
 namespace
 {
@@ -44,21 +43,21 @@ EFI_STATUS EFIAPI UefiMain(
     _In_ EFI_HANDLE ImageHandle,
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"Mobility Retrovisor"
-        L" " MOBILITY_RETROVISOR_VERSION_STRING L"\r\n"
-        L"(c) Kenji Mouri. All rights reserved.\r\n"
-        L"\r\n");
+        "Mobility Retrovisor"
+        " " MOBILITY_RETROVISOR_VERSION_UTF8_STRING "\r\n"
+        "(c) Kenji Mouri. All rights reserved.\r\n"
+        "\r\n");
 
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"Hello World!\r\n");
+        "Hello World!\r\n");
 
-    ::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"\r\n"
-        L"Press any key to return to the boot menu...\r\n");
+        "\r\n"
+        "Press any key to return to the boot menu...\r\n");
     {
         UINTN Index = 0;
         SystemTable->BootServices->WaitForEvent(
