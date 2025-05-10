@@ -15,23 +15,8 @@
 
 #include <Mile.Project.Version.h>
 
-#undef NULL
-#include <Uefi.h>
+#include <Mobility.Uefi.Core.h>
 #include <Protocol/GraphicsOutput.h>
-
-EXTERN_C VOID MOAPI MoEfiConsoleWriteAsciiString(
-    _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
-    _In_ MO_CONSTANT_STRING String)
-{
-    CHAR16 WideStringTemplate[2] = { 0, 0 };
-    while (*String)
-    {
-        WideStringTemplate[0] = *String > MO_UNICODE_DELETE
-            ? MO_UNICODE_SPACE
-            : *String++;
-        Output->OutputString(Output, WideStringTemplate);
-    }
-}
 
 #define MOBILITY_ONECENT_VERSION_UTF8_STRING \
     MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
@@ -51,7 +36,7 @@ EFI_STATUS EFIAPI UefiMain(
     _In_ EFI_HANDLE ImageHandle,
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    ::MoEfiConsoleWriteAsciiString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
         "Mobility OneCent"
         " " MOBILITY_ONECENT_VERSION_UTF8_STRING "\r\n"
@@ -72,7 +57,7 @@ EFI_STATUS EFIAPI UefiMain(
             reinterpret_cast<void**>(&GraphicsOutputProtocol));
         if (EFI_SUCCESS != Status)
         {
-            ::MoEfiConsoleWriteAsciiString(
+            ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
                 "Failed to locate the Graphics Output Protocol.\r\n"
                 "\r\nPress any key to return to the boot menu...\r\n");
