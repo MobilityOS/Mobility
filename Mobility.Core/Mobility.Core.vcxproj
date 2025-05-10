@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{13E81037-2BC9-4DC8-91AE-6B463759269B}</ProjectGuid>
+    <RootNamespace>Mobility.Core</RootNamespace>
+    <MileProjectType>StaticLibrary</MileProjectType>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.ARM64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.props" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1438" Project="Mile.Uefi.props" />
+  <ItemGroup>
+    <None Include="Mobility.Core.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mile.Mobility">
+      <Version>1.0.172</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.targets" />
+</Project>

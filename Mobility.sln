@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.Retrovisor", "Mobi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.Core.Uefi", "Mobility.Core.Uefi\Mobility.Core.Uefi.vcxproj", "{3FBDCF0B-51B2-47D8-990A-381F636ADD5D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.Core", "Mobility.Core\Mobility.Core.vcxproj", "{13E81037-2BC9-4DC8-91AE-6B463759269B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -55,6 +57,14 @@ Global
 		{3FBDCF0B-51B2-47D8-990A-381F636ADD5D}.Release|ARM64.Build.0 = Release|ARM64
 		{3FBDCF0B-51B2-47D8-990A-381F636ADD5D}.Release|x64.ActiveCfg = Release|x64
 		{3FBDCF0B-51B2-47D8-990A-381F636ADD5D}.Release|x64.Build.0 = Release|x64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Debug|ARM64.Build.0 = Debug|ARM64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Debug|x64.ActiveCfg = Debug|x64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Debug|x64.Build.0 = Debug|x64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Release|ARM64.ActiveCfg = Release|ARM64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Release|ARM64.Build.0 = Release|ARM64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Release|x64.ActiveCfg = Release|x64
+		{13E81037-2BC9-4DC8-91AE-6B463759269B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
