@@ -4,12 +4,14 @@
     <ProjectGuid>{13E81037-2BC9-4DC8-91AE-6B463759269B}</ProjectGuid>
     <RootNamespace>Mobility.Core</RootNamespace>
     <MileProjectType>StaticLibrary</MileProjectType>
+    <MileUefiDisableUefiHeaders>true</MileUefiDisableUefiHeaders>
+    <MileUefiDisableUefiGuidSources>true</MileUefiDisableUefiGuidSources>
   </PropertyGroup>
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.x64.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.ARM64.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.Default.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.props" />
-  <Import Sdk="Mile.Uefi" Version="1.0.1438" Project="Mile.Uefi.props" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.props" />
   <ItemGroup>
     <None Include="Mobility.Core.props" />
   </ItemGroup>
@@ -30,5 +32,6 @@
     <ClInclude Include="Mobility.Display.Core.h" />
     <ClInclude Include="Mobility.Unicode.Core.h" />
   </ItemGroup>
+  <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.targets" />
 </Project>
