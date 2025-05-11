@@ -279,53 +279,92 @@ extern "C" void MoAcpiGetDescriptionTables(
 
 namespace
 {
-    static EFI_DEVICE_PATH_PROTOCOL* GetNextDevicePath(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* DevicePath)
+    static bool IsDevicePathEndNode(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
-        return DevicePath
+        return Node
+            && END_DEVICE_PATH_TYPE == Node->Type
+            && END_ENTIRE_DEVICE_PATH_SUBTYPE == Node->SubType;
+    }
+
+    static bool IsDevicePathFilePathNode(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+    {
+        return Node
+            && MEDIA_DEVICE_PATH == Node->Type
+            && MEDIA_FILEPATH_DP == Node->SubType;
+    }
+
+    static UINT16 GetDevicePathNodeLength(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+    {
+        return Node
+            ? (static_cast<UINT16>(Node->Length[1]) << 8) | Node->Length[0]
+            : 0;
+    }
+
+    static bool SetDevicePathNodeLength(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Node,
+        _In_ UINT16 Length)
+    {
+        if (!Node)
+        {
+            return false;
+        }
+        Node->Length[0] = static_cast<UINT8>(Length);
+        Node->Length[1] = static_cast<UINT8>(Length >> 8);
+        return true;
+    }
+
+    static EFI_DEVICE_PATH_PROTOCOL* GetNextDevicePathNode(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+    {
+        return Node
             ? reinterpret_cast<EFI_DEVICE_PATH_PROTOCOL*>(
-                reinterpret_cast<UINT8*>(DevicePath)
-                + (static_cast<UINTN>(DevicePath->Length[1]) << 8)
-                + DevicePath->Length[0])
+                reinterpret_cast<UINT8*>(Node)
+                + ::GetDevicePathNodeLength(Node))
             : nullptr;
     }
 
-    static FILEPATH_DEVICE_PATH* DevicePathToFilePath(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* DevicePath)
+    static FILEPATH_DEVICE_PATH* DevicePathNodeToFilePathNode(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
-        return (
-            DevicePath &&
-            MEDIA_DEVICE_PATH == DevicePath->Type &&
-            MEDIA_FILEPATH_DP == DevicePath->SubType)
-            ? reinterpret_cast<FILEPATH_DEVICE_PATH*>(DevicePath)
+        return (Node && ::IsDevicePathFilePathNode(Node))
+            ? reinterpret_cast<FILEPATH_DEVICE_PATH*>(Node)
             : nullptr;
     }
 
-    static size_t GetFilePathLengthFromDevicePath(
+    static UINTN GetFilePathLengthFromDevicePath(
         _In_ EFI_DEVICE_PATH_PROTOCOL* Source)
     {
         // Initial length includes the null terminator.
-        size_t Length = 1;
+        UINTN Length = 1;
         while (Source)
         {
-            FILEPATH_DEVICE_PATH* FilePath = ::DevicePathToFilePath(Source);
+            FILEPATH_DEVICE_PATH* FilePath =
+                ::DevicePathNodeToFilePathNode(Source);
             if (!FilePath)
             {
                 break;
             }
 
-            // Add the length of the path separator and the file path string.
-            Length += 1 + ::wcslen(
-                reinterpret_cast<wchar_t*>(FilePath->PathName));
+            // Add the length of the path separator if needed.
+            if (L'\\' != *FilePath->PathName)
+            {
+                ++Length;
+            }
 
-            Source = ::GetNextDevicePath(Source);
+            // Add the file path string.
+            Length += ::wcslen(reinterpret_cast<wchar_t*>(FilePath->PathName));
+
+            Source = ::GetNextDevicePathNode(Source);
         }
         return Length;
     }
 
-    static bool GetFilePathFromEfiDevicePath(
+    static bool GetFilePathFromDevicePath(
         _Out_ wchar_t* Destination,
-        _In_ size_t DestinationLength,
+        _In_ UINTN DestinationLength,
         _In_ EFI_DEVICE_PATH_PROTOCOL* Source)
     {
         if (!Destination || !DestinationLength || !Source)
@@ -333,7 +372,7 @@ namespace
             return false;
         }
 
-        size_t RequiredLength = ::GetFilePathLengthFromDevicePath(Source);
+        UINTN RequiredLength = ::GetFilePathLengthFromDevicePath(Source);
         if (RequiredLength > DestinationLength)
         {
             return false;
@@ -342,7 +381,8 @@ namespace
         ::memset(Destination, 0, DestinationLength * sizeof(wchar_t));
         while (Source)
         {
-            FILEPATH_DEVICE_PATH* FilePath = ::DevicePathToFilePath(Source);
+            FILEPATH_DEVICE_PATH* FilePath =
+                ::DevicePathNodeToFilePathNode(Source);
             if (!FilePath)
             {
                 break;
@@ -351,16 +391,141 @@ namespace
             wcscat_s(
                 Destination,
                 DestinationLength,
-                L"\\");
-            wcscat_s(
-                Destination,
-                DestinationLength,
                 reinterpret_cast<wchar_t*>(FilePath->PathName));
 
-            Source = ::GetNextDevicePath(Source);
+            Source = ::GetNextDevicePathNode(Source);
         }
 
         return true;
+    }
+
+    EFI_DEVICE_PATH_PROTOCOL* GetDevicePathFromDeviceHandle(
+        _In_ EFI_BOOT_SERVICES* BootServices,
+        _In_ EFI_HANDLE DeviceHandle)
+    {
+        EFI_DEVICE_PATH_PROTOCOL* DevicePath = nullptr;
+        EFI_STATUS Status = BootServices->HandleProtocol(
+            DeviceHandle,
+            &gEfiDevicePathProtocolGuid,
+            reinterpret_cast<void**>(&DevicePath));
+        return EFI_SUCCESS == Status ? DevicePath : nullptr;
+    }
+
+    static UINTN GetAbsoluteDevicePathLengthForFile(
+        _In_ EFI_DEVICE_PATH_PROTOCOL* RootDevicePath,
+        _In_ wchar_t* RelativeFilePath)
+    {
+        if (!RootDevicePath || !RelativeFilePath)
+        {
+            return 0;
+        }
+
+        UINTN Length = 0;
+
+        EFI_DEVICE_PATH_PROTOCOL* Current = RootDevicePath;
+        while (Current && !::IsDevicePathEndNode(Current))
+        {
+            Length += ::GetDevicePathNodeLength(Current);
+            Current = ::GetNextDevicePathNode(Current);
+        }
+
+        while (*RelativeFilePath)
+        {
+            Length += L'\\' == *RelativeFilePath++
+                ? sizeof(FILEPATH_DEVICE_PATH) // Node Header with L'\0'
+                : sizeof(CHAR16);
+        }
+        Length += sizeof(FILEPATH_DEVICE_PATH); // End Node
+
+        return Length;
+    }
+
+    static bool CreateAbsoluteDevicePathForFile(
+        _Out_ EFI_DEVICE_PATH_PROTOCOL* DevicePathBuffer,
+        _In_ size_t DevicePathBufferLength,
+        _In_ EFI_DEVICE_PATH_PROTOCOL* RootDevicePath,
+        _In_ wchar_t* RelativeFilePath)
+    {
+        if (!DevicePathBuffer || !DevicePathBufferLength ||
+            !RootDevicePath || !RelativeFilePath)
+        {
+            return false;
+        }
+
+        UINTN RequiredLength = ::GetAbsoluteDevicePathLengthForFile(
+            RootDevicePath,
+            RelativeFilePath);
+        if (RequiredLength > DevicePathBufferLength)
+        {
+            return false;
+        }
+
+        ::memset(DevicePathBuffer, 0, DevicePathBufferLength);
+        EFI_DEVICE_PATH_PROTOCOL* Current = DevicePathBuffer;
+        while (RootDevicePath && !::IsDevicePathEndNode(RootDevicePath))
+        {
+            UINTN NodeLength = ::GetDevicePathNodeLength(RootDevicePath);
+            ::memcpy(Current, RootDevicePath, NodeLength);
+            Current = ::GetNextDevicePathNode(Current);
+            RootDevicePath = ::GetNextDevicePathNode(RootDevicePath);
+        }
+
+        UINT16 RelativeFilePathLength = static_cast<UINT16>(
+            ::wcslen(RelativeFilePath) + 1);
+        FILEPATH_DEVICE_PATH* FilePath =
+            reinterpret_cast<FILEPATH_DEVICE_PATH*>(Current);
+        FilePath->Header.Type = MEDIA_DEVICE_PATH;
+        FilePath->Header.SubType = MEDIA_FILEPATH_DP;
+        UINT16 NodeLength = sizeof(FILEPATH_DEVICE_PATH);
+        NodeLength += RelativeFilePathLength * sizeof(CHAR16);
+        ::SetDevicePathNodeLength(&FilePath->Header, NodeLength);
+        ::memcpy(
+            FilePath->PathName,
+            RelativeFilePath,
+            RelativeFilePathLength * sizeof(CHAR16));
+        Current = ::GetNextDevicePathNode(Current);
+
+        Current->Type = END_DEVICE_PATH_TYPE;
+        Current->SubType = END_ENTIRE_DEVICE_PATH_SUBTYPE;
+        ::SetDevicePathNodeLength(Current, sizeof(EFI_DEVICE_PATH_PROTOCOL));
+
+        return true;
+    }
+
+    static EFI_STATUS LaunchImage(
+        _In_ EFI_BOOT_SERVICES* BootServices,
+        _In_ EFI_HANDLE ParentImageHandle,
+        _In_ EFI_DEVICE_PATH_PROTOCOL* ImageDevicePath)
+    {
+        EFI_HANDLE ImageHandle = nullptr;
+        EFI_STATUS Status = BootServices->LoadImage(
+            TRUE,
+            ParentImageHandle,
+            ImageDevicePath,
+            nullptr,
+            0,
+            &ImageHandle);
+        if (EFI_SUCCESS != Status)
+        {
+            return Status;
+        }
+
+        EFI_LOADED_IMAGE_PROTOCOL* ImageInformation = nullptr;
+        Status = BootServices->HandleProtocol(
+            ImageHandle,
+            &gEfiLoadedImageProtocolGuid,
+            reinterpret_cast<void**>(&ImageInformation));
+        if (EFI_SUCCESS == Status &&
+            EfiLoaderCode == ImageInformation->ImageCodeType)
+        {
+            Status = BootServices->StartImage(ImageHandle, nullptr, nullptr);
+        }
+        else
+        {
+            BootServices->UnloadImage(ImageHandle);
+        }
+
+        return Status;
     }
 }
 
@@ -592,14 +757,14 @@ EFI_STATUS EFIAPI UefiMain(
     else
     {
         wchar_t TargetFileBuffer[260];
-        if (!::GetFilePathFromEfiDevicePath(
+        if (!::GetFilePathFromDevicePath(
             TargetFileBuffer,
             sizeof(TargetFileBuffer) / sizeof(*TargetFileBuffer),
             CurrentImageInformation->FilePath))
         {
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                "Failed to call GetFilePathFromEfiDevicePath.\r\n");
+                "Failed to get the file path from the device path.\r\n");
         }
         else
         {
@@ -609,64 +774,93 @@ EFI_STATUS EFIAPI UefiMain(
             ::MoUefiConsoleWriteUcs2String(
                 SystemTable->ConOut,
                 TargetFileBuffer);
-
-            /*EFI_HANDLE NewImageHandle = nullptr;
-            Status = SystemTable->BootServices->LoadImage(
-                TRUE,
-                ImageHandle,
-                CurrentImageInformation->DeviceHandle,
-                nullptr,
-                0,
-                &NewImageHandle);
-            if (EFI_SUCCESS != Status)
+            ::MoUefiConsoleWriteAsciiString(
+                SystemTable->ConOut,
+                "\r\n");
+            wchar_t* ReplacementStart = ::wcsrchr(TargetFileBuffer, L'\\');
+            if (ReplacementStart)
             {
-                ::OutputWideString(
+                ReplacementStart = ::wcsrchr(ReplacementStart, L'.');
+            }
+            if (!ReplacementStart)
+            {
+                ::MoUefiConsoleWriteAsciiString(
                     SystemTable->ConOut,
-                    L"Failed to load the EFI image.\r\n");
+                    "Failed to get the valid file path.\r\n");
             }
             else
             {
-                EFI_LOADED_IMAGE_PROTOCOL* NewImageInformation = nullptr;
-                Status = SystemTable->BootServices->HandleProtocol(
-                    NewImageHandle,
-                    &gEfiLoadedImageProtocolGuid,
-                    reinterpret_cast<void**>(&NewImageInformation));
-                if (EFI_SUCCESS != Status ||
-                    EfiLoaderCode != NewImageInformation->ImageCodeType)
+                ++ReplacementStart;
+                size_t BufferLength = sizeof(TargetFileBuffer) - sizeof(wchar_t);
+                BufferLength -= ReplacementStart - TargetFileBuffer;
+                BufferLength /= sizeof(wchar_t);
+                ::wcscpy_s(ReplacementStart, BufferLength, L"original.efi");
+                ::MoUefiConsoleWriteAsciiString(
+                    SystemTable->ConOut,
+                    "Target EFI Image Path = ");
+                ::MoUefiConsoleWriteUcs2String(
+                    SystemTable->ConOut,
+                    TargetFileBuffer);
+                ::MoUefiConsoleWriteAsciiString(
+                    SystemTable->ConOut,
+                    "\r\n");
+
+                EFI_DEVICE_PATH_PROTOCOL* RootDevicePath =
+                    ::GetDevicePathFromDeviceHandle(
+                        SystemTable->BootServices,
+                        CurrentImageInformation->DeviceHandle);
+                if (!RootDevicePath)
                 {
-                    ::OutputWideString(
+                    ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
-                        L"The EFI image is invalid.\r\n");
-                    SystemTable->BootServices->UnloadImage(NewImageHandle);
+                        "Failed to get the root device path.\r\n");
                 }
                 else
                 {
-                    Status = SystemTable->BootServices->StartImage(
-                        NewImageHandle,
-                        nullptr,
-                        nullptr);
-                    if (EFI_SUCCESS != Status)
+                    UINT8 DevicePathBuffer[4096];
+                    ::memset(DevicePathBuffer, 0, sizeof(DevicePathBuffer));
+                    EFI_DEVICE_PATH_PROTOCOL* TargetDevicePath =
+                        reinterpret_cast<EFI_DEVICE_PATH_PROTOCOL*>(
+                            DevicePathBuffer);
+                    if (!::CreateAbsoluteDevicePathForFile(
+                        TargetDevicePath,
+                        sizeof(DevicePathBuffer),
+                        RootDevicePath,
+                        TargetFileBuffer))
                     {
-                        ::OutputWideString(
+                        ::MoUefiConsoleWriteAsciiString(
                             SystemTable->ConOut,
-                            L"Failed to start the EFI image.\r\n");
+                            "Failed to create the absolute device path.\r\n");
+                    }
+                    else
+                    {
+                        Status = ::LaunchImage(
+                            SystemTable->BootServices,
+                            ImageHandle,
+                            TargetDevicePath);
+                        if (EFI_SUCCESS != Status)
+                        {
+                            ::MoUefiConsoleWriteAsciiString(
+                                SystemTable->ConOut,
+                                "Failed to launch the target image.\r\n");
+                        }
                     }
                 }
-            }*/
+            }
         }
     }
 
-    /*::OutputWideString(
+    ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        L"\r\n"
-        L"Press any key to return to the boot menu...\r\n");
+        "\r\n"
+        "Press any key to return to the boot menu...\r\n");
     {
         UINTN Index = 0;
         SystemTable->BootServices->WaitForEvent(
             1,
             &SystemTable->ConIn->WaitForKey,
             &Index);
-    }*/
+    }
 
     return Status;
 }
