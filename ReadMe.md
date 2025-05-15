@@ -6,6 +6,31 @@ want to make a duplicate POSIX-based toy OS implementation.
 
 Work In Progress
 
+## Flavors
+
+### Mobility OneCent (Otokonoko-based Core)
+
+Lightweight bare-metal WebAssembly Virtual Machine Manager.
+
+The WebAssembly Virtual Machine used in the Mobility project will finally be an
+independent implementation called Otokonoko.
+
+[Mobility.OneCent](Mobility.OneCent)
+
+### Mobility Retrovisor (Retro-V)
+
+Immersive bare-metal legacy x86-32 virtualization solution for modern x86-64
+UEFI Class 3 platform.
+
+[Mobility.Retrovisor](Mobility.Retrovisor)
+
+### Mobility Hyper-V Guest Compatibility Shim
+
+Simple compatibility shim for booting x86-64 Windows XP / Vista / 7 on Hyper-V
+Generation 2 Virtual Machines without modifications in some scenarios.
+
+[Mobility.HvGcs](Mobility.HvGcs)
+
 ## Supported Platforms
 
 - Hyper-V Generation 2 Virtual Machines
