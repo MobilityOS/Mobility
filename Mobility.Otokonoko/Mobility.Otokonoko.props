@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PROJECT:   Mobility
+  FILE:      Mobility.Otokonoko.props
+  PURPOSE:   MSBuild Properties for Mobility.Otokonoko
+
+  LICENSE:   The MIT License
+
+  MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <IncludePath>$(MSBuildThisFileDirectory);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>$(OutDir)Mobility.Otokonoko.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)Mobility.Otokonoko.vcxproj">
+      <Project>{AA62DA47-4A3D-470C-8148-CC7CB65E6F4C}</Project>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

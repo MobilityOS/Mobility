@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AA62DA47-4A3D-470C-8148-CC7CB65E6F4C}</ProjectGuid>
+    <RootNamespace>Mobility.Otokonoko</RootNamespace>
+    <MileProjectType>StaticLibrary</MileProjectType>
+    <MileUefiDisableUefiHeaders>true</MileUefiDisableUefiHeaders>
+    <MileUefiDisableUefiGuidSources>true</MileUefiDisableUefiGuidSources>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Platform.ARM64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.props" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.props" />
+  <ItemGroup>
+    <None Include="Mobility.Otokonoko.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mile.Mobility">
+      <Version>1.0.172</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Mobility.Otokonoko.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Mobility.Otokonoko.h" />
+  </ItemGroup>
+  <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.targets" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1622" Project="Mile.Project.Cpp.targets" />
+</Project>
