@@ -23,6 +23,7 @@
 #include <Mile.HyperV.VMBus.h>
 
 #include <intrin.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 
