@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mobility
- * FILE:      Mobility.MinUap.cpp
- * PURPOSE:   Implementation for Mobility Minimal UEFI Application Project
+ * PROJECT:    Mobility
+ * FILE:       Mobility.MinUap.cpp
+ * PURPOSE:    Implementation for Mobility Minimal UEFI Application Project
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */

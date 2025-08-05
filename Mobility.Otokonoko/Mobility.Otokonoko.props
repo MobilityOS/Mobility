@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  PROJECT:   Mobility
-  FILE:      Mobility.Otokonoko.props
-  PURPOSE:   MSBuild Properties for Mobility.Otokonoko
+  PROJECT:    Mobility
+  FILE:       Mobility.Otokonoko.props
+  PURPOSE:    MSBuild Properties for Mobility.Otokonoko
 
-  LICENSE:   The MIT License
+  LICENSE:    The MIT License
 
   MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
 -->

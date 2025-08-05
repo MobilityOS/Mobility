@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mobility
- * FILE:      Mobility.Otokonoko.h
- * PURPOSE:   Definition for Mobility Otokonoko
+ * PROJECT:    Mobility
+ * FILE:       Mobility.Otokonoko.h
+ * PURPOSE:    Definition for Mobility Otokonoko
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */

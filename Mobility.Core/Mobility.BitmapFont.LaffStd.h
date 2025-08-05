@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mobility
- * FILE:      Mobility.BitmapFont.LaffStd.h
- * PURPOSE:   Definition for LaffStd, the UEFI console default font
+ * PROJECT:    Mobility
+ * FILE:       Mobility.BitmapFont.LaffStd.h
+ * PURPOSE:    Definition for LaffStd, the UEFI console default font
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */

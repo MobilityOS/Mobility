@@ -1,11 +1,11 @@
 ﻿/*
- * PROJECT:   Mouri Internal Library Essentials
- * FILE:      stdbool.h
- * PURPOSE:   The C Standard Library <stdbool.h> header.
+ * PROJECT:    Mouri Internal Library Essentials
+ * FILE:       stdbool.h
+ * PURPOSE:    The C Standard Library <stdbool.h> header.
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
- * DEVELOPER: Mouri_Naruto (Mouri_Naruto AT Outlook.com)
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
 #ifndef MILE_UEFI_STDBOOL

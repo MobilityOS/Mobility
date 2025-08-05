@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mobility
- * FILE:      Mobility.HvGcs.cpp
- * PURPOSE:   Implementation for Mobility Hyper-V Guest Compatibility Shim
+ * PROJECT:    Mobility
+ * FILE:       Mobility.HvGcs.cpp
+ * PURPOSE:    Implementation for Mobility Hyper-V Guest Compatibility Shim
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
@@ -48,7 +48,7 @@ extern "C" bool MoHvCheckAvailability()
     // - Hypervisor synthetic MSRs HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL
     //   and HV_X64_MSR_VP_INDEX.
     // - A minimal implementation of the hypercall interface
-    // 
+    //
     // Software determines the presence of a hypervisor through the CPUID
     // instruction. Processors conforming to the Intel® 64 architecture have
     // reserved a feature flag in CPUID Function 0x01 - Feature Information for
@@ -56,14 +56,14 @@ extern "C" bool MoHvCheckAvailability()
     // always return 0 from the physical CPU. A hypervisor conformant with the
     // Microsoft hypervisor interface will set CPUID.1:ECX[bit 31] = 1 to
     // indicate its presence to software.
-    // 
+    //
     // The Intel® 64 architecture reserves CPUID leaves 0x40000000-0x400000FF
     // for use by system software. A Microsoft-compliant hypervisor guarantees
     // leaves 0x40000000 and 0x40000001 are always available.
     // The hypervisor interface identification is provided at CPUID leaf
     // 0x40000001. Hypervisors conforming to the Microsoft hypervisor interface
     // will return the hypervisor interface identification signature 'Hv#1'
-    // (0x31237648) in CPUID.40000001:EAX.   
+    // (0x31237648) in CPUID.40000001:EAX.
 
     HV_CPUID_RESULT HvCpuIdResult;
 

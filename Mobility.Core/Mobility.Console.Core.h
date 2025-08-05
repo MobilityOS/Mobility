@@ -1,9 +1,9 @@
 ﻿/*
- * PROJECT:   Mobility
- * FILE:      Mobility.Console.Core.h
- * PURPOSE:   Definition for Mobility Console Core
+ * PROJECT:    Mobility
+ * FILE:       Mobility.Console.Core.h
+ * PURPOSE:    Definition for Mobility Console Core
  *
- * LICENSE:   The MIT License
+ * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */

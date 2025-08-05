@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  PROJECT:   Mobility
-  FILE:      Mobility.Core.Uefi.props
-  PURPOSE:   MSBuild Properties for Mobility.Core.Uefi
+  PROJECT:    Mobility
+  FILE:       Mobility.Core.Uefi.props
+  PURPOSE:    MSBuild Properties for Mobility.Core.Uefi
 
-  LICENSE:   The MIT License
+  LICENSE:    The MIT License
 
   MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
 -->
