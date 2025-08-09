@@ -27,7 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mile.HyperV">
-      <Version>1.1.635</Version>
+      <Version>1.2.688</Version>
     </PackageReference>
     <PackageReference Include="Mile.Mobility">
       <Version>1.0.212</Version>
