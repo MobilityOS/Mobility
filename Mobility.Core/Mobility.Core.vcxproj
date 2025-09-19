@@ -7,10 +7,10 @@
     <MileUefiDisableUefiHeaders>true</MileUefiDisableUefiHeaders>
     <MileUefiDisableUefiGuidSources>true</MileUefiDisableUefiGuidSources>
   </PropertyGroup>
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1766" Project="Mile.Project.Platform.x64.props" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1766" Project="Mile.Project.Platform.ARM64.props" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1766" Project="Mile.Project.Cpp.Default.props" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1766" Project="Mile.Project.Cpp.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1768" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1768" Project="Mile.Project.Platform.ARM64.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1768" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1768" Project="Mile.Project.Cpp.props" />
   <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.props" />
   <ItemGroup>
     <None Include="Mobility.Core.props" />
@@ -33,5 +33,5 @@
     <ClInclude Include="Mobility.Unicode.Core.h" />
   </ItemGroup>
   <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.targets" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1766" Project="Mile.Project.Cpp.targets" />
+  <Import Sdk="Mile.Project.Configurations" Version="1.0.1768" Project="Mile.Project.Cpp.targets" />
 </Project>
