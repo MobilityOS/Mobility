@@ -31,6 +31,16 @@ Generation 2 Virtual Machines without modifications in some scenarios.
 
 [Mobility.HvGcs](Mobility.HvGcs)
 
+### Mobility Hyper-V Lightweight Debugger for Guests
+
+Lightweight bare-metal debugger for Hyper-V Generation 2 Virtual Machines guests.
+
+Note: Lightweight Debugger for Guests a.k.a. LDG is the acronym of the name of a
+professor ("Le De Guang" as the reading sequence) who gives me some inspiration
+to create this project as the middle stage of the whole Mobility project.
+
+[Mobility.HvLdg](Mobility.HvLdg)
+
 ## Supported Platforms
 
 - Hyper-V Generation 2 Virtual Machines
