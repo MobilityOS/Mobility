@@ -44,7 +44,7 @@ to create this project as the middle stage of the whole Mobility project.
 ## Supported Platforms
 
 - Hyper-V Generation 2 Virtual Machines
-  - x86-64 guests with minimum 32 MiB of memory
+  - x86-64 guests with minimum 64 MiB of memory
 
 ## Documents
 
