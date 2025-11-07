@@ -10,7 +10,7 @@
     },
     "GuestStateFile": "Mobility.TestVM.vmgs",
     "GuestType": "Windows",
-    "MemorySize": 32,
+    "MemorySize": 64,
     "Name": "Mobility.TestVM",
     "NetworkAdapters": [
       {
@@ -23,14 +23,17 @@
     "RuntimeStateFile": "Mobility.TestVM.vmrs",
     "ScsiDevices": [
       {
-        "Type": "VirtualImage"
-      },
-      {
         "Path": "Mobility.TestVM.vhd",
         "Type": "VirtualDisk"
+      },
+      {
+        "Type": "VirtualImage"
       }
     ],
     "Type": "VirtualMachine",
-    "Version": 1
+    "Version": 1,
+    "VideoMonitor": {
+      "DisableBasicSessionDpiScaling": true
+    }
   }
 }
