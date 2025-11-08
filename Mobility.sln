@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.Core", "Mobility.C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.Otokonoko", "Mobility.Otokonoko\Mobility.Otokonoko.vcxproj", "{AA62DA47-4A3D-470C-8148-CC7CB65E6F4C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mobility.HvLdg", "Mobility.HvLdg\Mobility.HvLdg.vcxproj", "{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -75,6 +77,14 @@ Global
 		{AA62DA47-4A3D-470C-8148-CC7CB65E6F4C}.Release|ARM64.Build.0 = Release|ARM64
 		{AA62DA47-4A3D-470C-8148-CC7CB65E6F4C}.Release|x64.ActiveCfg = Release|x64
 		{AA62DA47-4A3D-470C-8148-CC7CB65E6F4C}.Release|x64.Build.0 = Release|x64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Debug|ARM64.Build.0 = Debug|ARM64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Debug|x64.ActiveCfg = Debug|x64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Debug|x64.Build.0 = Debug|x64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Release|ARM64.ActiveCfg = Release|ARM64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Release|ARM64.Build.0 = Release|ARM64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Release|x64.ActiveCfg = Release|x64
+		{0394C1DC-71DA-4312-ACE7-E1CEFBFD126A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
