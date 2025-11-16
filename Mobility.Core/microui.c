@@ -20,9 +20,10 @@
 ** IN THE SOFTWARE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
+#include <Mile.Mobility.Portable.Types.h>
+typedef MO_UINTN size_t;
+
 #include "microui.h"
 
 size_t mu_strlen(const char* str)
