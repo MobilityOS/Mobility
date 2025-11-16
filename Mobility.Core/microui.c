@@ -25,6 +25,13 @@
 #include <string.h>
 #include "microui.h"
 
+size_t mu_strlen(const char* str)
+{
+    size_t i = 0;
+    while (str[i]) ++i;
+    return i;
+}
+
 void mu_sort(
     void* ptr,
     size_t count,
@@ -367,7 +374,7 @@ static mu_Container* get_container(mu_Context *ctx, mu_Id id, int opt) {
 
 
 mu_Container* mu_get_container(mu_Context *ctx, const char *name) {
-  mu_Id id = mu_get_id(ctx, name, strlen(name));
+  mu_Id id = mu_get_id(ctx, name, (int)mu_strlen(name));
   return get_container(ctx, id, 0);
 }
 
@@ -451,8 +458,8 @@ void mu_input_keyup(mu_Context *ctx, int key) {
 
 
 void mu_input_text(mu_Context *ctx, const char *text) {
-  int len = strlen(ctx->input_text);
-  int size = strlen(text) + 1;
+  int len = (int)mu_strlen(ctx->input_text);
+  int size = (int)mu_strlen(text) + 1;
   expect(len + size <= (int) sizeof(ctx->input_text));
   memcpy(ctx->input_text + len, text, size);
 }
@@ -530,7 +537,7 @@ void mu_draw_text(mu_Context *ctx, mu_Font font, const char *str, int len,
   if (clipped == MU_CLIP_ALL ) { return; }
   if (clipped == MU_CLIP_PART) { mu_set_clip(ctx, mu_get_clip_rect(ctx)); }
   /* add command */
-  if (len < 0) { len = strlen(str); }
+  if (len < 0) { len = (int)mu_strlen(str); }
   cmd = mu_push_command(ctx, MU_COMMAND_TEXT, sizeof(mu_TextCommand) + len);
   memcpy(cmd->text.str, str, len);
   cmd->text.str[len] = '\0';
@@ -769,7 +776,7 @@ void mu_label(mu_Context *ctx, const char *text) {
 
 int mu_button_ex(mu_Context *ctx, const char *label, int icon, int opt) {
   int res = 0;
-  mu_Id id = label ? mu_get_id(ctx, label, strlen(label))
+  mu_Id id = label ? mu_get_id(ctx, label, (int)mu_strlen(label))
                    : mu_get_id(ctx, &icon, sizeof(icon));
   mu_Rect r = mu_layout_next(ctx);
   mu_update_control(ctx, id, r, opt);
@@ -815,8 +822,8 @@ int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, mu_Id id, mu_Rect r,
 
   if (ctx->focus == id) {
     /* handle text input */
-    int len = strlen(buf);
-    int n = mu_min(bufsz - len - 1, (int) strlen(ctx->input_text));
+    int len = (int)mu_strlen(buf);
+    int n = mu_min(bufsz - len - 1, (int)mu_strlen(ctx->input_text));
     if (n > 0) {
       memcpy(buf + len, ctx->input_text, n);
       len += n;
@@ -869,7 +876,7 @@ int mu_textbox_ex(mu_Context *ctx, char *buf, int bufsz, int opt) {
 static int header(mu_Context *ctx, const char *label, int istreenode, int opt) {
   mu_Rect r;
   int active, expanded;
-  mu_Id id = mu_get_id(ctx, label, strlen(label));
+  mu_Id id = mu_get_id(ctx, label, (int)mu_strlen(label));
   int idx = mu_pool_get(ctx, ctx->treenode_pool, MU_TREENODEPOOL_SIZE, id);
   int width = -1;
   mu_layout_row(ctx, 1, &width, 0);
@@ -1025,7 +1032,7 @@ static void end_root_container(mu_Context *ctx) {
 
 int mu_begin_window_ex(mu_Context *ctx, const char *title, mu_Rect rect, int opt) {
   mu_Rect body;
-  mu_Id id = mu_get_id(ctx, title, strlen(title));
+  mu_Id id = mu_get_id(ctx, title, (int)mu_strlen(title));
   mu_Container *cnt = get_container(ctx, id, opt);
   if (!cnt || !cnt->open) { return 0; }
   push(ctx->id_stack, id);
@@ -1133,7 +1140,7 @@ void mu_end_popup(mu_Context *ctx) {
 
 void mu_begin_panel_ex(mu_Context *ctx, const char *name, int opt) {
   mu_Container *cnt;
-  mu_push_id(ctx, name, strlen(name));
+  mu_push_id(ctx, name, (int)mu_strlen(name));
   cnt = get_container(ctx, ctx->last_id, opt);
   cnt->rect = mu_layout_next(ctx);
   if (~opt & MU_OPT_NOFRAME) {
