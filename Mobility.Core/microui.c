@@ -25,13 +25,24 @@
 #include <string.h>
 #include "microui.h"
 
+void mu_expect_default_handler(
+    const char* source_file,
+    int source_line,
+    const char* expression)
+{
+    source_file;
+    source_line;
+    expression;
+    /* Just loop forever */
+    for (;;);
+}
+
+
 #define unused(x) ((void) (x))
 
 #define expect(x) do {                                               \
     if (!(x)) {                                                      \
-      fprintf(stderr, "Fatal error: %s:%d: assertion '%s' failed\n", \
-        __FILE__, __LINE__, #x);                                     \
-      abort();                                                       \
+      mu_expect_default_handler(__FILE__, __LINE__, #x);             \
     }                                                                \
   } while (0)
 
