@@ -98,7 +98,7 @@ mu_Rect mu_rect(int x, int y, int w, int h) {
 }
 
 
-mu_Color mu_color(int r, int g, int b, int a) {
+mu_Color mu_color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
   mu_Color res;
   res.r = r; res.g = g; res.b = b; res.a = a;
   return res;
@@ -723,12 +723,12 @@ void mu_text(mu_Context *ctx, const char *text) {
     do {
       const char* word = p;
       while (*p && *p != ' ' && *p != '\n') { p++; }
-      w += ctx->text_width(font, word, p - word);
+      w += ctx->text_width(font, word, (int)(p - word));
       if (w > r.w && end != start) { break; }
       w += ctx->text_width(font, p, 1);
       end = p++;
     } while (*end && *end != '\n');
-    mu_draw_text(ctx, font, start, end - start, mu_vec2(r.x, r.y), color);
+    mu_draw_text(ctx, font, start, (int)(end - start), mu_vec2(r.x, r.y), color);
     p = end + 1;
   } while (*end);
   mu_layout_end_column(ctx);

@@ -208,7 +208,7 @@ struct mu_Context {
 
 mu_Vec2 mu_vec2(int x, int y);
 mu_Rect mu_rect(int x, int y, int w, int h);
-mu_Color mu_color(int r, int g, int b, int a);
+mu_Color mu_color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 void mu_init(mu_Context *ctx);
 void mu_begin(mu_Context *ctx);
