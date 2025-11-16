@@ -40,6 +40,14 @@ size_t mu_strlen(const char* str)
     return i;
 }
 
+void* mu_memcpy(void* dest, const void* src, size_t n)
+{
+    volatile unsigned char* pout = (unsigned char*)dest;
+    volatile unsigned char* pin = (unsigned char*)src;
+    while (n-- > 0) *pout++ = *pin++;
+    return dest;
+}
+
 void mu_sort(
     void* ptr,
     size_t count,
@@ -469,7 +477,7 @@ void mu_input_text(mu_Context *ctx, const char *text) {
   int len = (int)mu_strlen(ctx->input_text);
   int size = (int)mu_strlen(text) + 1;
   expect(len + size <= (int) sizeof(ctx->input_text));
-  memcpy(ctx->input_text + len, text, size);
+  mu_memcpy(ctx->input_text + len, text, size);
 }
 
 
@@ -547,7 +555,7 @@ void mu_draw_text(mu_Context *ctx, mu_Font font, const char *str, int len,
   /* add command */
   if (len < 0) { len = (int)mu_strlen(str); }
   cmd = mu_push_command(ctx, MU_COMMAND_TEXT, sizeof(mu_TextCommand) + len);
-  memcpy(cmd->text.str, str, len);
+  mu_memcpy(cmd->text.str, str, len);
   cmd->text.str[len] = '\0';
   cmd->text.pos = pos;
   cmd->text.color = color;
@@ -602,7 +610,7 @@ void mu_layout_row(mu_Context *ctx, int items, const int *widths, int height) {
   mu_Layout *layout = get_layout(ctx);
   if (widths) {
     expect(items <= MU_MAX_WIDTHS);
-    memcpy(layout->widths, widths, items * sizeof(widths[0]));
+    mu_memcpy(layout->widths, widths, items * sizeof(widths[0]));
   }
   layout->items = items;
   layout->position = mu_vec2(layout->indent, layout->next_row);
@@ -833,7 +841,7 @@ int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, mu_Id id, mu_Rect r,
     int len = (int)mu_strlen(buf);
     int n = mu_min(bufsz - len - 1, (int)mu_strlen(ctx->input_text));
     if (n > 0) {
-      memcpy(buf + len, ctx->input_text, n);
+      mu_memcpy(buf + len, ctx->input_text, n);
       len += n;
       buf[len] = '\0';
       res |= MU_RES_CHANGE;
