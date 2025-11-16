@@ -26,6 +26,13 @@ typedef MO_UINTN size_t;
 
 #include "microui.h"
 
+void* mu_memset(void* s, int c, size_t n)
+{
+    volatile unsigned char* p = (unsigned char*)s;
+    while (n-- > 0) *p++ = (unsigned char)(c);
+    return s;
+}
+
 size_t mu_strlen(const char* str)
 {
     size_t i = 0;
@@ -174,7 +181,7 @@ static void draw_frame(mu_Context *ctx, mu_Rect rect, int colorid) {
 
 
 void mu_init(mu_Context *ctx) {
-  memset(ctx, 0, sizeof(*ctx));
+  mu_memset(ctx, 0, sizeof(*ctx));
   ctx->draw_frame = draw_frame;
   ctx->_style = default_style;
   ctx->style = &ctx->_style;
@@ -322,7 +329,7 @@ int mu_check_clip(mu_Context *ctx, mu_Rect r) {
 static void push_layout(mu_Context *ctx, mu_Rect body, mu_Vec2 scroll) {
   mu_Layout layout;
   int width = 0;
-  memset(&layout, 0, sizeof(layout));
+  mu_memset(&layout, 0, sizeof(layout));
   layout.body = mu_rect(body.x - scroll.x, body.y - scroll.y, body.w, body.h);
   layout.max = mu_vec2(-0x1000000, -0x1000000);
   push(ctx->layout_stack, layout);
@@ -367,7 +374,7 @@ static mu_Container* get_container(mu_Context *ctx, mu_Id id, int opt) {
   /* container not found in pool: init new container */
   idx = mu_pool_init(ctx, ctx->container_pool, MU_CONTAINERPOOL_SIZE, id);
   cnt = &ctx->containers[idx];
-  memset(cnt, 0, sizeof(*cnt));
+  mu_memset(cnt, 0, sizeof(*cnt));
   cnt->open = 1;
   mu_bring_to_front(ctx, cnt);
   return cnt;
@@ -893,7 +900,7 @@ static int header(mu_Context *ctx, const char *label, int istreenode, int opt) {
   /* update pool ref */
   if (idx >= 0) {
     if (active) { mu_pool_update(ctx, ctx->treenode_pool, idx); }
-           else { memset(&ctx->treenode_pool[idx], 0, sizeof(mu_PoolItem)); }
+           else { mu_memset(&ctx->treenode_pool[idx], 0, sizeof(mu_PoolItem)); }
   } else if (active) {
     mu_pool_init(ctx, ctx->treenode_pool, MU_TREENODEPOOL_SIZE, id);
   }
