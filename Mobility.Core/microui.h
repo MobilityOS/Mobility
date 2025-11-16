@@ -19,10 +19,6 @@
 #define MU_CONTAINERPOOL_SIZE   48
 #define MU_TREENODEPOOL_SIZE    48
 #define MU_MAX_WIDTHS           16
-#define MU_REAL                 float
-#define MU_REAL_FMT             "%.3g"
-#define MU_SLIDER_FMT           "%.2f"
-#define MU_MAX_FMT              127
 
 #define mu_stack(T, n)          struct { int idx; T items[n]; }
 #define mu_min(a, b)            ((a) < (b) ? (a) : (b))
@@ -108,7 +104,6 @@ enum {
 
 typedef struct mu_Context mu_Context;
 typedef unsigned mu_Id;
-typedef MU_REAL mu_Real;
 typedef void* mu_Font;
 
 typedef struct { int x, y; } mu_Vec2;
@@ -187,8 +182,6 @@ struct mu_Context {
   mu_Container *hover_root;
   mu_Container *next_hover_root;
   mu_Container *scroll_target;
-  char number_edit_buf[MU_MAX_FMT];
-  mu_Id number_edit;
   /* stacks */
   mu_stack(char, MU_COMMANDLIST_SIZE) command_list;
   mu_stack(mu_Container*, MU_ROOTLIST_SIZE) root_list;
@@ -267,8 +260,6 @@ void mu_update_control(mu_Context *ctx, mu_Id id, mu_Rect rect, int opt);
 
 #define mu_button(ctx, label)             mu_button_ex(ctx, label, 0, MU_OPT_ALIGNCENTER)
 #define mu_textbox(ctx, buf, bufsz)       mu_textbox_ex(ctx, buf, bufsz, 0)
-#define mu_slider(ctx, value, lo, hi)     mu_slider_ex(ctx, value, lo, hi, 0, MU_SLIDER_FMT, MU_OPT_ALIGNCENTER)
-#define mu_number(ctx, value, step)       mu_number_ex(ctx, value, step, MU_SLIDER_FMT, MU_OPT_ALIGNCENTER)
 #define mu_header(ctx, label)             mu_header_ex(ctx, label, 0)
 #define mu_begin_treenode(ctx, label)     mu_begin_treenode_ex(ctx, label, 0)
 #define mu_begin_window(ctx, title, rect) mu_begin_window_ex(ctx, title, rect, 0)
@@ -280,8 +271,6 @@ int mu_button_ex(mu_Context *ctx, const char *label, int icon, int opt);
 int mu_checkbox(mu_Context *ctx, const char *label, int *state);
 int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, mu_Id id, mu_Rect r, int opt);
 int mu_textbox_ex(mu_Context *ctx, char *buf, int bufsz, int opt);
-int mu_slider_ex(mu_Context *ctx, mu_Real *value, mu_Real low, mu_Real high, mu_Real step, const char *fmt, int opt);
-int mu_number_ex(mu_Context *ctx, mu_Real *value, mu_Real step, const char *fmt, int opt);
 int mu_header_ex(mu_Context *ctx, const char *label, int opt);
 int mu_begin_treenode_ex(mu_Context *ctx, const char *label, int opt);
 void mu_end_treenode(mu_Context *ctx);
