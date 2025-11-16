@@ -21,12 +21,14 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="microui.c" />
     <ClCompile Include="Mobility.BitmapFont.LaffStd.c" />
     <ClCompile Include="Mobility.Console.Core.c" />
     <ClCompile Include="Mobility.Display.Core.c" />
     <ClCompile Include="Mobility.Unicode.Core.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="microui.h" />
     <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
     <ClInclude Include="Mobility.Console.Core.h" />
     <ClInclude Include="Mobility.Display.Core.h" />
