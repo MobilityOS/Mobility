@@ -3,20 +3,20 @@
     <Platform Name="ARM64" />
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="Mobility.Core.Uefi/Mobility.Core.Uefi.vcxproj" />
-  <Project Path="Mobility.Core/Mobility.Core.vcxproj" />
-  <Project Path="Mobility.HvGcs/Mobility.HvGcs.vcxproj">
+  <Project Path="Mobility.Core.Uefi/Mobility.Core.Uefi.vcxproj" Id="3fbdcf0b-51b2-47d8-990a-381f636add5d" />
+  <Project Path="Mobility.Core/Mobility.Core.vcxproj" Id="13e81037-2bc9-4dc8-91ae-6b463759269b" />
+  <Project Path="Mobility.HvGcs/Mobility.HvGcs.vcxproj" Id="30b9de98-9479-4e1b-aafa-d754bd5f7182">
     <Platform Project="x64" />
     <Build Solution="*|ARM64" Project="false" />
   </Project>
-  <Project Path="Mobility.HvLdg/Mobility.HvLdg.vcxproj" />
-  <Project Path="Mobility.MinUap/Mobility.MinUap.vcxproj" />
-  <Project Path="Mobility.OneCent/Mobility.OneCent.vcxproj">
+  <Project Path="Mobility.HvLdg/Mobility.HvLdg.vcxproj" Id="0394c1dc-71da-4312-ace7-e1cefbfd126a" />
+  <Project Path="Mobility.MinUap/Mobility.MinUap.vcxproj" Id="a158bb1b-480d-4622-b0f1-517d8f366bc1" />
+  <Project Path="Mobility.OneCent/Mobility.OneCent.vcxproj" Id="049b9a7f-7074-41fb-8779-fbebedd302f6">
     <Platform Project="x64" />
     <Build Solution="*|ARM64" Project="false" />
   </Project>
-  <Project Path="Mobility.Otokonoko/Mobility.Otokonoko.vcxproj" />
-  <Project Path="Mobility.Retrovisor/Mobility.Retrovisor.vcxproj">
+  <Project Path="Mobility.Otokonoko/Mobility.Otokonoko.vcxproj" Id="aa62da47-4a3d-470c-8148-cc7cb65e6f4c" />
+  <Project Path="Mobility.Retrovisor/Mobility.Retrovisor.vcxproj" Id="116ff7d7-fc6d-4850-8c83-9bb855c35574">
     <Platform Project="x64" />
     <Build Solution="*|ARM64" Project="false" />
   </Project>
