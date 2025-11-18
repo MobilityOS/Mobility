@@ -1,0 +1,23 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Mobility.Core.Uefi/Mobility.Core.Uefi.vcxproj" />
+  <Project Path="Mobility.Core/Mobility.Core.vcxproj" />
+  <Project Path="Mobility.HvGcs/Mobility.HvGcs.vcxproj">
+    <Platform Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+  <Project Path="Mobility.HvLdg/Mobility.HvLdg.vcxproj" />
+  <Project Path="Mobility.MinUap/Mobility.MinUap.vcxproj" />
+  <Project Path="Mobility.OneCent/Mobility.OneCent.vcxproj">
+    <Platform Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+  <Project Path="Mobility.Otokonoko/Mobility.Otokonoko.vcxproj" />
+  <Project Path="Mobility.Retrovisor/Mobility.Retrovisor.vcxproj">
+    <Platform Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+</Solution>
