@@ -63,14 +63,17 @@ typedef struct _MO_MEMORY_SMALL_HEAP_HEADER
 {
     /**
      * @brief The signature for Small Heap (v1).
+     *        Value: MO_MEMORY_SMALL_HEAP_SIGNATURE
      */
     MO_UINT32 Signature;
     /**
      * @brief The number of allocated units in Small Heap (v1).
+     *        Initial value: MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS
      */
     MO_UINT16 AllocatedUnits;
     /**
      * @brief The hint unit for next allocation in Small Heap (v1).
+     *        Initial value: MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS
      */
     MO_UINT16 HintUnit;
 } MO_MEMORY_SMALL_HEAP_HEADER, *PMO_MEMORY_SMALL_HEAP_HEADER;
