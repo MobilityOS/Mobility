@@ -128,6 +128,7 @@ typedef struct _MO_MEMORY_SMALL_HEAP_ITEM_HEADER
     MO_UINT16 RequestedSize;
     /**
      * @brief The checksum for this item header.
+     *        Formula: ~(HeapHeaderOffsetUnits + AllocatedUnits + RequestedSize)
      */
     MO_UINT16 Checksum;
 } MO_MEMORY_SMALL_HEAP_ITEM_HEADER, *PMO_MEMORY_SMALL_HEAP_ITEM_HEADER;
