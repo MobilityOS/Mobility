@@ -94,7 +94,7 @@ typedef struct _MO_MEMORY_SMALL_HEAP
     /**
      * @brief The bitmap for Small Heap (v1).
      */
-    MO_UINT8 BitMap[MO_MEMORY_SMALL_HEAP_BITMAP_SIZE];
+    MO_UINT8 Bitmap[MO_MEMORY_SMALL_HEAP_BITMAP_SIZE];
 
     /* User Area */
 
