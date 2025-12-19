@@ -11,17 +11,17 @@
 #include "Mobility.Memory.Bitmap.h"
 
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
-    _In_ MO_POINTER BitMap,
+    _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
     _In_ MO_BOOL ExpectedValue)
 {
-    if (!BitMap || !Length)
+    if (!Bitmap || !Length)
     {
         // Invalid parameters.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    PMO_UINT8 Bytes = (PMO_UINT8)BitMap;
+    PMO_UINT8 Bytes = (PMO_UINT8)Bitmap;
 
     MO_UINTN EndIndex = StartIndex + Length;
     if (EndIndex < StartIndex)
@@ -79,19 +79,19 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
 }
 
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
-    _In_ MO_POINTER BitMap,
+    _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
     _In_ MO_BOOL ExpectedValue)
 {
-    if (!BitMap || !Length)
+    if (!Bitmap || !Length)
     {
         // Invalid parameters.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
     // Use volatile to prevent generate memset calls in compiler optimization.
     // Also, ensure the write operations are actually performed to the bitmap.
-    volatile PMO_UINT8 Bytes = (volatile PMO_UINT8)BitMap;
+    volatile PMO_UINT8 Bytes = (volatile PMO_UINT8)Bitmap;
 
     MO_UINTN EndIndex = StartIndex + Length;
     if (EndIndex < StartIndex)
@@ -172,16 +172,16 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapQueryContinuousRunLength(
     _Out_opt_ PMO_UINTN RunLength,
     _Out_opt_ PMO_BOOL BitValue,
-    _In_ MO_POINTER BitMap,
+    _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN MaximumIndex)
 {
-    if (!BitMap || !(StartIndex < MaximumIndex))
+    if (!Bitmap || !(StartIndex < MaximumIndex))
     {
         // Invalid parameters.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    PMO_UINT8 Bytes = (PMO_UINT8)BitMap;
+    PMO_UINT8 Bytes = (PMO_UINT8)Bitmap;
 
     if (RunLength)
     {

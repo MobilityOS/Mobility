@@ -16,7 +16,7 @@
 
 /**
  * @brief Test a range of bits in a bitmap for an expected value.
- * @param BitMap The bitmap to be tested. The caller must ensure that the bitmap
+ * @param Bitmap The bitmap to be tested. The caller must ensure that the bitmap
  *               pointer is valid and that the buffer is large enough to cover
  *               the specified bit range.
  * @param StartIndex The starting index of the range to be tested.
@@ -26,14 +26,14 @@
  *         it returns an MO_RESULT error code.
  */
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
-    _In_ MO_POINTER BitMap,
+    _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
     _In_ MO_BOOL ExpectedValue);
 
 /**
  * @brief Fill a range of bits in a bitmap with a specified value.
- * @param BitMap The bitmap to be filled. The caller must ensure that the bitmap
+ * @param Bitmap The bitmap to be filled. The caller must ensure that the bitmap
  *               pointer is valid and that the buffer is large enough to cover
  *               the specified bit range.
  * @param StartIndex The starting index of the range to be filled.
@@ -43,7 +43,7 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
  *         it returns an MO_RESULT error code.
  */
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
-    _In_ MO_POINTER BitMap,
+    _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
     _In_ MO_BOOL ExpectedValue);
@@ -53,7 +53,7 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
  *        from a specified index.
  * @param RunLength Receives the continuous run length. Optional.
  * @param BitValue Receives the bit value at StartIndex. Optional.
- * @param BitMap The bitmap to be queried. The caller must ensure that the bitmap
+ * @param Bitmap The bitmap to be queried. The caller must ensure that the bitmap
  *               pointer is valid and that the buffer is large enough to cover
  *               the specified bit range.
  * @param StartIndex The start bit index to query.
@@ -64,7 +64,7 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapQueryContinuousRunLength(
     _Out_opt_ PMO_UINTN RunLength,
     _Out_opt_ PMO_BOOL BitValue,
-    _In_ MO_POINTER BitMap,
+    _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN MaximumIndex);
 
