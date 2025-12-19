@@ -89,7 +89,9 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
         // Invalid parameters.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    PMO_UINT8 Bytes = (PMO_UINT8)BitMap;
+    // Use volatile to prevent generate memset calls in compiler optimization.
+    // Also, ensure the write operations are actually performed to the bitmap.
+    volatile PMO_UINT8 Bytes = (volatile PMO_UINT8)BitMap;
 
     MO_UINTN EndIndex = StartIndex + Length;
     if (EndIndex < StartIndex)
