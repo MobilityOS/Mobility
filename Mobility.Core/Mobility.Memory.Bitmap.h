@@ -48,4 +48,24 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
     _In_ MO_UINTN Length,
     _In_ MO_BOOL ExpectedValue);
 
+/**
+ * @brief Query the length of the continuous run of the same bit value starting
+ *        from a specified index.
+ * @param RunLength Receives the continuous run length. Optional.
+ * @param BitValue Receives the bit value at StartIndex. Optional.
+ * @param BitMap The bitmap to be queried. The caller must ensure that the bitmap
+ *               pointer is valid and that the buffer is large enough to cover
+ *               the specified bit range.
+ * @param StartIndex The start bit index to query.
+ * @param MaximumIndex The maximum bit index (exclusive).
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoMemoryBitmapQueryContinuousRunLength(
+    _Out_opt_ PMO_UINTN RunLength,
+    _Out_opt_ PMO_BOOL BitValue,
+    _In_ MO_POINTER BitMap,
+    _In_ MO_UINTN StartIndex,
+    _In_ MO_UINTN MaximumIndex);
+
 #endif // !MOBILITY_MEMORY_BITMAP

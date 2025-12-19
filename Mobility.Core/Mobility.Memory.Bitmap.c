@@ -166,3 +166,95 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
 
     return MO_RESULT_SUCCESS_OK;
 }
+
+EXTERN_C MO_RESULT MOAPI MoMemoryBitmapQueryContinuousRunLength(
+    _Out_opt_ PMO_UINTN RunLength,
+    _Out_opt_ PMO_BOOL BitValue,
+    _In_ MO_POINTER BitMap,
+    _In_ MO_UINTN StartIndex,
+    _In_ MO_UINTN MaximumIndex)
+{
+    if (!BitMap || !(StartIndex < MaximumIndex))
+    {
+        // Invalid parameters.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    PMO_UINT8 Bytes = (PMO_UINT8)BitMap;
+
+    if (RunLength)
+    {
+        *RunLength = 0u;
+    }
+
+    if (BitValue)
+    {
+        *BitValue = MO_FALSE;
+    }
+
+    MO_UINTN CurrentIndex = StartIndex;
+
+    MO_UINT8 CurrentBitMask = (MO_UINT8)(1u << (CurrentIndex & 7u));
+    MO_BOOL CurrentBitValue =
+        (Bytes[CurrentIndex >> 3u] & CurrentBitMask) != 0u;
+    if (BitValue)
+    {
+        *BitValue = CurrentBitValue;
+    }
+
+    while (CurrentIndex < MaximumIndex)
+    {
+        MO_UINTN RemainingBitsInByte = 8u - (CurrentIndex & 7u);
+        MO_UINTN MaximumBitsInByte = MaximumIndex - CurrentIndex;
+        MO_UINTN BitsToCheck = (RemainingBitsInByte < MaximumBitsInByte)
+            ? RemainingBitsInByte
+            : MaximumBitsInByte;
+
+        MO_UINTN RunLengthInByte = 0u;
+        MO_UINT8 CurrentByte = Bytes[CurrentIndex >> 3u];
+        MO_UINTN CurrentBitOffset = CurrentIndex & 7u;
+        MO_BOOL UseBitScan = MO_TRUE;
+
+        if (!CurrentBitOffset)
+        {
+            if (0x00u == CurrentByte)
+            {
+                RunLengthInByte = CurrentBitValue ? 0u : BitsToCheck;
+                UseBitScan = MO_FALSE;
+            }
+            else if (0xFFu == CurrentByte)
+            {
+                RunLengthInByte = CurrentBitValue ? BitsToCheck : 0u;
+                UseBitScan = MO_FALSE;
+            }
+        }
+
+        if (UseBitScan)
+        {
+            MO_UINT8 Mask = (MO_UINT8)(1u << CurrentBitOffset);
+            while (Mask != 0u && RunLengthInByte < BitsToCheck)
+            {
+                MO_BOOL BitValueInByte = (CurrentByte & Mask) != 0u;
+                if (BitValueInByte != CurrentBitValue)
+                {
+                    break;
+                }
+                ++RunLengthInByte;
+                Mask = (MO_UINT8)(Mask << 1u);
+            }
+        }
+
+        CurrentIndex += RunLengthInByte;
+        if (RunLengthInByte < BitsToCheck)
+        {
+            // Found different bit value.
+            break;
+        }
+    }
+
+    if (RunLength)
+    {
+        *RunLength = CurrentIndex - StartIndex;
+    }
+
+    return MO_RESULT_SUCCESS_OK;
+}
