@@ -40,9 +40,7 @@ size_t mu_strlen(const char* str)
 
 void* mu_memcpy(void* dest, const void* src, size_t n)
 {
-    volatile unsigned char* pout = (unsigned char*)dest;
-    volatile unsigned char* pin = (unsigned char*)src;
-    while (n-- > 0) *pout++ = *pin++;
+    MoRuntimeMemoryMove(dest, (void*)src, n);
     return dest;
 }
 
