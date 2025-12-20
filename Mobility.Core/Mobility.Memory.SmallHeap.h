@@ -23,12 +23,21 @@
  * Small Heap (v1) Physical Size: Fixed 64 KiB
  */
 #define MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE (64 * 1024)
+
+/*
+ * Small Heap (v1) Size and Units Conversion Macros
+ * Note: 1 Unit = 8 Bytes
+ */
+
+#define MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(Size) ((Size) >> 3)
+#define MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE(Units) ((Units) << 3)
+
 /*
  * Small Heap (v1) Physical Units: Fixed 8192 Units (8 Bytes Each)
  * Because start address of the user area is aligned with 8 bytes.
  */
 #define MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS \
-    (MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE >> 3)
+    MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE)
 
 /*
  * Small Heap (v1) Header: 8 Bytes (1 Unit)
@@ -48,13 +57,13 @@
     MO_MEMORY_SMALL_HEAP_HEADER_SIZE + \
     MO_MEMORY_SMALL_HEAP_BITMAP_SIZE)
 #define MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS ( \
-    MO_MEMORY_SMALL_HEAP_SERVICE_AREA_SIZE >> 3)
+    MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(MO_MEMORY_SMALL_HEAP_SERVICE_AREA_SIZE))
 
 #define MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE ( \
     MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE - \
     MO_MEMORY_SMALL_HEAP_SERVICE_AREA_SIZE)
 #define MO_MEMORY_SMALL_HEAP_USER_AREA_UNITS ( \
-    MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE >> 3)
+    MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE))
 
 /**
  * @brief The header structure for Small Heap (v1).
@@ -67,12 +76,14 @@ typedef struct _MO_MEMORY_SMALL_HEAP_HEADER
      */
     MO_UINT32 Signature;
     /**
-     * @brief The number of allocated units in Small Heap (v1).
+     * @brief The number of allocated units.
+     *        Note: The service area is also considered allocated.
      *        Initial value: MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS
      */
     MO_UINT16 AllocatedUnits;
     /**
-     * @brief The hint unit for next allocation in Small Heap (v1).
+     * @brief The hint unit for the next allocation, which also serves as the
+     *        starting point for searching for available units.
      *        Initial value: MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS
      */
     MO_UINT16 HintUnit;
@@ -134,5 +145,25 @@ typedef struct _MO_MEMORY_SMALL_HEAP_ITEM_HEADER
 } MO_MEMORY_SMALL_HEAP_ITEM_HEADER, *PMO_MEMORY_SMALL_HEAP_ITEM_HEADER;
 MO_C_STATIC_ASSERT(sizeof(MO_MEMORY_SMALL_HEAP_ITEM_HEADER) \
     == MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE);
+
+/**
+ * @brief The summary structure for Small Heap (v1).
+ */
+typedef struct _MO_MEMORY_SMALL_HEAP_SUMMARY
+{
+    /**
+     * @brief The allocated size in bytes.
+     *        Note: The service area is also considered allocated.
+     */
+    MO_UINT16 AllocatedSize;
+    /**
+     * @brief The free physical size in bytes.
+     */
+    MO_UINT16 FreeSize;
+    /**
+     * @brief The largest free block size in bytes.
+     */
+    MO_UINT16 LargestFreeBlockSize;
+} MO_MEMORY_SMALL_HEAP_SUMMARY, *PMO_MEMORY_SMALL_HEAP_SUMMARY;
 
 #endif // !MOBILITY_MEMORY_SMALLHEAP
