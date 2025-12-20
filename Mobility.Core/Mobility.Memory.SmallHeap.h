@@ -50,6 +50,7 @@
  * - Hint Unit: 2 Bytes
  */
 #define MO_MEMORY_SMALL_HEAP_HEADER_SIZE 8
+
 /*
  * Small Heap (v1) Bitmap: 8192 Units / 8 = 1024 Bytes
  * Each bit represents each unit allocation state.

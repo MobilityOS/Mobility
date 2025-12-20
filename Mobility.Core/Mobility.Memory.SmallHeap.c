@@ -150,6 +150,13 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
+    if (MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE - MO_MEMORY_SMALL_HEAP_HEADER_SIZE
+        < Size)
+    {
+        // Exceeds the maximum allocatable size.
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
     if (!MoMemorySmallHeapHeaderValidate(Instance))
     {
         return MO_RESULT_ERROR_INVALID_HANDLE;

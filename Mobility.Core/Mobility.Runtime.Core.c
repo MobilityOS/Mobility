@@ -338,6 +338,13 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
 
     MO_UINTN DestinationStart = (MO_UINTN)(Destination);
     MO_UINTN SourceStart = (MO_UINTN)(Source);
+    MO_UINTN SourceEnd = SourceStart + Length;
+
+    if (SourceEnd < SourceStart)
+    {
+        // Overflow detected.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
 
     if (DestinationStart < SourceStart ||
         DestinationStart >= (SourceStart + Length))
