@@ -359,3 +359,57 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
 
     return MO_RESULT_SUCCESS_OK;
 }
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
+    _Inout_ MO_POINTER ElementArray,
+    _In_ MO_UINTN ElementCount,
+    _In_ MO_UINTN ElementSize,
+    _In_ PMO_RUNTIME_SORT_COMPARE_HANDLER CompareHandler,
+    _In_opt_ MO_POINTER Context)
+{
+    if (!ElementArray || !ElementCount || !ElementSize || !CompareHandler)
+    {
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    MO_UINTN ElementBase = (MO_UINTN)ElementArray;
+
+    for (MO_UINTN Start = 0; Start < ElementCount - 1; ++Start)
+    {
+        MO_BOOL Swapped = MO_FALSE;
+
+        for (MO_UINTN Index = ElementCount - 1; Index > Start; --Index)
+        {
+            MO_UINTN LeftOffset = (Index - 1u) * ElementSize;
+            MO_UINTN RightOffset = Index * ElementSize;
+
+            MO_POINTER Left = (MO_POINTER)(ElementBase + LeftOffset);
+            MO_POINTER Right = (MO_POINTER)(ElementBase + RightOffset);
+
+            if (CompareHandler(Left, Right, Context) <= 0)
+            {
+                // Skip if already in order.
+                continue;
+            }
+
+            volatile PMO_UINT8 LeftBytes = (volatile PMO_UINT8)Left;
+            volatile PMO_UINT8 RightBytes = (volatile PMO_UINT8)Right;
+            for (MO_UINTN ByteIndex = 0u; ByteIndex < ElementSize; ++ByteIndex)
+            {
+                MO_UINT8 TemporaryByte = LeftBytes[ByteIndex];
+                LeftBytes[ByteIndex] = RightBytes[ByteIndex];
+                RightBytes[ByteIndex] = TemporaryByte;
+            }
+
+            Swapped = MO_TRUE;
+        }
+
+        if (!Swapped)
+        {
+            // Already sorted if no swaps in this pass.
+            break;
+        }
+    }
+
+    return MO_RESULT_SUCCESS_OK;
+}

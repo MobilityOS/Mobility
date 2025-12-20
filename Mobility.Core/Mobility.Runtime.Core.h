@@ -64,4 +64,49 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length);
 
+/**
+ * @brief Defines the comparison handler used for sorting operations.
+ * @param Left The pointer to the left element to be compared.
+ * @param Right The pointer to the right element to be compared.
+ * @param Context The user-defined context pointer that can be used to pass
+ *                through additional data to the comparison function.
+ * @return A value less than zero if Left is less than Right, zero if they are
+ *         equal, and a value greater than zero if Left is greater than Right.
+ */
+typedef MO_INTN(MOAPI* PMO_RUNTIME_SORT_COMPARE_HANDLER)(
+    _In_ MO_POINTER Left,
+    _In_ MO_POINTER Right,
+    _In_ MO_POINTER Context);
+
+/**
+ * @brief Sorts an array of elements in ascending order using the specified
+ *        comparison handler. This function uses the bubble sort algorithm for
+ *        sorting.
+ * @param ElementArray The pointer to the element array to be sorted.
+ * @param ElementCount The number of elements in the element array. If this
+ *                     parameter is zero, the function returns
+ *                     MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param ElementSize The size of each element in bytes. If this parameter is
+ *                    zero, the function returns
+ *                    MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param CompareHandler The comparison handler used to determine the order of
+ *                       elements. If this parameter is NULL, the function
+ *                       returns MO_RESULT_ERROR_INVALID_PARAMETER. The handler
+ *                       should return a value less than zero if the left
+ *                       element is less than the right element, zero if they
+ *                       are equal, and a value greater than zero if the left
+ *                       element is greater than the right element.
+ * @param Context The user-defined context pointer that will be passed to the
+ *                comparison handler. This parameter is optional and can be
+ *                NULL.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
+    _Inout_ MO_POINTER ElementArray,
+    _In_ MO_UINTN ElementCount,
+    _In_ MO_UINTN ElementSize,
+    _In_ PMO_RUNTIME_SORT_COMPARE_HANDLER CompareHandler,
+    _In_opt_ MO_POINTER Context);
+
 #endif // !MOBILITY_RUNTIME_CORE
