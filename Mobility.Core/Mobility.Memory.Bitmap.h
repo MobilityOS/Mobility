@@ -43,7 +43,7 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
  *         it returns an MO_RESULT error code.
  */
 EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
-    _In_ MO_POINTER Bitmap,
+    _Inout_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
     _In_ MO_BOOL ExpectedValue);
