@@ -42,4 +42,26 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
     _In_ MO_UINT8 Value,
     _In_ MO_UINTN Length);
 
+/**
+ * @brief Moves contents from the source memory buffer to the destination memory
+ *        buffer. This function correctly handles overlapping memory regions,
+ *        and is implemented with alignment-aware logic to improve performance
+ *        on native word boundaries.
+ * @param Destination The destination memory buffer where the contents will be
+ *                    moved to. If this parameter is NULL, the function returns
+ *                    MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param Source The source memory buffer from which the contents will be moved.
+ *               If this parameter is NULL, the function returns
+ *               MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param Length The length of the memory to be moved in bytes. If this
+ *               parameter is zero, the function does nothing and returns
+ *               MO_RESULT_SUCCESS_OK.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
+    _Out_ MO_POINTER Destination,
+    _In_ MO_POINTER Source,
+    _In_ MO_UINTN Length);
+
 #endif // !MOBILITY_RUNTIME_CORE
