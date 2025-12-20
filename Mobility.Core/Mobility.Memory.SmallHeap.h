@@ -25,8 +25,12 @@
 #define MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE (64 * 1024)
 
 /*
+ * Small Heap (v1) Unit Size: Fixed 8 Bytes
+ */
+#define MO_MEMORY_SMALL_HEAP_UNIT_SIZE (1 << 3)
+
+/*
  * Small Heap (v1) Size and Units Conversion Macros
- * Note: 1 Unit = 8 Bytes
  */
 
 #define MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(Size) ((Size) >> 3)
@@ -147,6 +151,15 @@ MO_C_STATIC_ASSERT(sizeof(MO_MEMORY_SMALL_HEAP_ITEM_HEADER) \
     == MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE);
 
 /**
+ * @brief Initializes the Small Heap (v1) instance.
+ * @param Instance The pointer to the Small Heap instance to be initialized.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
+    _Out_ PMO_MEMORY_SMALL_HEAP Instance);
+
+/**
  * @brief The summary structure for Small Heap (v1).
  */
 typedef struct _MO_MEMORY_SMALL_HEAP_SUMMARY
@@ -165,5 +178,56 @@ typedef struct _MO_MEMORY_SMALL_HEAP_SUMMARY
      */
     MO_UINT16 LargestFreeBlockSize;
 } MO_MEMORY_SMALL_HEAP_SUMMARY, *PMO_MEMORY_SMALL_HEAP_SUMMARY;
+
+/**
+ * @brief Generates a summary of the Small Heap (v1) instance.
+ * @param Summary Receives the summary of the Small Heap instance.
+ * @param Instance The pointer to the Small Heap instance to be summarized.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
+    _Out_ PMO_MEMORY_SMALL_HEAP_SUMMARY Summary,
+    _In_ PMO_MEMORY_SMALL_HEAP Instance);
+
+/**
+ * @brief Allocates a memory block from the Small Heap (v1) instance.
+ * @param Block Receives the pointer to the allocated memory block.
+ * @param Instance The pointer to the Small Heap instance to allocate from.
+ * @param Size The size in bytes to be allocated.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
+    _Out_ PMO_POINTER Block,
+    _In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _In_ MO_UINT16 Size);
+
+/**
+ * @brief Frees a memory block back to the Small Heap (v1) instance.
+ * @param Instance The pointer to the Small Heap instance to free to.
+ * @param Block The pointer to the memory block to be freed.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
+    _In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _In_ MO_POINTER Block);
+
+/**
+ * @brief Reallocates a memory block in the Small Heap (v1) instance.
+ * @param UpdatedBlock Receives the pointer to the reallocated memory block.
+ * @param Instance The pointer to the Small Heap instance to reallocate in.
+ * @param Block The pointer to the memory block to be reallocated. If this
+ *              parameter is nullptr, a new block will be allocated.
+ * @param NewSize The new size in bytes for the memory block.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
+    _Out_ PMO_POINTER UpdatedBlock,
+    _In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _In_opt_ MO_POINTER Block,
+    _In_ MO_UINT16 NewSize);
 
 #endif // !MOBILITY_MEMORY_SMALLHEAP
