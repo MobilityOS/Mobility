@@ -254,45 +254,43 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
     _In_ MO_UINTN Length)
 {
     MO_UINTN RemainingLength = Length;
-    MO_UINTN CurrentBackwardDestination = ((MO_UINTN)(Destination)) + RemainingLength;
-    MO_UINTN CurrentBackwardSource = ((MO_UINTN)(Source)) + RemainingLength;
+    MO_UINTN CurrentDestination = ((MO_UINTN)(Destination)) + RemainingLength;
+    MO_UINTN CurrentSource = ((MO_UINTN)(Source)) + RemainingLength;
 
     // Should use floor alignment for backward copy.
 
-    MO_UINTN AlignedBackwardDestination =
-        CurrentBackwardDestination & ~(sizeof(MO_UINTN) - 1);
-    MO_UINTN AlignedBackwardSource =
-        CurrentBackwardSource & ~(sizeof(MO_UINTN) - 1);
+    MO_UINTN AlignedDestination = CurrentDestination & ~(sizeof(MO_UINTN) - 1);
+    MO_UINTN AlignedSource = CurrentSource & ~(sizeof(MO_UINTN) - 1);
 
     // If the destination or source address is not aligned, process the
     // unaligned part with generic implementation first.
-    if (AlignedBackwardDestination != CurrentBackwardDestination ||
-        AlignedBackwardSource != CurrentBackwardSource)
+    if (AlignedDestination != CurrentDestination ||
+        AlignedSource != CurrentSource)
     {
         MO_UINTN UnalignedLength = 0u;
-        if (AlignedBackwardDestination > AlignedBackwardSource)
+        if (AlignedDestination > AlignedSource)
         {
-            UnalignedLength = CurrentBackwardDestination - AlignedBackwardDestination;
+            UnalignedLength = CurrentDestination - AlignedDestination;
         }
         else
         {
-            UnalignedLength = CurrentBackwardSource - AlignedBackwardSource;
+            UnalignedLength = CurrentSource - AlignedSource;
         }
         if (UnalignedLength > RemainingLength)
         {
             UnalignedLength = RemainingLength;
         }
         MoRuntimeMemoryBackwardCopyInternalUnaligned(
-            (MO_POINTER)(CurrentBackwardDestination - UnalignedLength),
-            (MO_POINTER)(CurrentBackwardSource - UnalignedLength),
+            (MO_POINTER)(CurrentDestination - UnalignedLength),
+            (MO_POINTER)(CurrentSource - UnalignedLength),
             UnalignedLength);
         if (RemainingLength == UnalignedLength)
         {
             // If all bytes have been processed, return directly.
             return;
         }
-        CurrentBackwardDestination -= UnalignedLength;
-        CurrentBackwardSource -= UnalignedLength;
+        CurrentDestination -= UnalignedLength;
+        CurrentSource -= UnalignedLength;
         RemainingLength -= UnalignedLength;
     }
 
@@ -300,8 +298,8 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
     if (RemainingLength < sizeof(MO_UINTN))
     {
         MoRuntimeMemoryBackwardCopyInternalUnaligned(
-            (MO_POINTER)(CurrentBackwardDestination - RemainingLength),
-            (MO_POINTER)(CurrentBackwardSource - RemainingLength),
+            (MO_POINTER)(CurrentDestination - RemainingLength),
+            (MO_POINTER)(CurrentSource - RemainingLength),
             RemainingLength);
         return;
     }
@@ -311,8 +309,8 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
 
     // Process the aligned part with native type implementation.
     MoRuntimeMemoryBackwardCopyInternalNativeAligned(
-        (MO_POINTER)(CurrentBackwardDestination - AlignedLength),
-        (MO_POINTER)(CurrentBackwardSource - AlignedLength),
+        (MO_POINTER)(CurrentDestination - AlignedLength),
+        (MO_POINTER)(CurrentSource - AlignedLength),
         AlignedLength);
 
     // Process the remaining unaligned part with generic implementation.
