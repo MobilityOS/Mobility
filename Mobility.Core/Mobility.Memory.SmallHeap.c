@@ -10,6 +10,7 @@
 
 #include "Mobility.Memory.SmallHeap.h"
 
+#include "Mobility.Runtime.Core.h"
 #include "Mobility.Memory.Bitmap.h"
 
 EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
@@ -26,8 +27,21 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
     Instance->Header.HintUnit =
         MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS;
 
-    // TODO: We should clear the bitmap for security consideration.
-    // TODO: We should clear the user area for security consideration.
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
+        Instance->Bitmap,
+        0u,
+        MO_MEMORY_SMALL_HEAP_BITMAP_SIZE))
+    {
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+    
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
+        Instance->UserArea,
+        0u,
+        MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE))
+    {
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
 
     if (MO_RESULT_SUCCESS_OK != MoMemoryBitmapFillRange(
         Instance->Bitmap,
@@ -57,7 +71,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
         MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS - Instance->Header.AllocatedUnits);
 
     Summary->LargestFreeBlockSize = 0u;
-    MO_UINTN LargestFreeBlockUnits = 0u;
+    MO_UINT16 LargestFreeBlockUnits = 0u;
     MO_UINTN CurrentIndex = Instance->Header.HintUnit;
     while (CurrentIndex < MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
     {
@@ -77,7 +91,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
             // Free block found.
             if (RunUnits > LargestFreeBlockUnits)
             {
-                LargestFreeBlockUnits = RunUnits;
+                LargestFreeBlockUnits = (MO_UINT16)RunUnits;
             }
         }
         CurrentIndex += RunUnits;
