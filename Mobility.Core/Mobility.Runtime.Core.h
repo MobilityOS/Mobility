@@ -29,7 +29,8 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
  *        implemented with alignment-aware logic to improve performance on
  *        native word boundaries.
  * @param Buffer The target memory buffer to be filled. If this parameter is
- *               NULL, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ *               nullptr, the function returns
+ *               MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param Value The byte value used to fill the target memory buffer.
  * @param Length The length of the target memory buffer in bytes. If this
  *               parameter is zero, the function does nothing and returns
@@ -48,10 +49,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
  *        and is implemented with alignment-aware logic to improve performance
  *        on native word boundaries.
  * @param Destination The destination memory buffer where the contents will be
- *                    moved to. If this parameter is NULL, the function returns
- *                    MO_RESULT_ERROR_INVALID_PARAMETER.
+ *                    moved to. If this parameter is nullptr, the function
+ *                    returns MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param Source The source memory buffer from which the contents will be moved.
- *               If this parameter is NULL, the function returns
+ *               If this parameter is nullptr, the function returns
  *               MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param Length The length of the memory to be moved in bytes. If this
  *               parameter is zero, the function does nothing and returns
@@ -90,7 +91,7 @@ typedef MO_INTN(MOAPI* PMO_RUNTIME_SORT_COMPARE_HANDLER)(
  *                    zero, the function returns
  *                    MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param CompareHandler The comparison handler used to determine the order of
- *                       elements. If this parameter is NULL, the function
+ *                       elements. If this parameter is nullptr, the function
  *                       returns MO_RESULT_ERROR_INVALID_PARAMETER. The handler
  *                       should return a value less than zero if the left
  *                       element is less than the right element, zero if they
@@ -98,7 +99,7 @@ typedef MO_INTN(MOAPI* PMO_RUNTIME_SORT_COMPARE_HANDLER)(
  *                       element is greater than the right element.
  * @param Context The user-defined context pointer that will be passed to the
  *                comparison handler. This parameter is optional and can be
- *                NULL.
+ *                nullptr.
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
