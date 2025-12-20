@@ -44,32 +44,6 @@ void* mu_memcpy(void* dest, const void* src, size_t n)
     return dest;
 }
 
-void mu_sort(
-    void* ptr,
-    size_t count,
-    size_t size,
-    int (*comp)(const void*, const void*))
-{
-    size_t outer_index, inner_index;
-    char* array = (char*)ptr;
-    for (outer_index = 0; outer_index < count - 1; ++outer_index) {
-        for (inner_index = 0; inner_index < count - outer_index - 1; ++inner_index) {
-            char* element_a = array + inner_index * size;
-            char* element_b = array + (inner_index + 1) * size;
-            if (comp((const void*)element_a, (const void*)element_b) > 0) {
-                /* Swap elements */
-                size_t byte_index;
-                for (byte_index = 0; byte_index < size; ++byte_index) {
-                    char temp = element_a[byte_index];
-                    element_a[byte_index] = element_b[byte_index];
-                    element_b[byte_index] = temp;
-                }
-            }
-        }
-    }
-
-}
-
 
 void mu_expect_default_handler(
     const char* source_file,
@@ -205,8 +179,13 @@ void mu_begin(mu_Context *ctx) {
 }
 
 
-static int compare_zindex(const void *a, const void *b) {
-  return (*(mu_Container**) a)->zindex - (*(mu_Container**) b)->zindex;
+static MO_INTN MOAPI compare_zindex(
+    _In_ MO_POINTER Left,
+    _In_ MO_POINTER Right,
+    _In_ MO_POINTER Context)
+{
+    Context; // Not used.
+    return (*(mu_Container**)Left)->zindex - (*(mu_Container**)Right)->zindex;
 }
 
 
@@ -245,7 +224,12 @@ void mu_end(mu_Context *ctx) {
 
   /* sort root containers by zindex */
   n = ctx->root_list.idx;
-  mu_sort(ctx->root_list.items, n, sizeof(mu_Container*), compare_zindex);
+  MoRuntimeElementSort(
+      ctx->root_list.items,
+      (MO_UINTN)n,
+      sizeof(mu_Container*),
+      compare_zindex,
+      NULL);
 
   /* set root container jump commands */
   for (i = 0; i < n; i++) {
