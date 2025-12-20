@@ -20,16 +20,14 @@
 ** IN THE SOFTWARE.
 */
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
-#include <Mile.Mobility.Portable.Types.h>
+#include "Mobility.Runtime.Core.h"
 typedef MO_UINTN size_t;
 
 #include "microui.h"
 
 void* mu_memset(void* s, int c, size_t n)
 {
-    volatile unsigned char* p = (unsigned char*)s;
-    while (n-- > 0) *p++ = (unsigned char)(c);
+    MoRuntimeMemoryFillByte(s, (unsigned char)(c), n);
     return s;
 }
 
