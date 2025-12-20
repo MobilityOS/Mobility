@@ -39,11 +39,11 @@ MO_FORCEINLINE VOID MoRuntimeMemoryFillByteInternalNativeAligned(
     {
         NativeValue |= (((MO_UINTN)Value) << (Index * 8u));
     }
-    volatile PMO_UINTN NativeTypeBuffer = (volatile PMO_UINTN)Buffer;
-    MO_UINTN NativeTypeBufferCount = Length / sizeof(MO_UINTN);
-    for (MO_UINTN Index = 0u; Index < NativeTypeBufferCount; ++Index)
+    volatile PMO_UINTN NativeBuffer = (volatile PMO_UINTN)Buffer;
+    MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
+    for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
     {
-        NativeTypeBuffer[Index] = NativeValue;
+        NativeBuffer[Index] = NativeValue;
     }
 }
 
