@@ -36,7 +36,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
 
     if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
         Instance->UserArea,
-        0u,
+        MO_MEMORY_SMALL_HEAP_USER_AREA_INITIAL_BYTE,
         MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE))
     {
         return MO_RESULT_ERROR_UNEXPECTED;
@@ -139,6 +139,36 @@ MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapCalculateItemHeaderChecksum(
     return (MO_UINT16)(~Checksum);
 }
 
+MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapFindSuitableBlock(
+    _In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _In_ MO_UINT16 RequiredUnits)
+{
+    MO_UINT16 CurrentIndex = Instance->Header.HintUnit;
+    while (CurrentIndex < MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
+    {
+        MO_UINTN RunUnits = 0u;
+        MO_BOOL BitValue = MO_FALSE;
+        if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapQueryContinuousRunLength(
+            &RunUnits,
+            &BitValue,
+            Instance->Bitmap,
+            CurrentIndex,
+            MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS))
+        {
+            // Unexpected error.
+            return 0;
+        }
+        if (!BitValue && RunUnits >= RequiredUnits)
+        {
+            // Suitable block found.
+            return CurrentIndex;
+        }
+        CurrentIndex += (MO_UINT16)RunUnits;
+    }
+    // No suitable block found.
+    return 0;
+}
+
 EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
     _Out_ PMO_POINTER Block,
     _In_ PMO_MEMORY_SMALL_HEAP Instance,
@@ -149,8 +179,8 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE - MO_MEMORY_SMALL_HEAP_HEADER_SIZE
-        < Size)
+    if (Size > MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE
+        - MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE)
     {
         // Exceeds the maximum allocatable size.
         return MO_RESULT_ERROR_OUT_OF_MEMORY;
@@ -167,66 +197,67 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
         MO_MEMORY_SMALL_HEAP_UNIT_SIZE);
     MO_UINT16 RequiredUnits = MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(RequiredSize);
 
-    MO_UINT16 CurrentIndex = Instance->Header.HintUnit;
-    while (CurrentIndex < MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
+    MO_UINT16 SuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
+        Instance,
+        RequiredUnits);
+    if (SuitableBlockIndex)
     {
-        MO_UINTN RunUnits = 0u;
-        MO_BOOL BitValue = MO_FALSE;
-        if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapQueryContinuousRunLength(
-            &RunUnits,
-            &BitValue,
+        // Mark the units as allocated if found.
+        if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapFillRange(
             Instance->Bitmap,
-            CurrentIndex,
-            MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS))
+            SuitableBlockIndex,
+            RequiredUnits,
+            MO_TRUE))
         {
             return MO_RESULT_ERROR_UNEXPECTED;
         }
-        if (!BitValue && RunUnits >= RequiredUnits)
+
+        MO_UINT16 ItemHeaderOffset = MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE(
+            SuitableBlockIndex);
+
+        MO_UINTN ItemHeaderStart = InstanceStart + ItemHeaderOffset;
+
+        // Clear the allocated area.
+        if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
+            (MO_POINTER)ItemHeaderStart,
+            MO_MEMORY_SMALL_HEAP_USER_AREA_ALLOCATED_BYTE,
+            RequiredSize))
         {
-            // Mark the units as allocated if found.
-            if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapFillRange(
-                Instance->Bitmap,
-                CurrentIndex,
-                RequiredUnits,
-                MO_TRUE))
-            {
-                return MO_RESULT_ERROR_UNEXPECTED;
-            }
-
-            MO_UINT16 ItemHeaderOffset = MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE(
-                CurrentIndex);
-
-            MO_UINTN ItemHeaderStart = InstanceStart + ItemHeaderOffset;
-
-            // Create the item header.
-
-            PMO_MEMORY_SMALL_HEAP_ITEM_HEADER ItemHeader =
-                (PMO_MEMORY_SMALL_HEAP_ITEM_HEADER)(ItemHeaderStart);
-            ItemHeader->HeapHeaderOffsetUnits = CurrentIndex;
-            ItemHeader->AllocatedUnits = RequiredUnits;
-            ItemHeader->RequestedSize = Size;
-            ItemHeader->Checksum =
-                MoMemorySmallHeapCalculateItemHeaderChecksum(ItemHeader);
-
-            // Update the heap header.
-
-            Instance->Header.AllocatedUnits += RequiredUnits;
-            MO_UINT16 CandidateHintUnit =
-                (MO_UINT16)(CurrentIndex + RequiredUnits);
-            if (CandidateHintUnit >= MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS &&
-                CandidateHintUnit < Instance->Header.HintUnit)
-            {
-                // Only update the hint if it's smaller.
-                Instance->Header.HintUnit = CandidateHintUnit;
-            }
-
-            // Return the pointer to the user area.
-            *Block = (MO_POINTER)(
-                ItemHeaderStart + MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE);
-
-            return MO_RESULT_SUCCESS_OK;
+            return MO_RESULT_ERROR_UNEXPECTED;
         }
-        CurrentIndex += (MO_UINT16)RunUnits;
+
+        // Create the item header.
+
+        PMO_MEMORY_SMALL_HEAP_ITEM_HEADER ItemHeader =
+            (PMO_MEMORY_SMALL_HEAP_ITEM_HEADER)(ItemHeaderStart);
+        ItemHeader->HeapHeaderOffsetUnits = SuitableBlockIndex;
+        ItemHeader->AllocatedUnits = RequiredUnits;
+        ItemHeader->RequestedSize = Size;
+        ItemHeader->Checksum =
+            MoMemorySmallHeapCalculateItemHeaderChecksum(ItemHeader);
+
+        // Update the heap header.
+
+        Instance->Header.AllocatedUnits += RequiredUnits;
+        MO_UINT16 CandidateHintUnit =
+            (MO_UINT16)(SuitableBlockIndex + RequiredUnits);
+        if (CandidateHintUnit >= MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS)
+        {
+            MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
+                Instance,
+                MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS);
+            if (FirstSuitableBlockIndex &&
+                FirstSuitableBlockIndex < CandidateHintUnit)
+            {
+                Instance->Header.HintUnit = FirstSuitableBlockIndex;
+            }
+        }
+
+        // Return the pointer to the user area.
+        *Block = (MO_POINTER)(
+            ItemHeaderStart + MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE);
+
+        return MO_RESULT_SUCCESS_OK;
     }
 
     // No suitable block found.
@@ -254,6 +285,19 @@ MO_FORCEINLINE MO_BOOL MoMemorySmallHeapItemHeaderValidate(
     {
         return MO_FALSE;
     }
+
+    if (!Header->AllocatedUnits ||
+        Header->AllocatedUnits > MO_MEMORY_SMALL_HEAP_USER_AREA_UNITS)
+    {
+        return MO_FALSE;
+    }
+
+    MO_UINTN EndUnits = Header->HeapHeaderOffsetUnits + Header->AllocatedUnits;
+    if (EndUnits > MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
+    {
+        return MO_FALSE;
+    }
+
     return MO_TRUE;
 }
 
@@ -296,13 +340,27 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
+    // Clear the item header and user area.
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
+        ItemHeader,
+        MO_MEMORY_SMALL_HEAP_USER_AREA_FREED_BYTE,
+        MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE((MO_UINTN)(AllocatedUnits))))
+    {
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+
     // Update the heap header.
     Instance->Header.AllocatedUnits -= AllocatedUnits;
-    if (HeapHeaderOffsetUnits >= MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS &&
-        HeapHeaderOffsetUnits < Instance->Header.HintUnit)
+    if (HeapHeaderOffsetUnits >= MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS)
     {
-        // Only update the hint if it's smaller.
-        Instance->Header.HintUnit = HeapHeaderOffsetUnits;
+        MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
+            Instance,
+            MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS);
+        if (FirstSuitableBlockIndex &&
+            FirstSuitableBlockIndex < Instance->Header.HintUnit)
+        {
+            Instance->Header.HintUnit = FirstSuitableBlockIndex;
+        }
     }
 
     return MO_RESULT_SUCCESS_OK;

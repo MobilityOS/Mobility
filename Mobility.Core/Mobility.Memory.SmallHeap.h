@@ -70,6 +70,31 @@
 #define MO_MEMORY_SMALL_HEAP_USER_AREA_UNITS ( \
     MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE))
 
+/*
+ * Small Heap (v1) User Area Initialization Byte: 0xFD
+ */
+#define MO_MEMORY_SMALL_HEAP_USER_AREA_INITIAL_BYTE 0xFD
+
+/*
+ * Small Heap (v1) User Area Freed Byte: 0xDD
+ */
+#define MO_MEMORY_SMALL_HEAP_USER_AREA_FREED_BYTE 0xDD
+
+/*
+ * Small Heap (v1) User Area Allocated Byte: 0xCD
+ */
+#define MO_MEMORY_SMALL_HEAP_USER_AREA_ALLOCATED_BYTE 0xCD
+
+/*
+ * Small Heap (v1) User Area Minimum Allocation Size: 16 Bytes (2 Units)
+ * - 8 Bytes (1 Unit) for Item Header
+ * - 8 Bytes (1 Unit) for User Data
+ */
+#define MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_SIZE 16
+#define MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS \
+    MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS( \
+        MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_SIZE)
+
 /**
  * @brief The header structure for Small Heap (v1).
  */
