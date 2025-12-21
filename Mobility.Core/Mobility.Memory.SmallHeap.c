@@ -11,7 +11,6 @@
 #include "Mobility.Memory.SmallHeap.h"
 
 #include "Mobility.Runtime.Core.h"
-#include "Mobility.Memory.Bitmap.h"
 
 EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
     _Out_ PMO_MEMORY_SMALL_HEAP Instance)

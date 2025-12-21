@@ -25,7 +25,6 @@
     <ClCompile Include="Mobility.BitmapFont.LaffStd.c" />
     <ClCompile Include="Mobility.Console.Core.c" />
     <ClCompile Include="Mobility.Display.Core.c" />
-    <ClCompile Include="Mobility.Memory.Bitmap.c" />
     <ClCompile Include="Mobility.Memory.SmallHeap.c" />
     <ClCompile Include="Mobility.Runtime.Core.c" />
     <ClCompile Include="Mobility.Unicode.Core.c" />
@@ -35,7 +34,6 @@
     <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
     <ClInclude Include="Mobility.Console.Core.h" />
     <ClInclude Include="Mobility.Display.Core.h" />
-    <ClInclude Include="Mobility.Memory.Bitmap.h" />
     <ClInclude Include="Mobility.Memory.SmallHeap.h" />
     <ClInclude Include="Mobility.Runtime.Core.h" />
     <ClInclude Include="Mobility.Unicode.Core.h" />
