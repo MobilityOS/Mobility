@@ -367,6 +367,153 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
     return MO_RESULT_SUCCESS_OK;
 }
 
+MO_FORCEINLINE MO_INTN MoRuntimeMemoryCompareInternalUnaligned(
+    _In_ MO_POINTER Left,
+    _In_ MO_POINTER Right,
+    _In_ MO_UINTN Length)
+{
+    volatile PMO_UINT8 LeftBytes = (volatile PMO_UINT8)Left;
+    volatile PMO_UINT8 RightBytes = (volatile PMO_UINT8)Right;
+    for (MO_UINTN Index = 0u; Index < Length; ++Index)
+    {
+        MO_UINT8 CurrentLeft = LeftBytes[Index];
+        MO_UINT8 CurrentRight = RightBytes[Index];
+        if (CurrentLeft != CurrentRight)
+        {
+            return (MO_INTN)CurrentLeft - (MO_INTN)CurrentRight;
+        }
+    }
+    return 0;
+}
+
+MO_FORCEINLINE MO_INTN MoRuntimeMemoryCompareInternalNativeAligned(
+    _In_ MO_POINTER Left,
+    _In_ MO_POINTER Right,
+    _In_ MO_UINTN Length)
+{
+    volatile PMO_UINTN LeftNative = (volatile PMO_UINTN)Left;
+    volatile PMO_UINTN RightNative = (volatile PMO_UINTN)Right;
+    MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
+    for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
+    {
+        MO_UINTN CurrentLeft = LeftNative[Index];
+        MO_UINTN CurrentRight = RightNative[Index];
+        if (CurrentLeft != CurrentRight)
+        {
+            return MoRuntimeMemoryCompareInternalUnaligned(
+                (MO_POINTER)(&LeftNative[Index]),
+                (MO_POINTER)(&RightNative[Index]),
+                sizeof(MO_UINTN));
+        }
+    }
+    return 0;
+}
+
+EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
+    _In_opt_ MO_POINTER Left,
+    _In_opt_ MO_POINTER Right,
+    _In_opt_ MO_UINTN Length)
+{
+    if (!Length)
+    {
+        // For zero length, consider equal.
+        return 0;
+    }
+
+    if (!Left && !Right)
+    {
+        // Both are nullptr, consider equal.
+        return 0;
+    }
+    else if (!Left)
+    {
+        // Left is nullptr, consider less than Right.
+        return -1;
+    }
+    else if (!Right)
+    {
+        // Right is nullptr, consider greater than Left.
+        return 1;
+    }
+
+    MO_INTN CurrentResult = 0;
+    MO_UINTN CurrentLeft = (MO_UINTN)(Left);
+    MO_UINTN CurrentRight = (MO_UINTN)(Right);
+
+    MO_UINTN AlignedLeft = MoRuntimeGetAlignedSize(
+        CurrentLeft,
+        sizeof(MO_UINTN));
+    MO_UINTN AlignedRight = MoRuntimeGetAlignedSize(
+        CurrentRight,
+        sizeof(MO_UINTN));
+
+    // If the left or right address is not aligned, process the unaligned part
+    // with generic implementation first.
+    if (AlignedLeft != CurrentLeft ||
+        AlignedRight != CurrentRight)
+    {
+        MO_UINTN UnalignedLength = 0u;
+        if (AlignedLeft < AlignedRight)
+        {
+            UnalignedLength = AlignedLeft - CurrentLeft;
+        }
+        else
+        {
+            UnalignedLength = AlignedRight - CurrentRight;
+        }
+        if (UnalignedLength > Length)
+        {
+            UnalignedLength = Length;
+        }
+        CurrentResult = MoRuntimeMemoryCompareInternalUnaligned(
+            (MO_POINTER)(CurrentLeft),
+            (MO_POINTER)(CurrentRight),
+            UnalignedLength);
+        if (CurrentResult != 0)
+        {
+            return CurrentResult;
+        }
+        if (Length == UnalignedLength)
+        {
+            // If all bytes have been processed, return directly.
+            return 0;
+        }
+        CurrentLeft = AlignedLeft;
+        CurrentRight = AlignedRight;
+        Length -= UnalignedLength;
+    }
+
+    // If the buffer is not large enough, use the generic implementation.
+    if (Length < sizeof(MO_UINTN))
+    {
+        CurrentResult = MoRuntimeMemoryCompareInternalUnaligned(
+            (MO_POINTER)(CurrentLeft),
+            (MO_POINTER)(CurrentRight),
+            Length);
+        return CurrentResult;
+    }
+
+    MO_UINTN UnalignedLength = Length % sizeof(MO_UINTN);
+    MO_UINTN AlignedLength = Length - UnalignedLength;
+
+    // Process the aligned part with native type implementation.
+    CurrentResult = MoRuntimeMemoryCompareInternalNativeAligned(
+        (MO_POINTER)(CurrentLeft),
+        (MO_POINTER)(CurrentRight),
+        AlignedLength);
+    if (CurrentResult != 0)
+    {
+        return CurrentResult;
+    }
+
+    // Process the remaining unaligned part with generic implementation.
+    CurrentResult = MoRuntimeMemoryCompareInternalUnaligned(
+        (MO_POINTER)(CurrentLeft + AlignedLength),
+        (MO_POINTER)(CurrentRight + AlignedLength),
+        UnalignedLength);
+    return CurrentResult;
+}
+
 EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
     _Inout_ MO_POINTER ElementArray,
     _In_ MO_UINTN ElementCount,

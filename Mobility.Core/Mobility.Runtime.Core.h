@@ -67,6 +67,29 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
     _In_ MO_UINTN Length);
 
 /**
+ * @brief Compares two memory buffers byte by byte.
+ * @param Left The pointer to the first memory buffer.
+ * @param Right The pointer to the second memory buffer.
+ * @param Length The length of the memory buffers in bytes.
+ * @return Returns 0 if one of the following conditions is met:
+ *         - Left is equal to Right.
+ *         - Left and Right are both nullptr.
+ *         - Length is zero.
+ *         Returns a value less than 0 if one of the following conditions is
+ *         met:
+ *         - Left is less than Right.
+ *         - Left is nullptr and Right is not nullptr.
+ *         Returns a value greater than 0 if one of the following conditions is
+ *         met:
+ *         - Left is greater than Right.
+ *         - Right is nullptr and Left is not nullptr.
+ */
+EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
+    _In_opt_ MO_POINTER Left,
+    _In_opt_ MO_POINTER Right,
+    _In_opt_ MO_UINTN Length);
+
+/**
  * @brief Defines the comparison handler used for sorting operations.
  * @param Left The pointer to the left element to be compared.
  * @param Right The pointer to the right element to be compared.
