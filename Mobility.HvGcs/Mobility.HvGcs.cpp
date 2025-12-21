@@ -104,83 +104,6 @@ extern "C" bool MoHvCheckAvailability()
     return true;
 }
 
-typedef struct _MO_ACPI_DESCRIPTION_TABLES
-{
-    EFI_ACPI_DESCRIPTION_HEADER* XsdtHeader;
-    EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER* MadtHeader;
-    EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE* Fadt;
-    EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER* SratHeader;
-} MO_ACPI_DESCRIPTION_TABLES, *PMO_ACPI_DESCRIPTION_TABLES;
-
-/**
- * @brief Retrieves the ACPI description tables information structure from the
- *        UEFI system table.
- * @param SystemTable Pointer to the UEFI system table.
- * @param DescriptionTables Pointer to the ACPI description tables information
- *                          structure which will be initialized to zero at the
- *                          beginning.
- */
-extern "C" void MoAcpiGetDescriptionTables(
-    _In_ EFI_SYSTEM_TABLE* SystemTable,
-    _Out_ PMO_ACPI_DESCRIPTION_TABLES DescriptionTables)
-{
-    if (!DescriptionTables)
-    {
-        return;
-    }
-    ::MoRuntimeMemoryFillByte(
-        DescriptionTables,
-        0,
-        sizeof(MO_ACPI_DESCRIPTION_TABLES));
-
-    MO_UINT64 ExtendedSystemDescriptionTableAddress = 0;
-    if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryExtendedSystemDescriptionTable(
-        &ExtendedSystemDescriptionTableAddress,
-        SystemTable))
-    {
-        return;
-    }
-    DescriptionTables->XsdtHeader =
-        reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(
-            ExtendedSystemDescriptionTableAddress);
-
-    MO_UINT64 MultipleApicDescriptionTableAddress = 0;
-    if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
-        &MultipleApicDescriptionTableAddress,
-        EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE,
-        EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
-        ExtendedSystemDescriptionTableAddress))
-    {
-        using TableType = EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER;
-        DescriptionTables->MadtHeader = reinterpret_cast<TableType*>(
-            MultipleApicDescriptionTableAddress);
-    }
-
-    MO_UINT64 FixedAcpiDescriptionTableAddress = 0;
-    if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
-        &FixedAcpiDescriptionTableAddress,
-        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
-        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
-        ExtendedSystemDescriptionTableAddress))
-    {
-        using TableType = EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE;
-        DescriptionTables->Fadt = reinterpret_cast<TableType*>(
-            FixedAcpiDescriptionTableAddress);
-    }
-
-    MO_UINT64 SystemResourceAffinityTableAddress = 0;
-    if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
-        &SystemResourceAffinityTableAddress,
-        EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
-        EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
-        ExtendedSystemDescriptionTableAddress))
-    {
-        using TableType = EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
-        DescriptionTables->SratHeader = reinterpret_cast<TableType*>(
-            SystemResourceAffinityTableAddress);
-    }
-}
-
 #define MOBILITY_HVGCS_VERSION_UTF8_STRING \
     MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
     MILE_PROJECT_MACRO_TO_UTF8_STRING(MILE_PROJECT_VERSION_BUILD) ")"
@@ -469,39 +392,58 @@ EFI_STATUS EFIAPI UefiMain(
         SystemTable->ConOut,
         Buffer);
 
-    if (::MoHvCheckAvailability())
+    MO_UINT64 ExtendedSystemDescriptionTable = 0u;
+    if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryExtendedSystemDescriptionTable(
+        &ExtendedSystemDescriptionTable,
+        SystemTable))
+    {
+        ExtendedSystemDescriptionTable = 0u;
+    }
+    if (::MoHvCheckAvailability() && ExtendedSystemDescriptionTable)
     {
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
             "Hyper-V Generation 2 Virtual Machine detected, "
             "starting to patch ACPI description tables...\r\n");
 
-        MO_ACPI_DESCRIPTION_TABLES DescriptionTables;
-        ::MoAcpiGetDescriptionTables(SystemTable, &DescriptionTables);
-
-        if (DescriptionTables.MadtHeader)
+        MO_UINT64 MultipleApicDescriptionTable = 0u;
+        if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
+            &MultipleApicDescriptionTable,
+            EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE,
+            EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+            ExtendedSystemDescriptionTable))
         {
-            DescriptionTables.MadtHeader->Flags |= EFI_ACPI_2_0_PCAT_COMPAT;
-            DescriptionTables.MadtHeader->Header.Checksum = 0;
+            using TableType = EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER;
+            TableType* MadtHeader = reinterpret_cast<TableType*>(
+                MultipleApicDescriptionTable);
+            MadtHeader->Flags |= EFI_ACPI_2_0_PCAT_COMPAT;
+            MadtHeader->Header.Checksum = 0;
             ::MoRuntimeCalculateChecksumByte(
-                &DescriptionTables.MadtHeader->Header.Checksum,
-                reinterpret_cast<uint8_t*>(DescriptionTables.MadtHeader),
-                DescriptionTables.MadtHeader->Header.Length);
+                &MadtHeader->Header.Checksum,
+                MadtHeader,
+                MadtHeader->Header.Length);
 
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
                 "ACPI MADT PC-AT Compatibility flags bit is applied.\r\n");
         }
 
-        if (DescriptionTables.Fadt)
+        MO_UINT64 FixedAcpiDescriptionTable = 0u;
+        if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
+            &FixedAcpiDescriptionTable,
+            EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+            EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
+            ExtendedSystemDescriptionTable))
         {
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XPm1aEvtBlk.AddressSpaceId)
+            using TableType = EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE;
+            TableType* Fadt = reinterpret_cast<TableType*>(
+                FixedAcpiDescriptionTable);
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XPm1aEvtBlk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Pm1aEvtBlk)
+                if (!Fadt->Pm1aEvtBlk)
                 {
-                    DescriptionTables.Fadt->Pm1aEvtBlk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XPm1aEvtBlk.Address);
+                    Fadt->Pm1aEvtBlk = static_cast<UINT32>(
+                        Fadt->XPm1aEvtBlk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -509,13 +451,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XPm1bEvtBlk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XPm1bEvtBlk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Pm1bEvtBlk)
+                if (!Fadt->Pm1bEvtBlk)
                 {
-                    DescriptionTables.Fadt->Pm1bEvtBlk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XPm1bEvtBlk.Address);
+                    Fadt->Pm1bEvtBlk = static_cast<UINT32>(
+                        Fadt->XPm1bEvtBlk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -523,13 +464,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XPm1aCntBlk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XPm1aCntBlk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Pm1aCntBlk)
+                if (!Fadt->Pm1aCntBlk)
                 {
-                    DescriptionTables.Fadt->Pm1aCntBlk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XPm1aCntBlk.Address);
+                    Fadt->Pm1aCntBlk = static_cast<UINT32>(
+                        Fadt->XPm1aCntBlk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -537,13 +477,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XPm1bCntBlk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XPm1bCntBlk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Pm1bCntBlk)
+                if (!Fadt->Pm1bCntBlk)
                 {
-                    DescriptionTables.Fadt->Pm1bCntBlk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XPm1bCntBlk.Address);
+                    Fadt->Pm1bCntBlk = static_cast<UINT32>(
+                        Fadt->XPm1bCntBlk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -551,13 +490,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XPm2CntBlk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XPm2CntBlk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Pm2CntBlk)
+                if (!Fadt->Pm2CntBlk)
                 {
-                    DescriptionTables.Fadt->Pm2CntBlk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XPm2CntBlk.Address);
+                    Fadt->Pm2CntBlk = static_cast<UINT32>(
+                        Fadt->XPm2CntBlk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -565,13 +503,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XPmTmrBlk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XPmTmrBlk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->PmTmrBlk)
+                if (!Fadt->PmTmrBlk)
                 {
-                    DescriptionTables.Fadt->PmTmrBlk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XPmTmrBlk.Address);
+                    Fadt->PmTmrBlk = static_cast<UINT32>(
+                        Fadt->XPmTmrBlk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -579,13 +516,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XGpe0Blk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XGpe0Blk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Gpe0Blk)
+                if (!Fadt->Gpe0Blk)
                 {
-                    DescriptionTables.Fadt->Gpe0Blk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XGpe0Blk.Address);
+                    Fadt->Gpe0Blk = static_cast<UINT32>(
+                        Fadt->XGpe0Blk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -593,13 +529,12 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            if (EFI_ACPI_2_0_SYSTEM_IO
-                == DescriptionTables.Fadt->XGpe1Blk.AddressSpaceId)
+            if (EFI_ACPI_2_0_SYSTEM_IO == Fadt->XGpe1Blk.AddressSpaceId)
             {
-                if (!DescriptionTables.Fadt->Gpe1Blk)
+                if (!Fadt->Gpe1Blk)
                 {
-                    DescriptionTables.Fadt->Gpe1Blk = static_cast<UINT32>(
-                        DescriptionTables.Fadt->XGpe1Blk.Address);
+                    Fadt->Gpe1Blk = static_cast<UINT32>(
+                        Fadt->XGpe1Blk.Address);
 
                     ::MoUefiConsoleWriteAsciiString(
                         SystemTable->ConOut,
@@ -607,20 +542,28 @@ EFI_STATUS EFIAPI UefiMain(
                 }
             }
 
-            DescriptionTables.Fadt->Header.Checksum = 0;
+            Fadt->Header.Checksum = 0;
             ::MoRuntimeCalculateChecksumByte(
-                &DescriptionTables.Fadt->Header.Checksum,
-                reinterpret_cast<uint8_t*>(DescriptionTables.Fadt),
-                DescriptionTables.Fadt->Header.Length);
+                &Fadt->Header.Checksum,
+                Fadt,
+                Fadt->Header.Length);
         }
 
-        if (DescriptionTables.SratHeader)
+        MO_UINT64 SystemResourceAffinityTable = 0u;
+        if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
+            &SystemResourceAffinityTable,
+            EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
+            EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
+            ExtendedSystemDescriptionTable))
         {
+            using TableType = EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
+            TableType* SratHeader = reinterpret_cast<TableType*>(
+                SystemResourceAffinityTable);
             uint8_t* CurrentSratItemEntry = reinterpret_cast<uint8_t*>(
-                &DescriptionTables.SratHeader[1]);
+                &SratHeader[1]);
             uint32_t ProcessedSize =
                 sizeof(EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER);
-            while (ProcessedSize < DescriptionTables.SratHeader->Header.Length)
+            while (ProcessedSize < SratHeader->Header.Length)
             {
                 EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE* CandidateItem =
                     reinterpret_cast<EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE*>(
@@ -639,11 +582,11 @@ EFI_STATUS EFIAPI UefiMain(
                 CurrentSratItemEntry += CandidateItem->Length;
             }
 
-            DescriptionTables.SratHeader->Header.Checksum = 0;
+            SratHeader->Header.Checksum = 0;
             ::MoRuntimeCalculateChecksumByte(
-                &DescriptionTables.SratHeader->Header.Checksum,
-                reinterpret_cast<uint8_t*>(DescriptionTables.SratHeader),
-                DescriptionTables.SratHeader->Header.Length);
+                &SratHeader->Header.Checksum,
+                SratHeader,
+                SratHeader->Header.Length);
 
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
