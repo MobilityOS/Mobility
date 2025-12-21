@@ -188,4 +188,42 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN MaximumIndex);
 
+/**
+ * @brief Calculates the 8-bit sum for the requested region.
+ * @param SumByte The pointer to store the calculated sum byte. If this
+ *                parameter is nullptr, the function returns
+ *                MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param Buffer The pointer to the target buffer. If this parameter is
+ *               nullptr, the function returns
+ *               MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param Size The size of the target buffer in bytes. If this parameter is
+ *             not greater than zero, the function returns
+ *             MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
+    _Out_ PMO_UINT8 SumByte,
+    _In_ MO_POINTER Buffer,
+    _In_ MO_UINTN Size);
+
+/**
+ * @brief Calculates the 8-bit checksum for the requested region.
+ * @param ChecksumByte The pointer to store the calculated checksum byte. If
+ *                     this parameter is nullptr, the function returns
+ *                     MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param Buffer The pointer to the target buffer. If this parameter is
+ *               nullptr, the function returns
+ *               MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param Size The size of the target buffer in bytes. If this parameter is
+ *             not greater than zero, the function returns
+ *             MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
+    _Out_ PMO_UINT8 ChecksumByte,
+    _In_ MO_POINTER Buffer,
+    _In_ MO_UINTN Size);
+
 #endif // !MOBILITY_RUNTIME_CORE

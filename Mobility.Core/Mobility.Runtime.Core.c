@@ -822,3 +822,41 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
 
     return MO_RESULT_SUCCESS_OK;
 }
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
+    _Out_ PMO_UINT8 SumByte,
+    _In_ MO_POINTER Buffer,
+    _In_ MO_UINTN Size)
+{
+    if (!SumByte || !Buffer || !Size)
+    {
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *SumByte = 0u;
+
+    MO_UINT8 Result = 0u;
+    for (MO_UINTN Index = 0u; Index < Size; ++Index)
+    {
+        Result += ((PMO_UINT8)Buffer)[Index];
+    }
+    *SumByte = Result;
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
+    _Out_ PMO_UINT8 ChecksumByte,
+    _In_ MO_POINTER Buffer,
+    _In_ MO_UINTN Size)
+{
+    MO_RESULT ResultCode = MoRuntimeCalculateSumByte(
+        ChecksumByte,
+        Buffer,
+        Size);
+    if (MO_RESULT_SUCCESS_OK != ResultCode)
+    {
+        return ResultCode;
+    }
+    *ChecksumByte = (MO_UINT8)(~(*ChecksumByte) + 1u);
+    return MO_RESULT_SUCCESS_OK;
+}
