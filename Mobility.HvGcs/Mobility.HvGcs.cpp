@@ -17,8 +17,8 @@
 #include <Mobility.Runtime.Core.h>
 
 #include <Mobility.Uefi.Core.h>
+#include <Mobility.Uefi.Acpi.h>
 
-#include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
 #include <IndustryStandard/Acpi30.h>
 #include <Protocol/LoadedImage.h>
@@ -133,151 +133,51 @@ extern "C" void MoAcpiGetDescriptionTables(
         0,
         sizeof(MO_ACPI_DESCRIPTION_TABLES));
 
-    for (UINTN i = 0; i < SystemTable->NumberOfTableEntries; ++i)
-    {
-        if (0 != ::MoRuntimeMemoryCompare(
-            &SystemTable->ConfigurationTable[i].VendorGuid,
-            &gEfiAcpiTableGuid,
-            sizeof(EFI_GUID)))
-        {
-            continue;
-        }
-
-        EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER* RsdpCandidate =
-            reinterpret_cast<EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER*>(
-                SystemTable->ConfigurationTable[i].VendorTable);
-        if (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE
-            != RsdpCandidate->Signature)
-        {
-            continue;
-        }
-        if (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION
-            != RsdpCandidate->Revision)
-        {
-            continue;
-        }
-        {
-            MO_UINT8 SumByte = 0;
-            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
-                &SumByte,
-                reinterpret_cast<MO_POINTER>(RsdpCandidate),
-                OFFSET_OF(EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER, Length)))
-            {
-                continue;
-            }
-            if (0 != SumByte)
-            {
-                continue;
-            }
-        }
-        {
-            MO_UINT8 SumByte = 0;
-            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
-                &SumByte,
-                reinterpret_cast<MO_POINTER>(RsdpCandidate),
-                RsdpCandidate->Length))
-            {
-                continue;
-            }
-            if (0 != SumByte)
-            {
-                continue;
-            }
-        }
-
-        EFI_ACPI_DESCRIPTION_HEADER* XsdtHeaderCandidate =
-            reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(
-                RsdpCandidate->XsdtAddress);
-        if (EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE
-            != XsdtHeaderCandidate->Signature)
-        {
-            continue;
-        }
-        if (XsdtHeaderCandidate->Revision
-            < EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION)
-        {
-            continue;
-        }
-        {
-            MO_UINT8 SumByte = 0;
-            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
-                &SumByte,
-                reinterpret_cast<MO_POINTER>(XsdtHeaderCandidate),
-                XsdtHeaderCandidate->Length))
-            {
-                continue;
-            }
-            if (0 != SumByte)
-            {
-                continue;
-            }
-        }
-
-        DescriptionTables->XsdtHeader = XsdtHeaderCandidate;
-        break;
-    }
-
-    if (!DescriptionTables->XsdtHeader)
+    MO_UINT64 ExtendedSystemDescriptionTableAddress = 0;
+    if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryExtendedSystemDescriptionTable(
+        &ExtendedSystemDescriptionTableAddress,
+        SystemTable))
     {
         return;
     }
+    DescriptionTables->XsdtHeader =
+        reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(
+            ExtendedSystemDescriptionTableAddress);
 
-    uint64_t* XsdtEntryArray = reinterpret_cast<uint64_t*>(
-        &DescriptionTables->XsdtHeader[1]);
-    size_t XsdtEntryArraySize = DescriptionTables->XsdtHeader->Length;
-    XsdtEntryArraySize -= sizeof(EFI_ACPI_DESCRIPTION_HEADER);
-    XsdtEntryArraySize /= sizeof(uint64_t);
-    for (size_t i = 0; i < XsdtEntryArraySize; ++i)
+    MO_UINT64 MultipleApicDescriptionTableAddress = 0;
+    if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
+        &MultipleApicDescriptionTableAddress,
+        EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE,
+        EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+        ExtendedSystemDescriptionTableAddress))
     {
-        EFI_ACPI_DESCRIPTION_HEADER* EntryCandidate =
-            reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(XsdtEntryArray[i]);
-        {
-            MO_UINT8 SumByte = 0;
-            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
-                &SumByte,
-                reinterpret_cast<MO_POINTER>(EntryCandidate),
-                EntryCandidate->Length))
-            {
-                continue;
-            }
-            if (0 != SumByte)
-            {
-                continue;
-            }
-        }
+        using TableType = EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER;
+        DescriptionTables->MadtHeader = reinterpret_cast<TableType*>(
+            MultipleApicDescriptionTableAddress);
+    }
 
-        switch (EntryCandidate->Signature)
-        {
-        case EFI_ACPI_2_0_MULTIPLE_SAPIC_DESCRIPTION_TABLE_SIGNATURE:
-            if (EntryCandidate->Revision
-                >= EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION)
-            {
-                DescriptionTables->MadtHeader =
-                    reinterpret_cast<EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER*>(
-                        EntryCandidate);
-            }
-            break;
-        case EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE:
-            if (EntryCandidate->Revision
-                >= EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION)
-            {
-                DescriptionTables->Fadt =
-                    reinterpret_cast<EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE*>(
-                        EntryCandidate);
-            }
-            break;
-        case EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE:
-            if (EntryCandidate->Revision
-                >= EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION)
-            {
-                DescriptionTables->SratHeader =
-                    reinterpret_cast<EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER*>(
-                        EntryCandidate);
-            }
-            break;
-        default:
-            break;
-        }
+    MO_UINT64 FixedAcpiDescriptionTableAddress = 0;
+    if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
+        &FixedAcpiDescriptionTableAddress,
+        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
+        ExtendedSystemDescriptionTableAddress))
+    {
+        using TableType = EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE;
+        DescriptionTables->Fadt = reinterpret_cast<TableType*>(
+            FixedAcpiDescriptionTableAddress);
+    }
+
+    MO_UINT64 SystemResourceAffinityTableAddress = 0;
+    if (MO_RESULT_SUCCESS_OK == ::MoUefiAcpiQueryDescriptionTable(
+        &SystemResourceAffinityTableAddress,
+        EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
+        EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
+        ExtendedSystemDescriptionTableAddress))
+    {
+        using TableType = EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
+        DescriptionTables->SratHeader = reinterpret_cast<TableType*>(
+            SystemResourceAffinityTableAddress);
     }
 }
 
