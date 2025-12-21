@@ -568,7 +568,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
+EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
     _In_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
@@ -636,7 +636,7 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapTestRange(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
+EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
     _Inout_ MO_POINTER Bitmap,
     _In_ MO_UINTN StartIndex,
     _In_ MO_UINTN Length,
@@ -727,7 +727,7 @@ EXTERN_C MO_RESULT MOAPI MoMemoryBitmapFillRange(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemoryBitmapQueryContinuousRunLength(
+EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
     _Out_opt_ PMO_UINTN RunLength,
     _Out_opt_ PMO_BOOL BitValue,
     _In_ MO_POINTER Bitmap,

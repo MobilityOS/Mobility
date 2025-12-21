@@ -42,7 +42,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
-    if (MO_RESULT_SUCCESS_OK != MoMemoryBitmapFillRange(
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapFillRange(
         Instance->Bitmap,
         0u,
         Instance->Header.AllocatedUnits,
@@ -104,7 +104,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
     {
         MO_UINTN RunUnits = 0u;
         MO_BOOL BitValue = MO_FALSE;
-        if (MO_RESULT_SUCCESS_OK != MoMemoryBitmapQueryContinuousRunLength(
+        if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapQueryContinuousRunLength(
             &RunUnits,
             &BitValue,
             Instance->Bitmap,
@@ -172,7 +172,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
     {
         MO_UINTN RunUnits = 0u;
         MO_BOOL BitValue = MO_FALSE;
-        if (MO_RESULT_SUCCESS_OK != MoMemoryBitmapQueryContinuousRunLength(
+        if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapQueryContinuousRunLength(
             &RunUnits,
             &BitValue,
             Instance->Bitmap,
@@ -184,7 +184,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
         if (!BitValue && RunUnits >= RequiredUnits)
         {
             // Mark the units as allocated if found.
-            if (MO_RESULT_SUCCESS_OK != MoMemoryBitmapFillRange(
+            if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapFillRange(
                 Instance->Bitmap,
                 CurrentIndex,
                 RequiredUnits,
@@ -287,7 +287,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
     MO_UINT16 HeapHeaderOffsetUnits = ItemHeader->HeapHeaderOffsetUnits;
 
     // Mark the units as free.
-    if (MO_RESULT_SUCCESS_OK != MoMemoryBitmapFillRange(
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapFillRange(
         Instance->Bitmap,
         HeapHeaderOffsetUnits,
         AllocatedUnits,
