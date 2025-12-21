@@ -21,9 +21,11 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Mobility.Uefi.Acpi.h" />
     <ClInclude Include="Mobility.Uefi.Core.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Mobility.Uefi.Acpi.cpp" />
     <ClCompile Include="Mobility.Uefi.Core.cpp" />
   </ItemGroup>
   <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.targets" />
