@@ -104,37 +104,6 @@ extern "C" bool MoHvCheckAvailability()
     return true;
 }
 
-/**
- * @brief Calculates the 8-bit sum for the requested region.
- * @param Buffer Pointer to buffer containing byte data of component.
- * @param Size Size of the buffer.
- * @return The 8-bit checksum value needed.
- */
-extern "C" uint8_t MoCalculateSum8(
-    _In_ uint8_t* Buffer,
-    _In_ size_t Size)
-{
-    uint8_t Result = 0;
-    for (size_t i = 0; i < Size; ++i)
-    {
-        Result += Buffer[i];
-    }
-    return Result;
-}
-
-/**
- * @brief Calculates the value needed for a valid 8-bit checksum.
- * @param Buffer Pointer to buffer containing byte data of component.
- * @param Size Size of the buffer.
- * @return The 8-bit checksum value needed.
- */
-extern "C" uint8_t MoCalculateChecksum8(
-    _In_ uint8_t* Buffer,
-    _In_ size_t Size)
-{
-    return static_cast<uint8_t>(0x100 - ::MoCalculateSum8(Buffer, Size));
-}
-
 typedef struct _MO_ACPI_DESCRIPTION_TABLES
 {
     EFI_ACPI_DESCRIPTION_HEADER* XsdtHeader;
@@ -187,17 +156,33 @@ extern "C" void MoAcpiGetDescriptionTables(
         {
             continue;
         }
-        if (0 != ::MoCalculateSum8(
-            reinterpret_cast<uint8_t*>(RsdpCandidate),
-            OFFSET_OF(EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER, Length)))
         {
-            continue;
+            MO_UINT8 SumByte = 0;
+            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
+                &SumByte,
+                reinterpret_cast<MO_POINTER>(RsdpCandidate),
+                OFFSET_OF(EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER, Length)))
+            {
+                continue;
+            }
+            if (0 != SumByte)
+            {
+                continue;
+            }
         }
-        if (0 != ::MoCalculateSum8(
-            reinterpret_cast<uint8_t*>(RsdpCandidate),
-            RsdpCandidate->Length))
         {
-            continue;
+            MO_UINT8 SumByte = 0;
+            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
+                &SumByte,
+                reinterpret_cast<MO_POINTER>(RsdpCandidate),
+                RsdpCandidate->Length))
+            {
+                continue;
+            }
+            if (0 != SumByte)
+            {
+                continue;
+            }
         }
 
         EFI_ACPI_DESCRIPTION_HEADER* XsdtHeaderCandidate =
@@ -213,11 +198,19 @@ extern "C" void MoAcpiGetDescriptionTables(
         {
             continue;
         }
-        if (0 != ::MoCalculateSum8(
-            reinterpret_cast<uint8_t*>(XsdtHeaderCandidate),
-            XsdtHeaderCandidate->Length))
         {
-            continue;
+            MO_UINT8 SumByte = 0;
+            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
+                &SumByte,
+                reinterpret_cast<MO_POINTER>(XsdtHeaderCandidate),
+                XsdtHeaderCandidate->Length))
+            {
+                continue;
+            }
+            if (0 != SumByte)
+            {
+                continue;
+            }
         }
 
         DescriptionTables->XsdtHeader = XsdtHeaderCandidate;
@@ -238,11 +231,19 @@ extern "C" void MoAcpiGetDescriptionTables(
     {
         EFI_ACPI_DESCRIPTION_HEADER* EntryCandidate =
             reinterpret_cast<EFI_ACPI_DESCRIPTION_HEADER*>(XsdtEntryArray[i]);
-        if (0 != ::MoCalculateSum8(
-            reinterpret_cast<uint8_t*>(EntryCandidate),
-            EntryCandidate->Length))
         {
-            break;
+            MO_UINT8 SumByte = 0;
+            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeCalculateSumByte(
+                &SumByte,
+                reinterpret_cast<MO_POINTER>(EntryCandidate),
+                EntryCandidate->Length))
+            {
+                continue;
+            }
+            if (0 != SumByte)
+            {
+                continue;
+            }
         }
 
         switch (EntryCandidate->Signature)
@@ -582,10 +583,10 @@ EFI_STATUS EFIAPI UefiMain(
         {
             DescriptionTables.MadtHeader->Flags |= EFI_ACPI_2_0_PCAT_COMPAT;
             DescriptionTables.MadtHeader->Header.Checksum = 0;
-            DescriptionTables.MadtHeader->Header.Checksum =
-                ::MoCalculateChecksum8(
-                    reinterpret_cast<uint8_t*>(DescriptionTables.MadtHeader),
-                    DescriptionTables.MadtHeader->Header.Length);
+            ::MoRuntimeCalculateChecksumByte(
+                &DescriptionTables.MadtHeader->Header.Checksum,
+                reinterpret_cast<uint8_t*>(DescriptionTables.MadtHeader),
+                DescriptionTables.MadtHeader->Header.Length);
 
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
@@ -707,10 +708,10 @@ EFI_STATUS EFIAPI UefiMain(
             }
 
             DescriptionTables.Fadt->Header.Checksum = 0;
-            DescriptionTables.Fadt->Header.Checksum =
-                ::MoCalculateChecksum8(
-                    reinterpret_cast<uint8_t*>(DescriptionTables.Fadt),
-                    DescriptionTables.Fadt->Header.Length);
+            ::MoRuntimeCalculateChecksumByte(
+                &DescriptionTables.Fadt->Header.Checksum,
+                reinterpret_cast<uint8_t*>(DescriptionTables.Fadt),
+                DescriptionTables.Fadt->Header.Length);
         }
 
         if (DescriptionTables.SratHeader)
@@ -739,10 +740,10 @@ EFI_STATUS EFIAPI UefiMain(
             }
 
             DescriptionTables.SratHeader->Header.Checksum = 0;
-            DescriptionTables.SratHeader->Header.Checksum =
-                ::MoCalculateChecksum8(
-                    reinterpret_cast<uint8_t*>(DescriptionTables.SratHeader),
-                    DescriptionTables.SratHeader->Header.Length);
+            ::MoRuntimeCalculateChecksumByte(
+                &DescriptionTables.SratHeader->Header.Checksum,
+                reinterpret_cast<uint8_t*>(DescriptionTables.SratHeader),
+                DescriptionTables.SratHeader->Header.Length);
 
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
