@@ -14,7 +14,10 @@
 
 #include <sal.h>
 
+#include <Mobility.Runtime.Core.h>
+
 #include <Mobility.Uefi.Core.h>
+
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
 #include <IndustryStandard/Acpi30.h>
@@ -67,7 +70,7 @@ extern "C" bool MoHvCheckAvailability()
 
     HV_CPUID_RESULT HvCpuIdResult;
 
-    ::memset(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
+    ::MoRuntimeMemoryFillByte(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
     ::__cpuid(
         reinterpret_cast<int*>(&HvCpuIdResult),
         HvCpuIdFunctionVersionAndFeatures);
@@ -76,7 +79,7 @@ extern "C" bool MoHvCheckAvailability()
         return false;
     }
 
-    ::memset(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
+    ::MoRuntimeMemoryFillByte(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
     ::__cpuid(
         reinterpret_cast<int*>(&HvCpuIdResult),
         HvCpuIdFunctionHvInterface);
@@ -85,7 +88,7 @@ extern "C" bool MoHvCheckAvailability()
         return false;
     }
 
-    ::memset(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
+    ::MoRuntimeMemoryFillByte(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
     ::__cpuid(
         reinterpret_cast<int*>(&HvCpuIdResult),
         HvCpuIdFunctionMsHvFeatures);
@@ -156,11 +159,14 @@ extern "C" void MoAcpiGetDescriptionTables(
     {
         return;
     }
-    ::memset(DescriptionTables, 0, sizeof(MO_ACPI_DESCRIPTION_TABLES));
+    ::MoRuntimeMemoryFillByte(
+        DescriptionTables,
+        0,
+        sizeof(MO_ACPI_DESCRIPTION_TABLES));
 
     for (UINTN i = 0; i < SystemTable->NumberOfTableEntries; ++i)
     {
-        if (0 != ::memcmp(
+        if (0 != ::MoRuntimeMemoryCompare(
             &SystemTable->ConfigurationTable[i].VendorGuid,
             &gEfiAcpiTableGuid,
             sizeof(EFI_GUID)))
@@ -379,7 +385,10 @@ namespace
             return false;
         }
 
-        ::memset(Destination, 0, DestinationLength * sizeof(wchar_t));
+        ::MoRuntimeMemoryFillByte(
+            Destination,
+            0,
+            DestinationLength * sizeof(wchar_t));
         while (Source)
         {
             FILEPATH_DEVICE_PATH* FilePath =
@@ -389,7 +398,7 @@ namespace
                 break;
             }
 
-            wcscat_s(
+            ::wcscat_s(
                 Destination,
                 DestinationLength,
                 reinterpret_cast<wchar_t*>(FilePath->PathName));
@@ -461,12 +470,15 @@ namespace
             return false;
         }
 
-        ::memset(DevicePathBuffer, 0, DevicePathBufferLength);
+        ::MoRuntimeMemoryFillByte(
+            DevicePathBuffer,
+            0,
+            DevicePathBufferLength);
         EFI_DEVICE_PATH_PROTOCOL* Current = DevicePathBuffer;
         while (RootDevicePath && !::IsDevicePathEndNode(RootDevicePath))
         {
             UINTN NodeLength = ::GetDevicePathNodeLength(RootDevicePath);
-            ::memcpy(Current, RootDevicePath, NodeLength);
+            ::MoRuntimeMemoryMove(Current, RootDevicePath, NodeLength);
             Current = ::GetNextDevicePathNode(Current);
             RootDevicePath = ::GetNextDevicePathNode(RootDevicePath);
         }
@@ -480,7 +492,7 @@ namespace
         UINT16 NodeLength = sizeof(FILEPATH_DEVICE_PATH);
         NodeLength += RelativeFilePathLength * sizeof(CHAR16);
         ::SetDevicePathNodeLength(&FilePath->Header, NodeLength);
-        ::memcpy(
+        ::MoRuntimeMemoryMove(
             FilePath->PathName,
             RelativeFilePath,
             RelativeFilePathLength * sizeof(CHAR16));
@@ -550,7 +562,7 @@ EFI_STATUS EFIAPI UefiMain(
         "\r\n");
 
     char Buffer[256];
-    ::memset(Buffer, 0, 256);
+    ::MoRuntimeMemoryFillByte(Buffer, 0, 256);
     ::_snprintf(Buffer, 256, "SystemTable = %p\r\n", SystemTable);
     ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
@@ -819,7 +831,10 @@ EFI_STATUS EFIAPI UefiMain(
                 else
                 {
                     UINT8 DevicePathBuffer[4096];
-                    ::memset(DevicePathBuffer, 0, sizeof(DevicePathBuffer));
+                    ::MoRuntimeMemoryFillByte(
+                        DevicePathBuffer,
+                        0,
+                        sizeof(DevicePathBuffer));
                     EFI_DEVICE_PATH_PROTOCOL* TargetDevicePath =
                         reinterpret_cast<EFI_DEVICE_PATH_PROTOCOL*>(
                             DevicePathBuffer);
