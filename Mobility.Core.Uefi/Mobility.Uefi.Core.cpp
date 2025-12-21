@@ -1,7 +1,7 @@
 ﻿/*
  * PROJECT:    Mobility
  * FILE:       Mobility.Uefi.Core.cpp
- * PURPOSE:    Implementation for Mobility Uefi Core
+ * PURPOSE:    Implementation for Mobility UEFI Core functions
  *
  * LICENSE:    The MIT License
  *

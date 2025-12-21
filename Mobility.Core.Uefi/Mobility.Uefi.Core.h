@@ -1,7 +1,7 @@
 ﻿/*
  * PROJECT:    Mobility
  * FILE:       Mobility.Uefi.Core.h
- * PURPOSE:    Definition for Mobility Uefi Core
+ * PURPOSE:    Definition for Mobility UEFI Core functions
  *
  * LICENSE:    The MIT License
  *
