@@ -69,221 +69,67 @@ void SimpleDemo(
         SystemTable->ConOut,
         "ACPI SRAT is located successfully.\r\n");
 
-    using TableHeaderType = EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
-    TableHeaderType* TableHeader = reinterpret_cast<TableHeaderType*>(
-        SystemResourceAffinityTable);
-
-    MO_UINT16 MemoryAffinityCount = 0;
-    {
-        MO_UINTN CurrentItem = reinterpret_cast<MO_UINTN>(&TableHeader[1]);
-        MO_UINT32 ProcessedSize = sizeof(TableHeaderType);
-        while (ProcessedSize < TableHeader->Header.Length)
-        {
-            using CandidateType = EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE;
-            CandidateType* Candidate =
-                reinterpret_cast<CandidateType*>(CurrentItem);
-            if (EFI_ACPI_3_0_MEMORY_AFFINITY == Candidate->Type)
-            {
-                ++MemoryAffinityCount;
-            }
-            ProcessedSize += Candidate->Length;
-            CurrentItem += Candidate->Length;
-        }
-    }
-
-    if (MemoryAffinityCount == 0)
+    PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MemoryHoleRanges = nullptr;
+    MO_UINTN MemoryHolesCount = 0u;
+    if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryMemoryHoles(
+        &MemoryHoleRanges,
+        &MemoryHolesCount,
+        SystemResourceAffinityTable))
     {
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            "No Memory Affinity Structure found in ACPI SRAT.\r\n");
+            "No Memory Holes found from ACPI SRAT.\r\n");
         return;
     }
+    ::MoUefiConsoleWriteAsciiString(
+        SystemTable->ConOut,
+        "Memory Holes found from ACPI SRAT:\r\n");
 
-    struct MemoryRangeItem
-    {
-        MO_UINT64 AddressBase;
-        MO_UINT64 Length;
-    };
-    MemoryRangeItem* MemoryRanges = nullptr;
-    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
-        reinterpret_cast<PMO_POINTER>(&MemoryRanges),
-        static_cast<MO_UINT16>(
-            sizeof(MemoryRangeItem) * MemoryAffinityCount)))
+    for (MO_UINTN i = 0; i < MemoryHolesCount; ++i)
     {
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            "Failed to allocate memory for Memory Range.\r\n");
-        return;
-    }
-
-
-    {
-        MO_UINTN CurrentIndex = 0;
-        MO_UINTN CurrentItem = reinterpret_cast<MO_UINTN>(&TableHeader[1]);
-        MO_UINT32 ProcessedSize = sizeof(TableHeaderType);
-        while (ProcessedSize < TableHeader->Header.Length)
+            "Hole Address: 0x");
         {
-            using CandidateType = EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE;
-            CandidateType* Candidate =
-                reinterpret_cast<CandidateType*>(CurrentItem);
-            if (EFI_ACPI_3_0_MEMORY_AFFINITY == Candidate->Type)
+            MO_UINT64 PrintValue = MemoryHoleRanges[i].AddressBase;
+            char AddressBuffer[17];
+            ::MoRuntimeMemoryFillByte(
+                AddressBuffer,
+                0,
+                sizeof(AddressBuffer));
+            const char HexDigits[] = "0123456789ABCDEF";
+            for (int j = 0; j < 16; ++j)
             {
-                MO_UINT64 AddressBase = Candidate->AddressBaseHigh;
-                AddressBase <<= 32;
-                AddressBase |= Candidate->AddressBaseLow;
-                MO_UINT64 Length = Candidate->LengthHigh;
-                Length <<= 32;
-                Length |= Candidate->LengthLow;
-                MemoryRanges[CurrentIndex].AddressBase = AddressBase;
-                MemoryRanges[CurrentIndex].Length = Length;
-                ++CurrentIndex;
+                AddressBuffer[15 - j] = HexDigits[PrintValue & 0x0F];
+                PrintValue >>= 4;
             }
-            ProcessedSize += Candidate->Length;
-            CurrentItem += Candidate->Length;
-        }
-    }
-
-    ::MoRuntimeElementSort(
-        MemoryRanges,
-        MemoryAffinityCount,
-        sizeof(MemoryRangeItem),
-        [](
-            _In_ MO_POINTER Left,
-            _In_ MO_POINTER Right,
-            _In_ MO_POINTER Context) -> MO_INTN MOAPI
-    {
-        Context; // Unused parameter.
-        MemoryRangeItem* LeftItem = reinterpret_cast<MemoryRangeItem*>(Left);
-        MemoryRangeItem* RightItem = reinterpret_cast<MemoryRangeItem*>(Right);
-        if (LeftItem->AddressBase < RightItem->AddressBase)
-        {
-            return -1;
-        }
-        else if (LeftItem->AddressBase > RightItem->AddressBase)
-        {
-            return 1;
-        }
-        return 0;
-    },
-        nullptr);
-
-    // Merge adjacent or overlapping ranges.
-    MO_UINT16 MergedRangeCount = 0;
-    {
-        for (MO_UINT16 i = 0; i < MemoryAffinityCount; ++i)
-        {
-            if (MergedRangeCount == 0)
-            {
-                MemoryRanges[MergedRangeCount] = MemoryRanges[i];
-                ++MergedRangeCount;
-            }
-            else
-            {
-                MemoryRangeItem* LastMergedRange =
-                    &MemoryRanges[MergedRangeCount - 1];
-                MO_UINT64 LastMergedEnd =
-                    LastMergedRange->AddressBase + LastMergedRange->Length;
-                MO_UINT64 CurrentStart = MemoryRanges[i].AddressBase;
-                MO_UINT64 CurrentEnd =
-                    MemoryRanges[i].AddressBase + MemoryRanges[i].Length;
-                if (CurrentStart <= LastMergedEnd)
-                {
-                    // Merge the ranges.
-                    if (CurrentEnd > LastMergedEnd)
-                    {
-                        LastMergedRange->Length =
-                            CurrentEnd - LastMergedRange->AddressBase;
-                    }
-                }
-                else
-                {
-                    MemoryRanges[MergedRangeCount] = MemoryRanges[i];
-                    ++MergedRangeCount;
-                }
-            }
-        }
-    }
-
-    // Find the hole above the range.
-    MemoryRangeItem* MemoryHoleRanges = nullptr;
-    if (MO_RESULT_SUCCESS_OK == ::MoMemoryInternalHeapAllocate(
-        reinterpret_cast<PMO_POINTER>(&MemoryHoleRanges),
-        static_cast<MO_UINT16>(
-            sizeof(MemoryRangeItem) * MergedRangeCount)))
-    {
-        MO_UINT16 MemoryHoleRangeCount = 0;
-        for (MO_UINT16 i = 0; i < MergedRangeCount - 1; ++i)
-        {
-            MO_UINT64 CurrentEnd =
-                MemoryRanges[i].AddressBase + MemoryRanges[i].Length;
-            MO_UINT64 NextStart = MemoryRanges[i + 1].AddressBase;
-            if (NextStart > CurrentEnd)
-            {
-                MemoryHoleRanges[MemoryHoleRangeCount].AddressBase = CurrentEnd;
-                MemoryHoleRanges[MemoryHoleRangeCount].Length =
-                    NextStart - CurrentEnd;
-                ++MemoryHoleRangeCount;
-            }
-        }
-        if (MemoryHoleRangeCount > 0)
-        {
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                "Memory Holes found between Memory Affinity Ranges:\r\n");
-            for (MO_UINT16 i = 0; i < MemoryHoleRangeCount; ++i)
-            {
-                ::MoUefiConsoleWriteAsciiString(
-                    SystemTable->ConOut,
-                    "Hole Address: 0x");
-                {
-                    MO_UINT64 PrintValue = MemoryHoleRanges[i].AddressBase;
-                    char AddressBuffer[17];
-                    ::MoRuntimeMemoryFillByte(
-                        AddressBuffer,
-                        0,
-                        sizeof(AddressBuffer));
-                    const char HexDigits[] = "0123456789ABCDEF";
-                    for (int j = 0; j < 16; ++j)
-                    {
-                        AddressBuffer[15 - j] = HexDigits[PrintValue & 0x0F];
-                        PrintValue >>= 4;
-                    }
-                    ::MoUefiConsoleWriteAsciiString(
-                        SystemTable->ConOut,
-                        AddressBuffer);
-                }
-                ::MoUefiConsoleWriteAsciiString(
-                    SystemTable->ConOut,
-                    ", Length: 0x");
-                {
-                    MO_UINT64 PrintValue = MemoryHoleRanges[i].Length;
-                    char LengthBuffer[17];
-                    ::MoRuntimeMemoryFillByte(
-                        LengthBuffer,
-                        0,
-                        sizeof(LengthBuffer));
-                    const char HexDigits[] = "0123456789ABCDEF";
-                    for (int j = 0; j < 16; ++j)
-                    {
-                        LengthBuffer[15 - j] = HexDigits[PrintValue & 0x0F];
-                        PrintValue >>= 4;
-                    }
-                    ::MoUefiConsoleWriteAsciiString(
-                        SystemTable->ConOut,
-                        LengthBuffer);
-                }
-                ::MoUefiConsoleWriteAsciiString(
-                    SystemTable->ConOut,
-                    "\r\n");
-            }
+                AddressBuffer);
         }
-        else
+        ::MoUefiConsoleWriteAsciiString(
+            SystemTable->ConOut,
+            ", Length: 0x");
         {
+            MO_UINT64 PrintValue = MemoryHoleRanges[i].Length;
+            char LengthBuffer[17];
+            ::MoRuntimeMemoryFillByte(
+                LengthBuffer,
+                0,
+                sizeof(LengthBuffer));
+            const char HexDigits[] = "0123456789ABCDEF";
+            for (int j = 0; j < 16; ++j)
+            {
+                LengthBuffer[15 - j] = HexDigits[PrintValue & 0x0F];
+                PrintValue >>= 4;
+            }
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                "No Memory Holes found between Memory Affinity Ranges.\r\n");
+                LengthBuffer);
         }
-        ::MoMemoryInternalHeapFree(MemoryHoleRanges);
+        ::MoUefiConsoleWriteAsciiString(
+            SystemTable->ConOut,
+            "\r\n");
     }
 }
 
