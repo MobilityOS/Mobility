@@ -90,4 +90,102 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
     _In_ MO_UINT8 MinimumRevision,
     _In_ MO_UINT64 ExtendedSystemDescriptionTable);
 
+/**
+ * @brief The simple memory range item structure for ACPI memory queries.
+ */
+typedef struct _MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM
+{
+    /**
+     * @brief The physical address base of the memory range.
+     */
+    MO_UINT64 AddressBase;
+    /**
+     * @brief The length in bytes of the memory range.
+     */
+    MO_UINT64 Length;
+} MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM, *PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM;
+
+/**
+ * @brief Queries the sorted original memory ranges definitions from the System
+ *        Resource Affinity Table (SRAT).
+ * @param MemoryRanges The pointer to receive the allocated memory block which
+ *                     contains an array of memory ranges found in the System
+ *                     Resource Affinity Table (SRAT). The caller is responsible
+ *                     for freeing the allocated memory block using
+ *                     MoMemoryInternalHeapFree. If this parameter is nullptr,
+ *                     the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param MemoryRangesCount The pointer to receive the count of memory ranges
+ *                          found in the System Resource Affinity Table (SRAT).
+ * @param SystemResourceAffinityTable The physical address of the System
+ *                                    Resource Affinity Table (SRAT). If this
+ *                                    parameter is zero, the function returns
+ *                                    MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If no memory ranges are found, the function returns
+ *          MO_RESULT_ERROR_NO_INTERFACE.
+ *          If the System Resource Affinity Table (SRAT) is invalid, the
+ *          function returns MO_RESULT_ERROR_INVALID_POINTER.
+ */
+EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
+    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryRanges,
+    _Out_ PMO_UINTN MemoryRangesCount,
+    _In_ MO_UINT64 SystemResourceAffinityTable);
+
+/**
+ * @brief Queries the sorted merged memory ranges definitions from the System
+ *        Resource Affinity Table (SRAT).
+ * @param MemoryRanges The pointer to receive the allocated memory block which
+ *                     contains an array of memory ranges found in the System
+ *                     Resource Affinity Table (SRAT). The caller is responsible
+ *                     for freeing the allocated memory block using
+ *                     MoMemoryInternalHeapFree. If this parameter is nullptr,
+ *                     the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param MemoryRangesCount The pointer to receive the count of memory ranges
+ *                          found in the System Resource Affinity Table (SRAT).
+ * @param SystemResourceAffinityTable The physical address of the System
+ *                                    Resource Affinity Table (SRAT). If this
+ *                                    parameter is zero, the function returns
+ *                                    MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If no memory ranges are found, the function returns
+ *          MO_RESULT_ERROR_NO_INTERFACE.
+ *          If the System Resource Affinity Table (SRAT) is invalid, the
+ *          function returns MO_RESULT_ERROR_INVALID_POINTER.
+ */
+EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
+    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MergedMemoryRanges,
+    _Out_ PMO_UINTN MergedMemoryRangesCount,
+    _In_ MO_UINT64 SystemResourceAffinityTable);
+
+/**
+ * @brief Queries the sorted merged memory holes definitions from the System
+ *        Resource Affinity Table (SRAT).
+ * @param MemoryHoleRanges The pointer to receive the allocated memory block
+ *                         which contains an array of memory holes found in the
+ *                         System Resource Affinity Table (SRAT). The caller is
+ *                         responsible for freeing the allocated memory block
+ *                         using MoMemoryInternalHeapFree. If this parameter is
+ *                         nullptr, the function returns
+ *                         MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param MemoryHoleRangesCount The pointer to receive the count of memory holes
+ *                              found in the System Resource Affinity Table
+ *                              (SRAT).
+ * @param SystemResourceAffinityTable The physical address of the System
+ *                                    Resource Affinity Table (SRAT). If this
+ *                                    parameter is zero, the function returns
+ *                                    MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If no memory holes are found, the function returns
+ *          MO_RESULT_ERROR_NO_INTERFACE.
+ *          If the System Resource Affinity Table (SRAT) is invalid, the
+ *          function returns MO_RESULT_ERROR_INVALID_POINTER.
+ */
+EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
+    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryHoleRanges,
+    _Out_ PMO_UINTN MemoryHoleRangesCount,
+    _In_ MO_UINT64 SystemResourceAffinityTable);
+
 #endif // !MOBILITY_UEFI_ACPI

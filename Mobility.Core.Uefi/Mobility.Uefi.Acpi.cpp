@@ -11,6 +11,7 @@
 #include "Mobility.Uefi.Acpi.h"
 
 #include <Mobility.Runtime.Core.h>
+#include <Mobility.Memory.InternalHeap.h>
 
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
@@ -185,6 +186,288 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
     {
         return MO_RESULT_ERROR_NO_INTERFACE;
     }
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
+    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryRanges,
+    _Out_ PMO_UINTN MemoryRangesCount,
+    _In_ MO_UINT64 SystemResourceAffinityTable)
+{
+    if (!MemoryRanges ||
+        !MemoryRangesCount ||
+        !SystemResourceAffinityTable)
+    {
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *MemoryRanges = nullptr;
+    *MemoryRangesCount = 0u;
+
+    if (!::MoUefiAcpiDescriptionTableValidate(
+        reinterpret_cast<MO_POINTER>(SystemResourceAffinityTable),
+        EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
+        EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION))
+    {
+        return MO_RESULT_ERROR_INVALID_POINTER;
+    }
+
+    using TableHeaderType = EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
+    TableHeaderType* TableHeader = reinterpret_cast<TableHeaderType*>(
+        SystemResourceAffinityTable);
+    MO_UINTN TableEntriesStart = reinterpret_cast<MO_UINTN>(&TableHeader[1]);
+
+    MO_UINT16 Count = 0;
+    {
+        MO_UINTN CurrentItem = TableEntriesStart;
+        MO_UINT32 ProcessedSize = sizeof(TableHeaderType);
+        while (ProcessedSize < TableHeader->Header.Length)
+        {
+            using CandidateType = EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE;
+            CandidateType* Candidate =
+                reinterpret_cast<CandidateType*>(CurrentItem);
+            if (EFI_ACPI_3_0_MEMORY_AFFINITY == Candidate->Type)
+            {
+                ++Count;
+            }
+            ProcessedSize += Candidate->Length;
+            CurrentItem += Candidate->Length;
+        }
+    }
+    if (!Count)
+    {
+        // No Memory Affinity Structure found.
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+    MO_UINT16 Size = static_cast<MO_UINT16>(
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count);
+
+    PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM Ranges = nullptr;
+    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
+        reinterpret_cast<PMO_POINTER>(&Ranges),
+        Size))
+    {
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    {
+        MO_UINTN CurrentIndex = 0;
+        MO_UINTN CurrentItem = TableEntriesStart;
+        MO_UINT32 ProcessedSize = sizeof(TableHeaderType);
+        while (ProcessedSize < TableHeader->Header.Length)
+        {
+            using CandidateType = EFI_ACPI_3_0_MEMORY_AFFINITY_STRUCTURE;
+            CandidateType* Candidate =
+                reinterpret_cast<CandidateType*>(CurrentItem);
+            if (EFI_ACPI_3_0_MEMORY_AFFINITY == Candidate->Type)
+            {
+                MO_UINT64 AddressBase = Candidate->AddressBaseHigh;
+                AddressBase <<= 32;
+                AddressBase |= Candidate->AddressBaseLow;
+                MO_UINT64 Length = Candidate->LengthHigh;
+                Length <<= 32;
+                Length |= Candidate->LengthLow;
+                Ranges[CurrentIndex].AddressBase = AddressBase;
+                Ranges[CurrentIndex].Length = Length;
+                ++CurrentIndex;
+            }
+            ProcessedSize += Candidate->Length;
+            CurrentItem += Candidate->Length;
+        }
+    }
+
+    if (MO_RESULT_SUCCESS_OK != ::MoRuntimeElementSort(
+        Ranges,
+        Count,
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM),
+        [](
+            _In_ MO_POINTER Left,
+            _In_ MO_POINTER Right,
+            _In_ MO_POINTER Context) -> MO_INTN MOAPI
+    {
+        Context; // Unused parameter.
+        PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM LeftItem =
+            reinterpret_cast<PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM>(Left);
+        PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM RightItem =
+            reinterpret_cast<PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM>(Right);
+        if (LeftItem->AddressBase < RightItem->AddressBase)
+        {
+            return -1;
+        }
+        else if (LeftItem->AddressBase > RightItem->AddressBase)
+        {
+            return 1;
+        }
+        return 0;
+    },
+        nullptr))
+    {
+        // Cleanup on error.
+        ::MoMemoryInternalHeapFree(Ranges);
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+
+    *MemoryRanges = Ranges;
+    *MemoryRangesCount = Count;
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
+    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MergedMemoryRanges,
+    _Out_ PMO_UINTN MergedMemoryRangesCount,
+    _In_ MO_UINT64 SystemResourceAffinityTable)
+{
+    if (!MergedMemoryRanges ||
+        !MergedMemoryRangesCount ||
+        !SystemResourceAffinityTable)
+    {
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *MergedMemoryRanges = nullptr;
+    *MergedMemoryRangesCount = 0u;
+
+    PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MemoryRanges = nullptr;
+    MO_UINTN MemoryRangesCount = 0u;
+    MO_RESULT Result = ::MoUefiAcpiQueryMemoryRanges(
+        &MemoryRanges,
+        &MemoryRangesCount,
+        SystemResourceAffinityTable);
+    if (MO_RESULT_SUCCESS_OK != Result)
+    {
+        return Result;
+    }
+
+    // Merge adjacent or overlapping ranges.
+    MO_UINTN Count = 0;
+    {
+        for (MO_UINTN i = 0; i < MemoryRangesCount; ++i)
+        {
+            if (!Count)
+            {
+                MemoryRanges[Count] = MemoryRanges[i];
+                ++Count;
+            }
+            else
+            {
+                PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM LastMergedRange =
+                    &MemoryRanges[Count - 1];
+                MO_UINT64 LastMergedRangeEnd =
+                    LastMergedRange->AddressBase + LastMergedRange->Length;
+                MO_UINT64 CurrentRangeStart = MemoryRanges[i].AddressBase;
+                if (CurrentRangeStart <= LastMergedRangeEnd)
+                {
+                    // Overlapping or adjacent ranges, merge them.
+                    MO_UINT64 CurrentRangeEnd =
+                        MemoryRanges[i].AddressBase + MemoryRanges[i].Length;
+                    if (CurrentRangeEnd > LastMergedRangeEnd)
+                    {
+                        LastMergedRange->Length =
+                            CurrentRangeEnd - LastMergedRange->AddressBase;
+                    }
+                }
+                else
+                {
+                    // Non-overlapping range, add it to the merged list.
+                    MemoryRanges[Count] = MemoryRanges[i];
+                    ++Count;
+                }
+            }
+        }
+    }
+    if (!Count)
+    {
+        // Should not happen.
+        ::MoMemoryInternalHeapFree(MemoryRanges);
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+    MO_UINT16 Size = static_cast<MO_UINT16>(
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count);
+
+    PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MergedRanges = nullptr;
+    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
+        reinterpret_cast<PMO_POINTER>(&MergedRanges),
+        Size))
+    {
+        ::MoMemoryInternalHeapFree(MemoryRanges);
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    if (MO_RESULT_SUCCESS_OK != ::MoRuntimeMemoryMove(
+        MergedRanges,
+        MemoryRanges,
+        Size))
+    {
+        ::MoMemoryInternalHeapFree(MemoryRanges);
+        ::MoMemoryInternalHeapFree(MergedRanges);
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+
+    ::MoMemoryInternalHeapFree(MemoryRanges);
+
+    *MergedMemoryRanges = MergedRanges;
+    *MergedMemoryRangesCount = Count;
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
+    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryHoleRanges,
+    _Out_ PMO_UINTN MemoryHoleRangesCount,
+    _In_ MO_UINT64 SystemResourceAffinityTable)
+{
+    if (!MemoryHoleRanges ||
+        !MemoryHoleRangesCount ||
+        !SystemResourceAffinityTable)
+    {
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *MemoryHoleRanges = nullptr;
+    *MemoryHoleRangesCount = 0u;
+
+    PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MergedMemoryRanges = nullptr;
+    MO_UINTN MergedMemoryRangesCount = 0u;
+    MO_RESULT Result = ::MoUefiAcpiQueryMergedMemoryRanges(
+        &MergedMemoryRanges,
+        &MergedMemoryRangesCount,
+        SystemResourceAffinityTable);
+    if (MO_RESULT_SUCCESS_OK != Result)
+    {
+        return Result;
+    }
+
+    if (MergedMemoryRangesCount < 2)
+    {
+        // No memory holes found.
+        ::MoMemoryInternalHeapFree(MergedMemoryRanges);
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+
+    MO_UINTN HoleCount = MergedMemoryRangesCount - 1;
+    MO_UINT16 Size = static_cast<MO_UINT16>(
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * HoleCount);
+    PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM Holes = nullptr;
+    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
+        reinterpret_cast<PMO_POINTER>(&Holes),
+        Size))
+    {
+        ::MoMemoryInternalHeapFree(MergedMemoryRanges);
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    for (MO_UINTN i = 0; i < HoleCount; ++i)
+    {
+        MO_UINT64 PreviousRangeEnd =
+            MergedMemoryRanges[i].AddressBase + MergedMemoryRanges[i].Length;
+        MO_UINT64 CurrentRangeStart = MergedMemoryRanges[i + 1].AddressBase;
+        Holes[i].AddressBase = PreviousRangeEnd;
+        Holes[i].Length = CurrentRangeStart - PreviousRangeEnd;
+    }
+
+    ::MoMemoryInternalHeapFree(MergedMemoryRanges);
+
+    *MemoryHoleRanges = Holes;
+    *MemoryHoleRangesCount = HoleCount;
 
     return MO_RESULT_SUCCESS_OK;
 }
