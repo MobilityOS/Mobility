@@ -64,12 +64,14 @@ MO_FORCEINLINE MO_BOOL MoMemorySmallHeapHeaderValidate(
         return MO_FALSE;
     }
 
-    if (MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS > Header->AllocatedUnits)
+    if (MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS > Header->AllocatedUnits ||
+        MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS < Header->AllocatedUnits)
     {
         return MO_FALSE;
     }
 
-    if (MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS > Header->HintUnit)
+    if (MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS > Header->HintUnit ||
+        MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS < Header->HintUnit)
     {
         return MO_FALSE;
     }
@@ -141,9 +143,10 @@ MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapCalculateItemHeaderChecksum(
 
 MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapFindSuitableBlock(
     _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ MO_UINT16 RequiredUnits)
+    _In_ MO_UINT16 RequiredUnits,
+    _In_ MO_UINT16 StartIndex)
 {
-    MO_UINT16 CurrentIndex = Instance->Header.HintUnit;
+    MO_UINT16 CurrentIndex = StartIndex;
     while (CurrentIndex < MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
     {
         MO_UINTN RunUnits = 0u;
@@ -156,6 +159,11 @@ MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapFindSuitableBlock(
             MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS))
         {
             // Unexpected error.
+            return 0;
+        }
+        if (!RunUnits)
+        {
+            // No more blocks available.
             return 0;
         }
         if (!BitValue && RunUnits >= RequiredUnits)
@@ -199,7 +207,8 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
 
     MO_UINT16 SuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
         Instance,
-        RequiredUnits);
+        RequiredUnits,
+        Instance->Header.HintUnit);
     if (SuitableBlockIndex)
     {
         // Mark the units as allocated if found.
@@ -245,9 +254,9 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
         {
             MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
                 Instance,
-                MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS);
-            if (FirstSuitableBlockIndex &&
-                FirstSuitableBlockIndex < CandidateHintUnit)
+                MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS,
+                MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS);
+            if (FirstSuitableBlockIndex)
             {
                 Instance->Header.HintUnit = FirstSuitableBlockIndex;
             }
@@ -355,9 +364,9 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
     {
         MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
             Instance,
-            MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS);
-        if (FirstSuitableBlockIndex &&
-            FirstSuitableBlockIndex < Instance->Header.HintUnit)
+            MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS,
+            MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS);
+        if (FirstSuitableBlockIndex)
         {
             Instance->Header.HintUnit = FirstSuitableBlockIndex;
         }
