@@ -226,4 +226,34 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
     _In_ MO_POINTER Buffer,
     _In_ MO_UINTN Size);
 
+/**
+ * @brief Convert an unsigned integer to a hexadecimal string.
+ * @param Buffer The buffer to receive the hexadecimal string. This parameter
+ *               can be nullptr if only the required buffer size is queried.
+ * @param RequiredBufferSize The pointer to receive the required buffer size in
+ *                           characters, including the null terminator. This
+ *                           parameter can be nullptr if the required buffer
+ *                           size is not needed like only converting the value.
+ * @param BufferSize The size of the Buffer in characters, including the null
+ *                   terminator. If the size is insufficient, the function
+ *                   returns MO_RESULT_ERROR_OUT_OF_MEMORY.
+ * @param Value The unsigned integer value to convert.
+ * @param ValueWidth The width of the value in bits. It must be one of 4, 8, 12,
+ *                   16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, or 64.
+ * @param Uppercase If this parameter is MO_TRUE, the hexadecimal digits A-F are
+ *                  used. Otherwise, the hexadecimal digits a-f are used.
+ * @param Prefix If this parameter is MO_TRUE, the "0x" prefix is added before
+ *               the hexadecimal digits.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
+    _Out_opt_ PMO_CHAR Buffer,
+    _Out_opt_ PMO_UINTN RequiredBufferSize,
+    _In_ MO_UINTN BufferSize,
+    _In_ MO_UINT64 Value,
+    _In_ MO_UINTN ValueWidth,
+    _In_ MO_BOOL Uppercase,
+    _In_ MO_BOOL Prefix);
+
 #endif // !MOBILITY_RUNTIME_CORE

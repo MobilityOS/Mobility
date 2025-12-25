@@ -860,3 +860,75 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
     *ChecksumByte = (MO_UINT8)(~(*ChecksumByte) + 1u);
     return MO_RESULT_SUCCESS_OK;
 }
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
+    _Out_opt_ PMO_CHAR Buffer,
+    _Out_opt_ PMO_UINTN RequiredBufferSize,
+    _In_ MO_UINTN BufferSize,
+    _In_ MO_UINT64 Value,
+    _In_ MO_UINTN ValueWidth,
+    _In_ MO_BOOL Uppercase,
+    _In_ MO_BOOL Prefix)
+{
+    if (!Buffer && !RequiredBufferSize)
+    {
+        // At least one output parameter is required.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    if (ValueWidth < 4u || ValueWidth > 64u || ValueWidth & 3u)
+    {
+        // The value width must be 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
+        // 52, 56, 60, or 64.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    if (ValueWidth < 64u)
+    {
+        // Use mask to limit the value width.
+        Value &= ((MO_UINT64)1u << ValueWidth) - 1u;
+    }
+    
+    MO_UINTN NibbleCount = ValueWidth >> 2u;
+    MO_UINTN TotalLength = NibbleCount;
+    if (Prefix)
+    {
+        // With "0x" prefix.
+        TotalLength += 2u;
+    }
+    // Including null terminator.
+    TotalLength += 1u;
+
+    if (RequiredBufferSize)
+    {
+        *RequiredBufferSize = TotalLength;
+    }
+
+    if (Buffer)
+    {
+        if (BufferSize < TotalLength)
+        {
+            // Buffer too small.
+            return MO_RESULT_ERROR_OUT_OF_MEMORY;
+        }
+
+        MO_CHAR HexNonDigitCharacterBase = Uppercase ? 'A' : 'a';
+
+        MO_UINTN CurrentIndex = 0u;
+        if (Prefix)
+        {
+            Buffer[CurrentIndex++] = '0';
+            Buffer[CurrentIndex++] = 'x';
+        }
+        for (MO_UINTN Index = 0u; Index < NibbleCount; ++Index)
+        {
+            MO_UINTN ShiftAmount = (NibbleCount - 1u - Index) * 4u;
+            MO_UINT8 Nibble = (MO_UINT8)((Value >> ShiftAmount) & 0xFu);
+            Buffer[CurrentIndex++] = (MO_CHAR)((Nibble < 10u)
+                ? ('0' + Nibble)
+                : (HexNonDigitCharacterBase + (Nibble - 10u)));
+        }
+
+        Buffer[CurrentIndex] = '\0';
+    }
+
+    return MO_RESULT_SUCCESS_OK;
+}
