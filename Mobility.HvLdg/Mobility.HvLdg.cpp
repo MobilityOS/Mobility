@@ -87,45 +87,52 @@ void SimpleDemo(
 
     for (MO_UINTN i = 0; i < MemoryHolesCount; ++i)
     {
+        // 19 characters: "0x" + 16 hex digits + '\0'
+        MO_CHAR AddressBuffer[19];
+
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            "Hole Address: 0x");
+            "Hole Address: ");
+        if (MO_RESULT_SUCCESS_OK == ::MoRuntimeConvertUnsignedIntegerToHexString(
+            AddressBuffer,
+            nullptr,
+            sizeof(AddressBuffer),
+            MemoryHoleRanges[i].AddressBase,
+            64u,
+            MO_TRUE,
+            MO_TRUE))
         {
-            MO_UINT64 PrintValue = MemoryHoleRanges[i].AddressBase;
-            char AddressBuffer[17];
-            ::MoRuntimeMemoryFillByte(
-                AddressBuffer,
-                0,
-                sizeof(AddressBuffer));
-            const char HexDigits[] = "0123456789ABCDEF";
-            for (int j = 0; j < 16; ++j)
-            {
-                AddressBuffer[15 - j] = HexDigits[PrintValue & 0x0F];
-                PrintValue >>= 4;
-            }
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
                 AddressBuffer);
         }
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
-            ", Length: 0x");
+        else
         {
-            MO_UINT64 PrintValue = MemoryHoleRanges[i].Length;
-            char LengthBuffer[17];
-            ::MoRuntimeMemoryFillByte(
-                LengthBuffer,
-                0,
-                sizeof(LengthBuffer));
-            const char HexDigits[] = "0123456789ABCDEF";
-            for (int j = 0; j < 16; ++j)
-            {
-                LengthBuffer[15 - j] = HexDigits[PrintValue & 0x0F];
-                PrintValue >>= 4;
-            }
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
-                LengthBuffer);
+                "<Conversion Error>");
+        }
+        ::MoUefiConsoleWriteAsciiString(
+            SystemTable->ConOut,
+            ", Length: ");
+        if (MO_RESULT_SUCCESS_OK == ::MoRuntimeConvertUnsignedIntegerToHexString(
+            AddressBuffer,
+            nullptr,
+            sizeof(AddressBuffer),
+            MemoryHoleRanges[i].Length,
+            64u,
+            MO_TRUE,
+            MO_TRUE))
+        {
+            ::MoUefiConsoleWriteAsciiString(
+                SystemTable->ConOut,
+                AddressBuffer);
+        }
+        else
+        {
+            ::MoUefiConsoleWriteAsciiString(
+                SystemTable->ConOut,
+                "<Conversion Error>");
         }
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
