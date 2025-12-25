@@ -17,7 +17,7 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
     return (Size + Alignment - 1) & ~(Alignment - 1);
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryFillByteInternalUnaligned(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteUnaligned(
     _Out_ MO_POINTER Buffer,
     _In_ MO_UINT8 Value,
     _In_ MO_UINTN Length)
@@ -29,7 +29,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryFillByteInternalUnaligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryFillByteInternalNativeAligned(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteNativeAligned(
     _Out_ MO_POINTER Buffer,
     _In_ MO_UINT8 Value,
     _In_ MO_UINTN Length)
@@ -79,7 +79,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
         {
             UnalignedLength = RemainingLength;
         }
-        MoRuntimeMemoryFillByteInternalUnaligned(
+        MoRuntimeInternalMemoryFillByteUnaligned(
             (MO_POINTER)(CurrentStart),
             Value,
             UnalignedLength);
@@ -95,7 +95,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
     // If the buffer is not large enough, use the generic implementation.
     if (RemainingLength < sizeof(MO_UINTN))
     {
-        MoRuntimeMemoryFillByteInternalUnaligned(
+        MoRuntimeInternalMemoryFillByteUnaligned(
             (MO_POINTER)(CurrentStart),
             Value,
             RemainingLength);
@@ -106,13 +106,13 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
     MO_UINTN AlignedLength = RemainingLength - UnalignedLength;
 
     // Process the aligned part with native type implementation.
-    MoRuntimeMemoryFillByteInternalNativeAligned(
+    MoRuntimeInternalMemoryFillByteNativeAligned(
         (MO_POINTER)(CurrentStart),
         Value,
         AlignedLength);
 
     // Process the remaining unaligned part with generic implementation.
-    MoRuntimeMemoryFillByteInternalUnaligned(
+    MoRuntimeInternalMemoryFillByteUnaligned(
         (MO_POINTER)(CurrentStart + AlignedLength),
         Value,
         UnalignedLength);
@@ -120,7 +120,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
     return MO_RESULT_SUCCESS_OK;
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternalUnaligned(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyUnaligned(
     _Out_ MO_POINTER Destination,
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
@@ -133,7 +133,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternalUnaligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternalNativeAligned(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyNativeAligned(
     _Out_ MO_POINTER Destination,
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
@@ -147,7 +147,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternalNativeAligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternal(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopy(
     _Out_ MO_POINTER Destination,
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
@@ -181,7 +181,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternal(
         {
             UnalignedLength = RemainingLength;
         }
-        MoRuntimeMemoryCopyInternalUnaligned(
+        MoRuntimeInternalMemoryCopyUnaligned(
             (MO_POINTER)(CurrentDestination),
             (MO_POINTER)(CurrentSource),
             UnalignedLength);
@@ -198,7 +198,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternal(
     // If the buffer is not large enough, use the generic implementation.
     if (RemainingLength < sizeof(MO_UINTN))
     {
-        MoRuntimeMemoryCopyInternalUnaligned(
+        MoRuntimeInternalMemoryCopyUnaligned(
             (MO_POINTER)(CurrentDestination),
             (MO_POINTER)(CurrentSource),
             RemainingLength);
@@ -209,19 +209,19 @@ MO_FORCEINLINE VOID MoRuntimeMemoryCopyInternal(
     MO_UINTN AlignedLength = RemainingLength - UnalignedLength;
 
     // Process the aligned part with native type implementation.
-    MoRuntimeMemoryCopyInternalNativeAligned(
+    MoRuntimeInternalMemoryCopyNativeAligned(
         (MO_POINTER)(CurrentDestination),
         (MO_POINTER)(CurrentSource),
         AlignedLength);
 
     // Process the remaining unaligned part with generic implementation.
-    MoRuntimeMemoryCopyInternalUnaligned(
+    MoRuntimeInternalMemoryCopyUnaligned(
         (MO_POINTER)(CurrentDestination + AlignedLength),
         (MO_POINTER)(CurrentSource + AlignedLength),
         UnalignedLength);
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternalUnaligned(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyUnaligned(
     _Out_ MO_POINTER Destination,
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
@@ -234,7 +234,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternalUnaligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternalNativeAligned(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyNativeAligned(
     _Out_ MO_POINTER Destination,
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
@@ -248,7 +248,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternalNativeAligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
+MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopy(
     _Out_ MO_POINTER Destination,
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
@@ -280,7 +280,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
         {
             UnalignedLength = RemainingLength;
         }
-        MoRuntimeMemoryBackwardCopyInternalUnaligned(
+        MoRuntimeInternalMemoryBackwardCopyUnaligned(
             (MO_POINTER)(CurrentDestination - UnalignedLength),
             (MO_POINTER)(CurrentSource - UnalignedLength),
             UnalignedLength);
@@ -297,7 +297,7 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
     // If the buffer is not large enough, use the generic implementation.
     if (RemainingLength < sizeof(MO_UINTN))
     {
-        MoRuntimeMemoryBackwardCopyInternalUnaligned(
+        MoRuntimeInternalMemoryBackwardCopyUnaligned(
             (MO_POINTER)(CurrentDestination - RemainingLength),
             (MO_POINTER)(CurrentSource - RemainingLength),
             RemainingLength);
@@ -308,13 +308,13 @@ MO_FORCEINLINE VOID MoRuntimeMemoryBackwardCopyInternal(
     MO_UINTN AlignedLength = RemainingLength - UnalignedLength;
 
     // Process the aligned part with native type implementation.
-    MoRuntimeMemoryBackwardCopyInternalNativeAligned(
+    MoRuntimeInternalMemoryBackwardCopyNativeAligned(
         (MO_POINTER)(CurrentDestination - AlignedLength),
         (MO_POINTER)(CurrentSource - AlignedLength),
         AlignedLength);
 
     // Process the remaining unaligned part with generic implementation.
-    MoRuntimeMemoryBackwardCopyInternalUnaligned(
+    MoRuntimeInternalMemoryBackwardCopyUnaligned(
         Destination,
         Source,
         UnalignedLength);
@@ -350,7 +350,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
         DestinationStart >= (SourceStart + Length))
     {
         // No overlap or safe to copy forward.
-        MoRuntimeMemoryCopyInternal(
+        MoRuntimeInternalMemoryCopy(
             Destination,
             Source,
             Length);
@@ -358,7 +358,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
     else
     {
         // Overlap and need to copy backward.
-        MoRuntimeMemoryBackwardCopyInternal(
+        MoRuntimeInternalMemoryBackwardCopy(
             Destination,
             Source,
             Length);
@@ -367,7 +367,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
     return MO_RESULT_SUCCESS_OK;
 }
 
-MO_FORCEINLINE MO_INTN MoRuntimeMemoryCompareInternalUnaligned(
+MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareUnaligned(
     _In_ MO_POINTER Left,
     _In_ MO_POINTER Right,
     _In_ MO_UINTN Length)
@@ -386,7 +386,7 @@ MO_FORCEINLINE MO_INTN MoRuntimeMemoryCompareInternalUnaligned(
     return 0;
 }
 
-MO_FORCEINLINE MO_INTN MoRuntimeMemoryCompareInternalNativeAligned(
+MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareNativeAligned(
     _In_ MO_POINTER Left,
     _In_ MO_POINTER Right,
     _In_ MO_UINTN Length)
@@ -400,7 +400,7 @@ MO_FORCEINLINE MO_INTN MoRuntimeMemoryCompareInternalNativeAligned(
         MO_UINTN CurrentRight = RightNative[Index];
         if (CurrentLeft != CurrentRight)
         {
-            return MoRuntimeMemoryCompareInternalUnaligned(
+            return MoRuntimeInternalMemoryCompareUnaligned(
                 (MO_POINTER)(&LeftNative[Index]),
                 (MO_POINTER)(&RightNative[Index]),
                 sizeof(MO_UINTN));
@@ -465,7 +465,7 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
         {
             UnalignedLength = Length;
         }
-        CurrentResult = MoRuntimeMemoryCompareInternalUnaligned(
+        CurrentResult = MoRuntimeInternalMemoryCompareUnaligned(
             (MO_POINTER)(CurrentLeft),
             (MO_POINTER)(CurrentRight),
             UnalignedLength);
@@ -486,7 +486,7 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     // If the buffer is not large enough, use the generic implementation.
     if (Length < sizeof(MO_UINTN))
     {
-        CurrentResult = MoRuntimeMemoryCompareInternalUnaligned(
+        CurrentResult = MoRuntimeInternalMemoryCompareUnaligned(
             (MO_POINTER)(CurrentLeft),
             (MO_POINTER)(CurrentRight),
             Length);
@@ -497,7 +497,7 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     MO_UINTN AlignedLength = Length - UnalignedLength;
 
     // Process the aligned part with native type implementation.
-    CurrentResult = MoRuntimeMemoryCompareInternalNativeAligned(
+    CurrentResult = MoRuntimeInternalMemoryCompareNativeAligned(
         (MO_POINTER)(CurrentLeft),
         (MO_POINTER)(CurrentRight),
         AlignedLength);
@@ -507,7 +507,7 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     }
 
     // Process the remaining unaligned part with generic implementation.
-    CurrentResult = MoRuntimeMemoryCompareInternalUnaligned(
+    CurrentResult = MoRuntimeInternalMemoryCompareUnaligned(
         (MO_POINTER)(CurrentLeft + AlignedLength),
         (MO_POINTER)(CurrentRight + AlignedLength),
         UnalignedLength);
