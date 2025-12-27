@@ -385,12 +385,36 @@ EFI_STATUS EFIAPI UefiMain(
         "(c) Kenji Mouri. All rights reserved.\r\n"
         "\r\n");
 
-    char Buffer[256];
-    ::MoRuntimeMemoryFillByte(Buffer, 0, 256);
-    ::_snprintf(Buffer, 256, "SystemTable = %p\r\n", SystemTable);
-    ::MoUefiConsoleWriteAsciiString(
-        SystemTable->ConOut,
-        Buffer);
+    {
+        // 19 characters: "0x" + 16 hex digits + '\0'
+        MO_CHAR AddressBuffer[19];
+
+        ::MoUefiConsoleWriteAsciiString(
+            SystemTable->ConOut,
+            "SystemTable = ");
+        if (MO_RESULT_SUCCESS_OK == ::MoRuntimeConvertUnsignedIntegerToHexString(
+            AddressBuffer,
+            nullptr,
+            sizeof(AddressBuffer),
+            (MO_UINTN)SystemTable,
+            sizeof(SystemTable) * 8u,
+            MO_TRUE,
+            MO_TRUE))
+        {
+            ::MoUefiConsoleWriteAsciiString(
+                SystemTable->ConOut,
+                AddressBuffer);
+        }
+        else
+        {
+            ::MoUefiConsoleWriteAsciiString(
+                SystemTable->ConOut,
+                "<Conversion Error>");
+        }
+        ::MoUefiConsoleWriteAsciiString(
+            SystemTable->ConOut,
+            "\r\n");
+    }
 
     MO_UINT64 ExtendedSystemDescriptionTable = 0u;
     if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryExtendedSystemDescriptionTable(
