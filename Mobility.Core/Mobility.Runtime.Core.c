@@ -865,7 +865,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
     _Out_opt_ PMO_CHAR Buffer,
     _Out_opt_ PMO_UINTN RequiredBufferSize,
     _In_ MO_UINTN BufferSize,
-    _In_ MO_UINT64 Value,
+    _In_ MO_UINTN Value,
     _In_ MO_UINTN ValueWidth,
     _In_ MO_BOOL Uppercase,
     _In_ MO_BOOL Prefix)
@@ -875,16 +875,17 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
         // At least one output parameter is required.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    if (ValueWidth < 4u || ValueWidth > 64u || ValueWidth & 3u)
+    const MO_UINTN MaximumValueWidth = sizeof(Value) * 8u;
+    if (ValueWidth < 4u || ValueWidth > MaximumValueWidth || ValueWidth & 3u)
     {
-        // The value width must be 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
-        // 52, 56, 60, or 64.
+        // The value width must be multiple of 4 and between 4 and the number of
+        // bits of MO_UINTN.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    if (ValueWidth < 64u)
+    if (ValueWidth < MaximumValueWidth)
     {
         // Use mask to limit the value width.
-        Value &= ((MO_UINT64)1u << ValueWidth) - 1u;
+        Value &= ((MO_UINTN)1u << ValueWidth) - 1u;
     }
     
     MO_UINTN NibbleCount = ValueWidth >> 2u;

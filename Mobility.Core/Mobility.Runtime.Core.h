@@ -238,8 +238,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
  *                   terminator. If the size is insufficient, the function
  *                   returns MO_RESULT_ERROR_OUT_OF_MEMORY.
  * @param Value The unsigned integer value to convert.
- * @param ValueWidth The width of the value in bits. It must be one of 4, 8, 12,
- *                   16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, or 64.
+ * @param ValueWidth The width of the value in bits. It must be multiple of 4
+ *                   and between 4 and the number of bits of MO_UINTN.
  * @param Uppercase If this parameter is MO_TRUE, the hexadecimal digits A-F are
  *                  used. Otherwise, the hexadecimal digits a-f are used.
  * @param Prefix If this parameter is MO_TRUE, the "0x" prefix is added before
@@ -251,7 +251,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
     _Out_opt_ PMO_CHAR Buffer,
     _Out_opt_ PMO_UINTN RequiredBufferSize,
     _In_ MO_UINTN BufferSize,
-    _In_ MO_UINT64 Value,
+    _In_ MO_UINTN Value,
     _In_ MO_UINTN ValueWidth,
     _In_ MO_BOOL Uppercase,
     _In_ MO_BOOL Prefix);
