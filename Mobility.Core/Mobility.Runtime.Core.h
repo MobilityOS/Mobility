@@ -256,4 +256,46 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
     _In_ MO_BOOL Uppercase,
     _In_ MO_BOOL Prefix);
 
+/**
+ * @brief Convert a signed integer to a decimal string.
+ * @param Buffer The buffer to receive the converted string. This parameter can
+ *               be nullptr if only the required buffer size is queried.
+ * @param RequiredBufferSize The pointer to receive the required buffer size in
+ *                           characters, including the null terminator. This
+ *                           parameter can be nullptr if the required buffer
+ *                           size is not needed like only converting the value.
+ * @param BufferSize The size of the Buffer in characters, including the null
+ *                   terminator. If the size is insufficient, the function
+ *                   returns MO_RESULT_ERROR_OUT_OF_MEMORY.
+ * @param Value The signed integer value to convert.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
+    _Out_opt_ PMO_CHAR Buffer,
+    _Out_opt_ PMO_UINTN RequiredBufferSize,
+    _In_ MO_UINTN BufferSize,
+    _In_ MO_INTN Value);
+
+/**
+ * @brief Convert an unsigned integer to a decimal string.
+ * @param Buffer The buffer to receive the converted string. This parameter can
+ *               be nullptr if only the required buffer size is queried.
+ * @param RequiredBufferSize The pointer to receive the required buffer size in
+ *                           characters, including the null terminator. This
+ *                           parameter can be nullptr if the required buffer
+ *                           size is not needed like only converting the value.
+ * @param BufferSize The size of the Buffer in characters, including the null
+ *                   terminator. If the size is insufficient, the function
+ *                   returns MO_RESULT_ERROR_OUT_OF_MEMORY.
+ * @param Value The unsigned integer value to convert.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
+    _Out_opt_ PMO_CHAR Buffer,
+    _Out_opt_ PMO_UINTN RequiredBufferSize,
+    _In_ MO_UINTN BufferSize,
+    _In_ MO_UINTN Value);
+
 #endif // !MOBILITY_RUNTIME_CORE

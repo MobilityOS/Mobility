@@ -932,3 +932,119 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
 
     return MO_RESULT_SUCCESS_OK;
 }
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
+    _Out_opt_ PMO_CHAR Buffer,
+    _Out_opt_ PMO_UINTN RequiredBufferSize,
+    _In_ MO_UINTN BufferSize,
+    _In_ MO_INTN Value)
+{
+    if (!Buffer && !RequiredBufferSize)
+    {
+        // At least one output parameter is required.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    MO_BOOL IsNegative = (Value < 0);
+    MO_UINTN AbsoluteValue = (MO_UINTN)Value;
+    if (IsNegative)
+    {
+        AbsoluteValue = 0u - AbsoluteValue;
+    }
+
+    MO_UINTN DigitCount = 0u;
+    MO_UINTN TempValue = AbsoluteValue;
+    do
+    {
+        ++DigitCount;
+        TempValue /= 10u;
+    } while (TempValue != 0u);
+    MO_UINTN TotalLength = DigitCount;
+    if (IsNegative)
+    {
+        // For negative sign.
+        ++TotalLength;
+    }
+    // Including null terminator.
+    TotalLength += 1u;
+
+    if (RequiredBufferSize)
+    {
+        *RequiredBufferSize = TotalLength;
+    }
+
+    if (Buffer)
+    {
+        if (BufferSize < TotalLength)
+        {
+            // Buffer too small.
+            return MO_RESULT_ERROR_OUT_OF_MEMORY;
+        }
+
+        MO_UINTN CurrentIndex = TotalLength - 1u;
+        Buffer[CurrentIndex--] = '\0';
+        MO_UINTN CurrentValue = AbsoluteValue;
+        do
+        {
+            MO_UINT8 Digit = CurrentValue % 10u;
+            Buffer[CurrentIndex--] = (MO_CHAR)('0' + Digit);
+            CurrentValue /= 10u;
+        } while (CurrentValue != 0u);
+        if (IsNegative)
+        {
+            Buffer[CurrentIndex] = '-';
+        }
+    }
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
+    _Out_opt_ PMO_CHAR Buffer,
+    _Out_opt_ PMO_UINTN RequiredBufferSize,
+    _In_ MO_UINTN BufferSize,
+    _In_ MO_UINTN Value)
+{
+    if (!Buffer && !RequiredBufferSize)
+    {
+        // At least one output parameter is required.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    MO_UINTN DigitCount = 0u;
+    MO_UINTN TempValue = Value;
+    do
+    {
+        ++DigitCount;
+        TempValue /= 10u;
+    } while (TempValue != 0u);
+    MO_UINTN TotalLength = DigitCount;
+    // Including null terminator.
+    TotalLength += 1u;
+
+    if (RequiredBufferSize)
+    {
+        *RequiredBufferSize = TotalLength;
+    }
+
+    if (Buffer)
+    {
+        if (BufferSize < TotalLength)
+        {
+            // Buffer too small.
+            return MO_RESULT_ERROR_OUT_OF_MEMORY;
+        }
+
+        MO_UINTN CurrentIndex = TotalLength - 1u;
+        Buffer[CurrentIndex--] = '\0';
+        MO_UINTN CurrentValue = Value;
+        do
+        {
+            MO_UINT8 Digit = CurrentValue % 10u;
+            Buffer[CurrentIndex--] = (MO_CHAR)('0' + Digit);
+            CurrentValue /= 10u;
+        } while (CurrentValue != 0u);
+    }
+
+    return MO_RESULT_SUCCESS_OK;
+}
