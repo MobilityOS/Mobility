@@ -93,14 +93,15 @@ void SimpleDemo(
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
             "Hole Address: ");
-        if (MO_RESULT_SUCCESS_OK == ::MoRuntimeConvertUnsignedIntegerToHexString(
-            AddressBuffer,
-            nullptr,
-            sizeof(AddressBuffer),
-            (MO_UINTN)MemoryHoleRanges[i].AddressBase,
-            sizeof(MemoryHoleRanges[i].AddressBase) * 8u,
-            MO_TRUE,
-            MO_TRUE))
+        if (MO_RESULT_SUCCESS_OK ==
+            ::MoRuntimeConvertUnsignedIntegerToHexString(
+                AddressBuffer,
+                nullptr,
+                sizeof(AddressBuffer),
+                (MO_UINTN)MemoryHoleRanges[i].AddressBase,
+                sizeof(MemoryHoleRanges[i].AddressBase) * 8u,
+                MO_TRUE,
+                MO_TRUE))
         {
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
@@ -115,11 +116,12 @@ void SimpleDemo(
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
             ", Length: ");
-        if (MO_RESULT_SUCCESS_OK == ::MoRuntimeConvertUnsignedIntegerToDecimalString(
-            AddressBuffer,
-            nullptr,
-            sizeof(AddressBuffer),
-            MemoryHoleRanges[i].Length))
+        if (MO_RESULT_SUCCESS_OK ==
+            ::MoRuntimeConvertUnsignedIntegerToDecimalString(
+                AddressBuffer,
+                nullptr,
+                sizeof(AddressBuffer),
+                MemoryHoleRanges[i].Length))
         {
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
