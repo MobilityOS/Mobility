@@ -18,7 +18,7 @@
  * @brief Calculates the aligned size based on the specified size and alignment.
  * @param Size The input size value which needs to be aligned.
  * @param Alignment The size value to which it wants to align. This value must
- *                  be the power of two.
+ *                  be the power of two. This value must not be zero.
  * @return The output size value aligned to the specified alignment.
  */
 EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(

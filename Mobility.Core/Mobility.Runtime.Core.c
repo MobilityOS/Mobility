@@ -22,7 +22,12 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteUnaligned(
     _In_ MO_UINT8 Value,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINT8 Bytes = (volatile PMO_UINT8)Buffer;
+
     for (MO_UINTN Index = 0u; Index < Length; ++Index)
     {
         Bytes[Index] = Value;
@@ -39,7 +44,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteNativeAligned(
     {
         NativeValue |= (((MO_UINTN)Value) << (Index * 8u));
     }
+
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINTN NativeBuffer = (volatile PMO_UINTN)Buffer;
+
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
     {
@@ -125,8 +136,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyUnaligned(
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINT8 DestinationBytes = (volatile PMO_UINT8)Destination;
     volatile PMO_UINT8 SourceBytes = (volatile PMO_UINT8)Source;
+
     for (MO_UINTN Index = 0u; Index < Length; ++Index)
     {
         DestinationBytes[Index] = SourceBytes[Index];
@@ -138,8 +154,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyNativeAligned(
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINTN DestinationNative = (volatile PMO_UINTN)Destination;
     volatile PMO_UINTN SourceNative = (volatile PMO_UINTN)Source;
+
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
     {
@@ -156,43 +177,34 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopy(
     MO_UINTN CurrentSource = (MO_UINTN)(Source);
     MO_UINTN RemainingLength = Length;
 
-    MO_UINTN AlignedDestination = MoRuntimeGetAlignedSize(
-        CurrentDestination,
-        sizeof(MO_UINTN));
-    MO_UINTN AlignedSource = MoRuntimeGetAlignedSize(
-        CurrentSource,
-        sizeof(MO_UINTN));
-
-    // If the destination or source address is not aligned, process the
-    // unaligned part with generic implementation first.
-    if (AlignedDestination != CurrentDestination ||
-        AlignedSource != CurrentSource)
+    // Make sure the destination address is aligned.
     {
-        MO_UINTN UnalignedLength = 0u;
-        if (AlignedDestination < AlignedSource)
+        MO_UINTN AlignedDestination = MoRuntimeGetAlignedSize(
+            CurrentDestination,
+            sizeof(MO_UINTN));
+
+        // If the destination address is not aligned, process the unaligned part
+        // with generic implementation first.
+        if (AlignedDestination != CurrentDestination)
         {
-            UnalignedLength = AlignedDestination - CurrentDestination;
+            MO_UINTN UnalignedLength = AlignedDestination - CurrentDestination;
+            if (UnalignedLength > RemainingLength)
+            {
+                UnalignedLength = RemainingLength;
+            }
+            MoRuntimeInternalMemoryCopyUnaligned(
+                (MO_POINTER)(CurrentDestination),
+                (MO_POINTER)(CurrentSource),
+                UnalignedLength);
+            if (RemainingLength == UnalignedLength)
+            {
+                // If all bytes have been processed, return directly.
+                return;
+            }
+            CurrentDestination += UnalignedLength;
+            CurrentSource += UnalignedLength;
+            RemainingLength -= UnalignedLength;
         }
-        else
-        {
-            UnalignedLength = AlignedSource - CurrentSource;
-        }
-        if (UnalignedLength > RemainingLength)
-        {
-            UnalignedLength = RemainingLength;
-        }
-        MoRuntimeInternalMemoryCopyUnaligned(
-            (MO_POINTER)(CurrentDestination),
-            (MO_POINTER)(CurrentSource),
-            UnalignedLength);
-        if (RemainingLength == UnalignedLength)
-        {
-            // If all bytes have been processed, return directly.
-            return;
-        }
-        CurrentDestination += UnalignedLength;
-        CurrentSource += UnalignedLength;
-        RemainingLength -= UnalignedLength;
     }
 
     // If the buffer is not large enough, use the generic implementation.
@@ -203,6 +215,23 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopy(
             (MO_POINTER)(CurrentSource),
             RemainingLength);
         return;
+    }
+
+    // Make sure the source address is aligned.
+    {
+        MO_UINTN AlignedSource = MoRuntimeGetAlignedSize(
+            CurrentSource,
+            sizeof(MO_UINTN));
+
+        // If the source address is not aligned, use the generic implementation.
+        if (AlignedSource != CurrentSource)
+        {
+            MoRuntimeInternalMemoryCopyUnaligned(
+                (MO_POINTER)(CurrentDestination),
+                (MO_POINTER)(CurrentSource),
+                RemainingLength);
+            return;
+        }
     }
 
     MO_UINTN UnalignedLength = RemainingLength % sizeof(MO_UINTN);
@@ -226,8 +255,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyUnaligned(
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINT8 DestinationBytes = (volatile PMO_UINT8)Destination;
     volatile PMO_UINT8 SourceBytes = (volatile PMO_UINT8)Source;
+
     for (MO_UINTN Index = Length; Index > 0u; --Index)
     {
         DestinationBytes[Index - 1u] = SourceBytes[Index - 1u];
@@ -239,8 +273,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyNativeAligned(
     _In_ MO_POINTER Source,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINTN DestinationNative = (volatile PMO_UINTN)Destination;
     volatile PMO_UINTN SourceNative = (volatile PMO_UINTN)Source;
+
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = NativeCount; Index > 0u; --Index)
     {
@@ -257,41 +296,34 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopy(
     MO_UINTN CurrentDestination = ((MO_UINTN)(Destination)) + RemainingLength;
     MO_UINTN CurrentSource = ((MO_UINTN)(Source)) + RemainingLength;
 
-    // Should use floor alignment for backward copy.
-
-    MO_UINTN AlignedDestination = CurrentDestination & ~(sizeof(MO_UINTN) - 1);
-    MO_UINTN AlignedSource = CurrentSource & ~(sizeof(MO_UINTN) - 1);
-
-    // If the destination or source address is not aligned, process the
-    // unaligned part with generic implementation first.
-    if (AlignedDestination != CurrentDestination ||
-        AlignedSource != CurrentSource)
+    // Make sure the destination address is aligned.
     {
-        MO_UINTN UnalignedLength = 0u;
-        if (AlignedDestination > AlignedSource)
+        // Should use floor alignment for backward copy.
+        MO_UINTN AlignedDestination =
+            CurrentDestination & ~(sizeof(MO_UINTN) - 1);
+
+        // If the destination address is not aligned, process the unaligned part
+        // with generic implementation first.
+        if (AlignedDestination != CurrentDestination)
         {
-            UnalignedLength = CurrentDestination - AlignedDestination;
+            MO_UINTN UnalignedLength = CurrentDestination - AlignedDestination;
+            if (UnalignedLength > RemainingLength)
+            {
+                UnalignedLength = RemainingLength;
+            }
+            MoRuntimeInternalMemoryBackwardCopyUnaligned(
+                (MO_POINTER)(CurrentDestination - UnalignedLength),
+                (MO_POINTER)(CurrentSource - UnalignedLength),
+                UnalignedLength);
+            if (RemainingLength == UnalignedLength)
+            {
+                // If all bytes have been processed, return directly.
+                return;
+            }
+            CurrentDestination -= UnalignedLength;
+            CurrentSource -= UnalignedLength;
+            RemainingLength -= UnalignedLength;
         }
-        else
-        {
-            UnalignedLength = CurrentSource - AlignedSource;
-        }
-        if (UnalignedLength > RemainingLength)
-        {
-            UnalignedLength = RemainingLength;
-        }
-        MoRuntimeInternalMemoryBackwardCopyUnaligned(
-            (MO_POINTER)(CurrentDestination - UnalignedLength),
-            (MO_POINTER)(CurrentSource - UnalignedLength),
-            UnalignedLength);
-        if (RemainingLength == UnalignedLength)
-        {
-            // If all bytes have been processed, return directly.
-            return;
-        }
-        CurrentDestination -= UnalignedLength;
-        CurrentSource -= UnalignedLength;
-        RemainingLength -= UnalignedLength;
     }
 
     // If the buffer is not large enough, use the generic implementation.
@@ -302,6 +334,22 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopy(
             (MO_POINTER)(CurrentSource - RemainingLength),
             RemainingLength);
         return;
+    }
+
+    // Make sure the source address is aligned.
+    {
+        // Should use floor alignment for backward copy.
+        MO_UINTN AlignedSource = CurrentSource & ~(sizeof(MO_UINTN) - 1);
+
+        // If the source address is not aligned, use the generic implementation.
+        if (AlignedSource != CurrentSource)
+        {
+            MoRuntimeInternalMemoryBackwardCopyUnaligned(
+                (MO_POINTER)(CurrentDestination - RemainingLength),
+                (MO_POINTER)(CurrentSource - RemainingLength),
+                RemainingLength);
+            return;
+        }
     }
 
     MO_UINTN UnalignedLength = RemainingLength % sizeof(MO_UINTN);
@@ -335,12 +383,17 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
         // For zero length, do nothing and return success.
         return MO_RESULT_SUCCESS_OK;
     }
+    if (Destination == Source)
+    {
+        // Both are the same address, do nothing and return success.
+        return MO_RESULT_SUCCESS_OK;
+    }
 
     MO_UINTN DestinationStart = (MO_UINTN)(Destination);
     MO_UINTN SourceStart = (MO_UINTN)(Source);
-    MO_UINTN SourceEnd = SourceStart + Length;
 
-    if (SourceEnd < SourceStart)
+    if (Length > (MO_UINTN_MAX - DestinationStart) ||
+        Length > (MO_UINTN_MAX - SourceStart))
     {
         // Overflow detected.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -372,15 +425,20 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareUnaligned(
     _In_ MO_POINTER Right,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINT8 LeftBytes = (volatile PMO_UINT8)Left;
     volatile PMO_UINT8 RightBytes = (volatile PMO_UINT8)Right;
+
     for (MO_UINTN Index = 0u; Index < Length; ++Index)
     {
         MO_UINT8 CurrentLeft = LeftBytes[Index];
         MO_UINT8 CurrentRight = RightBytes[Index];
         if (CurrentLeft != CurrentRight)
         {
-            return (MO_INTN)CurrentLeft - (MO_INTN)CurrentRight;
+            return CurrentLeft > CurrentRight ? 1 : -1;
         }
     }
     return 0;
@@ -391,8 +449,13 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareNativeAligned(
     _In_ MO_POINTER Right,
     _In_ MO_UINTN Length)
 {
+    // This library is designed for freestanding environments where C standard
+    // library functions (like memcpy) and SIMD intrinsics may not be available.
+    // Use volatile to ensure no dependencies on such functions or intrinsics.
+
     volatile PMO_UINTN LeftNative = (volatile PMO_UINTN)Left;
     volatile PMO_UINTN RightNative = (volatile PMO_UINTN)Right;
+
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
     {
@@ -419,6 +482,11 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
         // For zero length, consider equal.
         return 0;
     }
+    if (Left == Right)
+    {
+        // Both are the same address, consider equal.
+        return 0;
+    }
 
     if (!Left && !Right)
     {
@@ -440,47 +508,38 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     MO_UINTN CurrentLeft = (MO_UINTN)(Left);
     MO_UINTN CurrentRight = (MO_UINTN)(Right);
 
-    MO_UINTN AlignedLeft = MoRuntimeGetAlignedSize(
-        CurrentLeft,
-        sizeof(MO_UINTN));
-    MO_UINTN AlignedRight = MoRuntimeGetAlignedSize(
-        CurrentRight,
-        sizeof(MO_UINTN));
-
-    // If the left or right address is not aligned, process the unaligned part
-    // with generic implementation first.
-    if (AlignedLeft != CurrentLeft ||
-        AlignedRight != CurrentRight)
+    // Make sure the left address is aligned.
     {
-        MO_UINTN UnalignedLength = 0u;
-        if (AlignedLeft < AlignedRight)
+        MO_UINTN AlignedLeft = MoRuntimeGetAlignedSize(
+            CurrentLeft,
+            sizeof(MO_UINTN));
+
+        // If the left address is not aligned, process the unaligned part with
+        // generic implementation first.
+        if (AlignedLeft != CurrentLeft)
         {
-            UnalignedLength = AlignedLeft - CurrentLeft;
+            MO_UINTN UnalignedLength = AlignedLeft - CurrentLeft;
+            if (UnalignedLength > Length)
+            {
+                UnalignedLength = Length;
+            }
+            CurrentResult = MoRuntimeInternalMemoryCompareUnaligned(
+                (MO_POINTER)(CurrentLeft),
+                (MO_POINTER)(CurrentRight),
+                UnalignedLength);
+            if (CurrentResult != 0)
+            {
+                return CurrentResult;
+            }
+            if (Length == UnalignedLength)
+            {
+                // If all bytes have been processed, return directly.
+                return 0;
+            }
+            CurrentLeft = AlignedLeft;
+            CurrentRight += UnalignedLength;
+            Length -= UnalignedLength;
         }
-        else
-        {
-            UnalignedLength = AlignedRight - CurrentRight;
-        }
-        if (UnalignedLength > Length)
-        {
-            UnalignedLength = Length;
-        }
-        CurrentResult = MoRuntimeInternalMemoryCompareUnaligned(
-            (MO_POINTER)(CurrentLeft),
-            (MO_POINTER)(CurrentRight),
-            UnalignedLength);
-        if (CurrentResult != 0)
-        {
-            return CurrentResult;
-        }
-        if (Length == UnalignedLength)
-        {
-            // If all bytes have been processed, return directly.
-            return 0;
-        }
-        CurrentLeft = AlignedLeft;
-        CurrentRight = AlignedRight;
-        Length -= UnalignedLength;
     }
 
     // If the buffer is not large enough, use the generic implementation.
@@ -491,6 +550,23 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
             (MO_POINTER)(CurrentRight),
             Length);
         return CurrentResult;
+    }
+
+    // Make sure the right address is aligned.
+    {
+        MO_UINTN AlignedRight = MoRuntimeGetAlignedSize(
+            CurrentRight,
+            sizeof(MO_UINTN));
+
+        // If the right address is not aligned, use the generic implementation.
+        if (AlignedRight != CurrentRight)
+        {
+            CurrentResult = MoRuntimeInternalMemoryCompareUnaligned(
+                (MO_POINTER)(CurrentLeft),
+                (MO_POINTER)(CurrentRight),
+                Length);
+            return CurrentResult;
+        }
     }
 
     MO_UINTN UnalignedLength = Length % sizeof(MO_UINTN);
@@ -546,8 +622,14 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
                 continue;
             }
 
+            // This library is designed for freestanding environments where C
+            // standard library functions (like memcpy) and SIMD intrinsics may
+            // not be available. Use volatile to ensure no dependencies on such
+            // functions or intrinsics.
+
             volatile PMO_UINT8 LeftBytes = (volatile PMO_UINT8)Left;
             volatile PMO_UINT8 RightBytes = (volatile PMO_UINT8)Right;
+
             for (MO_UINTN ByteIndex = 0u; ByteIndex < ElementSize; ++ByteIndex)
             {
                 MO_UINT8 TemporaryByte = LeftBytes[ByteIndex];
@@ -581,8 +663,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
     }
     PMO_UINT8 Bytes = (PMO_UINT8)Bitmap;
 
-    MO_UINTN EndIndex = StartIndex + Length;
-    if (EndIndex < StartIndex)
+    if (Length > (MO_UINTN_MAX - StartIndex))
     {
         // Overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -597,6 +678,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
             ? MO_RESULT_SUCCESS_OK
             : MO_RESULT_SUCCESS_FALSE);
     }
+
+    MO_UINTN EndIndex = StartIndex + Length;
 
     MO_UINTN FirstByteIndex = StartIndex >> 3u;
     MO_UINTN LastByteIndex = (EndIndex - 1u) >> 3u;
@@ -649,8 +732,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
     }
     PMO_UINT8 Bytes = (PMO_UINT8)Bitmap;
 
-    MO_UINTN EndIndex = StartIndex + Length;
-    if (EndIndex < StartIndex)
+    if (Length > (MO_UINTN_MAX - StartIndex))
     {
         // Overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -672,6 +754,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
         }
         return MO_RESULT_SUCCESS_OK;
     }
+
+    MO_UINTN EndIndex = StartIndex + Length;
 
     MO_UINTN FirstByteIndex = StartIndex >> 3u;
     MO_UINTN LastByteIndex = (EndIndex - 1u) >> 3u;
@@ -951,6 +1035,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
     if (IsNegative)
     {
         AbsoluteValue = 0u - AbsoluteValue;
+    }
+    if (MO_INTN_MIN == Value)
+    {
+        // Handling MO_INTN_MIN case to avoid overflow.
+        AbsoluteValue = (MO_UINTN)(-(MO_INTN_MIN + 1)) + 1u;
     }
 
     MO_UINTN DigitCount = 0u;
