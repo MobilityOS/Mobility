@@ -10,7 +10,10 @@
 
 #include "Mobility.Uefi.Core.h"
 
+#include <Mobility.Runtime.Core.h>
 #include <Mobility.Unicode.Core.h>
+
+#include <Protocol/GraphicsOutput.h>
 
 EXTERN_C VOID MOAPI MoUefiConsoleWriteUcs2String(
     _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
@@ -33,4 +36,49 @@ EXTERN_C VOID MOAPI MoUefiConsoleWriteAsciiString(
             : *String++;
         ::MoUefiConsoleWriteUcs2String(Output, WideStringTemplate);
     }
+}
+
+EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
+    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _In_ EFI_BOOT_SERVICES* BootServices)
+{
+    if (!DisplayFrameBuffer || !BootServices)
+    {
+        return EFI_INVALID_PARAMETER;
+    }
+    ::MoRuntimeMemoryFillByte(
+        DisplayFrameBuffer,
+        0u,
+        sizeof(MO_DISPLAY_BGRA32_FRAMEBUFFER));
+
+    EFI_GRAPHICS_OUTPUT_PROTOCOL* GraphicsOutputProtocol = nullptr;
+    EFI_STATUS Status = BootServices->LocateProtocol(
+        &gEfiGraphicsOutputProtocolGuid,
+        nullptr,
+        reinterpret_cast<void**>(&GraphicsOutputProtocol));
+    if (EFI_SUCCESS != Status)
+    {
+        return Status;
+    }
+    if (PixelBlueGreenRedReserved8BitPerColor != 
+        GraphicsOutputProtocol->Mode->Info->PixelFormat)
+    {
+        return EFI_UNSUPPORTED;
+    }
+
+    DisplayFrameBuffer->FrameBufferBase = reinterpret_cast<PMO_UINT32>(
+        GraphicsOutputProtocol->Mode->FrameBufferBase);
+    DisplayFrameBuffer->HorizontalResolution =
+        GraphicsOutputProtocol->Mode->Info->HorizontalResolution;
+    DisplayFrameBuffer->VerticalResolution =
+        GraphicsOutputProtocol->Mode->Info->VerticalResolution;
+    DisplayFrameBuffer->PixelsPerScanLine =
+        GraphicsOutputProtocol->Mode->Info->PixelsPerScanLine;
+
+    if (!::MoDisplayFrameBufferValidate(DisplayFrameBuffer))
+    {
+        return EFI_UNSUPPORTED;
+    }
+
+    return EFI_SUCCESS;
 }
