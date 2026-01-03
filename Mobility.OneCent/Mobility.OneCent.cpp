@@ -48,82 +48,71 @@ EFI_STATUS EFIAPI UefiMain(
     // Disable UEFI watchdog timer
     BootServices->SetWatchdogTimer(0, 0, 0, nullptr);
 
+    MO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer;
+
     // Initialize the basic framebuffer information
+    if (EFI_SUCCESS != ::MoUefiInitializeDisplayFrameBuffer(
+        &DisplayFrameBuffer,
+        BootServices))
     {
-        EFI_GRAPHICS_OUTPUT_PROTOCOL* GraphicsOutputProtocol = nullptr;
-        EFI_STATUS Status = BootServices->LocateProtocol(
-            &gEfiGraphicsOutputProtocolGuid,
-            nullptr,
-            reinterpret_cast<void**>(&GraphicsOutputProtocol));
-        if (EFI_SUCCESS != Status)
+        ::MoUefiConsoleWriteAsciiString(
+            SystemTable->ConOut,
+            "Failed to initialize the display frame buffer.\r\n"
+            "\r\nPress any key to return to the boot menu...\r\n");
         {
-            ::MoUefiConsoleWriteAsciiString(
-                SystemTable->ConOut,
-                "Failed to locate the Graphics Output Protocol.\r\n"
-                "\r\nPress any key to return to the boot menu...\r\n");
-            {
-                UINTN Index = 0;
-                BootServices->WaitForEvent(
-                    1,
-                    &SystemTable->ConIn->WaitForKey,
-                    &Index);
-            }
-            return Status;
+            UINTN Index = 0;
+            BootServices->WaitForEvent(
+                1,
+                &SystemTable->ConIn->WaitForKey,
+                &Index);
         }
+        return EFI_UNSUPPORTED;
+    }
 
-        MO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer;
-        DisplayFrameBuffer.FrameBufferBase = reinterpret_cast<PMO_UINT32>(
-            GraphicsOutputProtocol->Mode->FrameBufferBase);
-        DisplayFrameBuffer.HorizontalResolution =
-            GraphicsOutputProtocol->Mode->Info->HorizontalResolution;
-        DisplayFrameBuffer.VerticalResolution =
-            GraphicsOutputProtocol->Mode->Info->VerticalResolution;
+    MO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer;
+    ::MoConsoleCoreInitializeScreenBuffer(
+        &ConsoleScreenBuffer,
+        80,
+        25,
+        MO_CONSOLE_DEFAULT_BACKGROUND_COLOR,
+        MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
+        g_CharacterBuffer);
 
-        MO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer;
-        ::MoConsoleCoreInitializeScreenBuffer(
-            &ConsoleScreenBuffer,
-            80,
-            25,
-            MO_CONSOLE_DEFAULT_BACKGROUND_COLOR,
-            MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
-            g_CharacterBuffer);
+    const char LogoString[] =
+        "Mobility OneCent"
+        " " MOBILITY_ONECENT_VERSION_UTF8_STRING "\r\n"
+        "(c) Kenji Mouri. All rights reserved.\r\n"
+        "\r\n"
+        "Hello World!\r\n"
+        "\r\n";
 
-        const char LogoString[] =
-            "Mobility OneCent"
-            " " MOBILITY_ONECENT_VERSION_UTF8_STRING "\r\n"
-            "(c) Kenji Mouri. All rights reserved.\r\n"
-            "\r\n"
-            "Hello World!\r\n"
-            "\r\n";
+    char StringTemplate[] = "0\r\n";
 
-        char StringTemplate[] = "0\r\n";
-
-        for (MO_UINT32 i = 0; i < 0x00FFFFFF; i++)
+    for (MO_UINT32 i = 0; i < 0x00FFFFFF; i++)
+    {
+        if (0 == i % 10)
         {
-            if (0 == i % 10)
-            {
-                MoConsoleCoreWriteString(
-                    &ConsoleScreenBuffer,
-                    LogoString,
-                    MO_ARRAY_SIZE(LogoString) - 1);
-            }
-
-            StringTemplate[0] = '0' + (i % 10);
-
             MoConsoleCoreWriteString(
                 &ConsoleScreenBuffer,
-                StringTemplate,
-                MO_ARRAY_SIZE(StringTemplate) - 1);
-
-            MoConsoleCoreUpdateColorSettings(
-                &ConsoleScreenBuffer,
-                MO_CONSOLE_DEFAULT_BACKGROUND_COLOR,
-                i);
-
-            MoConsoleCoreRefreshScreen(
-                &DisplayFrameBuffer,
-                &ConsoleScreenBuffer);
+                LogoString,
+                MO_ARRAY_SIZE(LogoString) - 1);
         }
+
+        StringTemplate[0] = '0' + (i % 10);
+
+        MoConsoleCoreWriteString(
+            &ConsoleScreenBuffer,
+            StringTemplate,
+            MO_ARRAY_SIZE(StringTemplate) - 1);
+
+        MoConsoleCoreUpdateColorSettings(
+            &ConsoleScreenBuffer,
+            MO_CONSOLE_DEFAULT_BACKGROUND_COLOR,
+            i);
+
+        MoConsoleCoreRefreshScreen(
+            &DisplayFrameBuffer,
+            &ConsoleScreenBuffer);
     }
 
     return EFI_SUCCESS;
