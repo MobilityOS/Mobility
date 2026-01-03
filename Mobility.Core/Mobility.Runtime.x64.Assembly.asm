@@ -10,4 +10,20 @@
 
 .CODE
 
+;------------------------------------------------------------------------------
+; EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
+;------------------------------------------------------------------------------
+MoPlatformDisableInterrupts PROC
+    cli
+    ret
+MoPlatformDisableInterrupts ENDP
+
+;------------------------------------------------------------------------------
+; EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
+;------------------------------------------------------------------------------
+MoPlatformEnableInterrupts PROC
+    sti
+    ret
+MoPlatformEnableInterrupts ENDP
+
 END

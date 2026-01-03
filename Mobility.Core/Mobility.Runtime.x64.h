@@ -14,5 +14,17 @@
 #define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
+/**
+ * @brief Disables interrupts on the current processor.
+ * @remarks Implemented in the assembly parts.
+ */
+EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
+
+/**
+ * @brief Enables interrupts on the current processor.
+ * @remarks Implemented in the assembly parts.
+ */
+EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
+
 #endif // !MOBILITY_RUNTIME_X64
 
