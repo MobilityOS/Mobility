@@ -25,8 +25,12 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteUnaligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINT8*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer. Using
+    // 'volatile PMO_UINT8' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINT8 Bytes = (volatile PMO_UINT8)Buffer;
+    volatile MO_UINT8* Bytes = (volatile MO_UINT8*)Buffer;
 
     for (MO_UINTN Index = 0u; Index < Length; ++Index)
     {
@@ -48,8 +52,12 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteNativeAligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINTN*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer. Using
+    // 'volatile MO_UINTN*' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINTN NativeBuffer = (volatile PMO_UINTN)Buffer;
+    volatile MO_UINTN* NativeBuffer = (volatile MO_UINTN*)Buffer;
 
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
@@ -139,9 +147,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyUnaligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINT8*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer. Using
+    // 'volatile PMO_UINT8' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINT8 DestinationBytes = (volatile PMO_UINT8)Destination;
-    volatile PMO_UINT8 SourceBytes = (volatile PMO_UINT8)Source;
+    volatile MO_UINT8* DestinationBytes = (volatile MO_UINT8*)Destination;
+    volatile MO_UINT8* SourceBytes = (volatile MO_UINT8*)Source;
 
     for (MO_UINTN Index = 0u; Index < Length; ++Index)
     {
@@ -157,9 +169,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyNativeAligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINTN*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer. Using
+    // 'volatile MO_UINTN*' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINTN DestinationNative = (volatile PMO_UINTN)Destination;
-    volatile PMO_UINTN SourceNative = (volatile PMO_UINTN)Source;
+    volatile MO_UINTN* DestinationNative = (volatile MO_UINTN*)Destination;
+    volatile MO_UINTN* SourceNative = (volatile MO_UINTN*)Source;
 
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
@@ -258,9 +274,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyUnaligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINT8*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer.
+    // Using 'volatile PMO_UINT8' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINT8 DestinationBytes = (volatile PMO_UINT8)Destination;
-    volatile PMO_UINT8 SourceBytes = (volatile PMO_UINT8)Source;
+    volatile MO_UINT8* DestinationBytes = (volatile MO_UINT8*)Destination;
+    volatile MO_UINT8* SourceBytes = (volatile MO_UINT8*)Source;
 
     for (MO_UINTN Index = Length; Index > 0u; --Index)
     {
@@ -276,9 +296,13 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyNativeAligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINTN*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer.
+    // Using 'volatile PMO_UINTN' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINTN DestinationNative = (volatile PMO_UINTN)Destination;
-    volatile PMO_UINTN SourceNative = (volatile PMO_UINTN)Source;
+    volatile MO_UINTN* DestinationNative = (volatile MO_UINTN*)Destination;
+    volatile MO_UINTN* SourceNative = (volatile MO_UINTN*)Source;
 
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = NativeCount; Index > 0u; --Index)
@@ -428,9 +452,13 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareUnaligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINT8*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer.
+    // Using 'volatile PMO_UINT8' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINT8 LeftBytes = (volatile PMO_UINT8)Left;
-    volatile PMO_UINT8 RightBytes = (volatile PMO_UINT8)Right;
+    volatile MO_UINT8* LeftBytes = (volatile MO_UINT8*)Left;
+    volatile MO_UINT8* RightBytes = (volatile MO_UINT8*)Right;
 
     for (MO_UINTN Index = 0u; Index < Length; ++Index)
     {
@@ -452,9 +480,13 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareNativeAligned(
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
     // Use volatile to ensure no dependencies on such functions or intrinsics.
+    // Use 'volatile MO_UINTN*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer.
+    // Using 'volatile PMO_UINTN' would only make the pointer variable itself
+    // volatile.
 
-    volatile PMO_UINTN LeftNative = (volatile PMO_UINTN)Left;
-    volatile PMO_UINTN RightNative = (volatile PMO_UINTN)Right;
+    volatile MO_UINTN* LeftNative = (volatile MO_UINTN*)Left;
+    volatile MO_UINTN* RightNative = (volatile MO_UINTN*)Right;
 
     MO_UINTN NativeCount = Length / sizeof(MO_UINTN);
     for (MO_UINTN Index = 0u; Index < NativeCount; ++Index)
@@ -625,10 +657,13 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
             // This library is designed for freestanding environments where C
             // standard library functions (like memcpy) and SIMD intrinsics may
             // not be available. Use volatile to ensure no dependencies on such
-            // functions or intrinsics.
+            // functions or intrinsics. Use 'volatile MO_UINT8*' to ensure the
+            // compiler treats the data pointed to as volatile, forcing actual
+            // memory writes to the framebuffer. Using 'volatile PMO_UINT8'
+            // would only make the pointer variable itself volatile.
 
-            volatile PMO_UINT8 LeftBytes = (volatile PMO_UINT8)Left;
-            volatile PMO_UINT8 RightBytes = (volatile PMO_UINT8)Right;
+            volatile MO_UINT8* LeftBytes = (volatile MO_UINT8*)Left;
+            volatile MO_UINT8* RightBytes = (volatile MO_UINT8*)Right;
 
             for (MO_UINTN ByteIndex = 0u; ByteIndex < ElementSize; ++ByteIndex)
             {
