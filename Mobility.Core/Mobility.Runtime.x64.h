@@ -606,6 +606,22 @@ typedef union _MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY
 #endif
 
 /**
+ * @brief Inserts a PAUSE instruction to improve the performance of spin-wait
+ *        loops.
+ */
+EXTERN_C VOID MOAPI MoPlatformPause();
+
+/**
+ * @brief Halts the current processor until the next external interrupt arrives.
+ */
+EXTERN_C VOID MOAPI MoPlatformHalt();
+
+/**
+ * @brief Triggers a breakpoint exception.
+ */
+EXTERN_C VOID MOAPI MoPlatformDebugBreak();
+
+/**
  * @brief Disables interrupts on the current processor.
  * @remarks Implemented in the assembly parts.
  */
@@ -616,6 +632,80 @@ EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
  * @remarks Implemented in the assembly parts.
  */
 EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
+
+/**
+ * @brief Reads the value of the specified Model-Specific Register (MSR).
+ * @param Index The index of the MSR to read.
+ * @return The value of the specified MSR.
+ */
+EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
+    _In_ MO_UINT32 Index);
+
+/**
+ * @brief Writes a value to the specified Model-Specific Register (MSR).
+ * @param Index The index of the MSR to write.
+ * @param Value The value to write to the MSR.
+ */
+EXTERN_C VOID MOAPI MoPlatformWriteMsr(
+    _In_ MO_UINT32 Index,
+    _In_ MO_UINT64 Value);
+
+/**
+ * @brief Reads the value of the CR3 register.
+ * @return The value of the CR3 register.
+ */
+EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3();
+
+/**
+ * @brief Writes a value to the CR3 register.
+ * @param Value The value to write to the CR3 register.
+ */
+EXTERN_C VOID MOAPI MoPlatformWriteCr3(
+    _In_ MO_UINT64 Value);
+
+/**
+ * @brief Loads the Global Descriptor Table (GDT) with the specified descriptor.
+ * @param Descriptor A pointer to the pseudo-descriptor that contains the base
+ *                   address and limit of the GDT.
+ */
+EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
+    _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
+
+/**
+ * @brief Loads the Interrupt Descriptor Table (IDT) with the specified
+ *        descriptor.
+ * @param Descriptor A pointer to the pseudo-descriptor that contains the base
+ *                   address and limit of the IDT.
+ */
+EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
+    _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
+
+/**
+ * @brief Reloads the segment selectors for data and code segments.
+ * @param DataSelector The data segment selector.
+ * @param CodeSelector The code segment selector.
+ */
+EXTERN_C VOID MOAPI MoPlatformReloadSegmentSelectors(
+    MO_UINT16 DataSelector,
+    MO_UINT16 CodeSelector);
+
+/**
+ * @brief Registers a new Task State Segment (TSS) for task switching.
+ * @param TssSelector The TSS segment selector.
+ */
+EXTERN_C VOID MOAPI MoPlatformLoadTaskRegister(
+    MO_UINT16 TssSelector);
+
+/**
+ * @brief Switches the current stack to a new stack and jumps to the specified
+ *        address.
+ * @param StackAddress The address of the new stack to switch to.
+ * @param FunctionAddress The address of the function to jump to after switching
+ *                        to the new stack.
+ */
+EXTERN_C VOID MOAPI MoPlatformSwitchToNewStack(
+    MO_POINTER StackAddress,
+    MO_POINTER FunctionAddress);
 
 #endif // !MOBILITY_RUNTIME_X64
 
