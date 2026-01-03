@@ -132,30 +132,37 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
         }
     }
 
+    // Use 'volatile MO_UINT32*' to ensure the compiler treats the data pointed
+    // to as volatile, forcing actual memory writes to the framebuffer.
+    // Using 'volatile PMO_UINT32' would only make the pointer variable itself
+    // volatile.
+    volatile MO_UINT32* FrameBufferBase = (volatile MO_UINT32*)(
+        DisplayFrameBuffer->FrameBufferBase);
+
     MO_UINT32 ScreenX = DestinationCoordinate.X * FontWidth;
     MO_UINT32 ScreenY = DestinationCoordinate.Y * FontHeight;
     for (MO_UINT8 GlyphY = 0; GlyphY < FontHeight; ++GlyphY)
     {
         MO_UINTN PixelStartOffset = ScreenY + GlyphY;
-        PixelStartOffset *= DisplayFrameBuffer->HorizontalResolution;
+        PixelStartOffset *= DisplayFrameBuffer->PixelsPerScanLine;
         PixelStartOffset += ScreenX;
         MO_UINT8 GlyphDataLow = GlyphData[GlyphY] & 0x0F;
         MO_UINT8 GlyphDataHigh = (GlyphData[GlyphY] & 0xF0) >> 4;
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 0] =
+        FrameBufferBase[PixelStartOffset + 0] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][0];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 1] =
+        FrameBufferBase[PixelStartOffset + 1] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][1];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 2] =
+        FrameBufferBase[PixelStartOffset + 2] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][2];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 3] =
+        FrameBufferBase[PixelStartOffset + 3] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][3];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 4] =
+        FrameBufferBase[PixelStartOffset + 4] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][0];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 5] =
+        FrameBufferBase[PixelStartOffset + 5] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][1];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 6] =
+        FrameBufferBase[PixelStartOffset + 6] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][2];
-        DisplayFrameBuffer->FrameBufferBase[PixelStartOffset + 7] =
+        FrameBufferBase[PixelStartOffset + 7] =
             ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][3];
     }
 }
