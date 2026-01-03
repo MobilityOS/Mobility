@@ -29,7 +29,6 @@
     <ClCompile Include="Mobility.Memory.InternalHeap.c" />
     <ClCompile Include="Mobility.Memory.SmallHeap.c" />
     <ClCompile Include="Mobility.Runtime.Core.c" />
-    <ClCompile Include="Mobility.Runtime.x64.c" />
     <ClCompile Include="Mobility.Unicode.Core.c" />
   </ItemGroup>
   <ItemGroup>
@@ -44,11 +43,19 @@
     <ClInclude Include="Mobility.Unicode.Core.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Mobility.Runtime.x64.c" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Mobility.Runtime.x64.Assembly.asm" />
   </ItemGroup>
   <Target Name="MobilityCoreBuildAssemblySource" BeforeTargets="_MASM;_MARMASM">
     <ItemGroup Condition="'$(Platform)' == 'x64'">
       <MASM Include="Mobility.Runtime.x64.Assembly.asm" />
+    </ItemGroup>
+  </Target>
+  <Target Name="MobilityCoreBuildCSource" BeforeTargets="BeforeClCompile">
+    <ItemGroup Condition="'$(Platform)' == 'x64'">
+      <ClCompile Include="Mobility.Runtime.x64.c" />
     </ItemGroup>
   </Target>
   <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.targets" />
