@@ -38,6 +38,7 @@
     <ClInclude Include="Mobility.Display.Core.h" />
     <ClInclude Include="Mobility.Memory.InternalHeap.h" />
     <ClInclude Include="Mobility.Memory.SmallHeap.h" />
+    <ClInclude Include="Mobility.Platform.Interface.h" />
     <ClInclude Include="Mobility.Runtime.Core.h" />
     <ClInclude Include="Mobility.Runtime.x64.h" />
     <ClInclude Include="Mobility.Unicode.Core.h" />
