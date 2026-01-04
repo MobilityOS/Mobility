@@ -928,10 +928,10 @@ typedef VOID(MOAPI* PMO_RUNTIME_X64_INTERRUPT_HANDLER)(
 /**
  * @brief The interrupt descriptor table handlers for x64 architecture. Because
  *        each entry must be no more than 8 bytes and must be 8-byte aligned,
- *        which allows the C code to compute the address of each vector as an
- *        array index.
+ *        which allows the C code to compute the address of each interrupt as
+ *        &MoPlatformInterruptDescriptorTableHandlers[Interrupt] directly.
  */
-EXTERN_C MO_POINTER MOAPI MoPlatformInterruptDescriptorTableHandler[256];
+EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
 
 /**
  * @brief Set the Base value for the specific 64-Bit Segment Descriptor.

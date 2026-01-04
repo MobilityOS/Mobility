@@ -456,7 +456,7 @@ NonNullValue:
 MoPlatformInterruptCommonEntry ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C MO_POINTER MOAPI MoPlatformInterruptDescriptorTableHandler[256];
+; EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
 ; -----------------------------------------------------------------------------
 ; These are the actual interrupt vector entry points. The macros below ensure
 ; that the vector always pushes an error code and the vector number to the stack
@@ -464,10 +464,10 @@ MoPlatformInterruptCommonEntry ENDP
 ; pre-populated with an error code and do not need an extra one pushed.
 ; N.B. Each entry must be no more than 8 bytes and must be 8-byte aligned.
 ; This allows the C code to compute the address of each vector as an offset
-; from MoPlatformInterruptDescriptorTableHandler.
+; from MoPlatformInterruptDescriptorTableHandlers.
 ALIGN 8
-PUBLIC MoPlatformInterruptDescriptorTableHandler
-MoPlatformInterruptDescriptorTableHandler LABEL BYTE
+PUBLIC MoPlatformInterruptDescriptorTableHandlers
+MoPlatformInterruptDescriptorTableHandlers LABEL BYTE
 Vector = 0
 REPEAT 256
 ALIGN 8
