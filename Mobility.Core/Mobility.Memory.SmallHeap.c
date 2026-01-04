@@ -31,6 +31,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
         0u,
         MO_MEMORY_SMALL_HEAP_BITMAP_SIZE))
     {
+        // This function should not fail here.
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
@@ -39,6 +40,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
         MO_MEMORY_SMALL_HEAP_USER_AREA_INITIAL_BYTE,
         MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE))
     {
+        // This function should not fail here.
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
@@ -48,6 +50,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
         Instance->Header.AllocatedUnits,
         MO_TRUE))
     {
+        // This function should not fail here.
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
@@ -113,6 +116,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
             CurrentIndex,
             MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS))
         {
+            // This function should not fail here.
             return MO_RESULT_ERROR_UNEXPECTED;
         }
         if (!BitValue)
@@ -177,6 +181,19 @@ MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapFindSuitableBlock(
     return 0;
 }
 
+MO_FORCEINLINE VOID MoMemorySmallHeapUpdateHintUnit(
+    _In_ PMO_MEMORY_SMALL_HEAP Instance)
+{
+    MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
+        Instance,
+        MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS,
+        MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS);
+    if (FirstSuitableBlockIndex)
+    {
+        Instance->Header.HintUnit = FirstSuitableBlockIndex;
+    }
+}
+
 EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
     _Out_ PMO_POINTER Block,
     _In_ PMO_MEMORY_SMALL_HEAP Instance,
@@ -218,6 +235,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
             RequiredUnits,
             MO_TRUE))
         {
+            // This function should not fail here.
             return MO_RESULT_ERROR_UNEXPECTED;
         }
 
@@ -232,6 +250,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
             MO_MEMORY_SMALL_HEAP_USER_AREA_ALLOCATED_BYTE,
             RequiredSize))
         {
+            // This function should not fail here.
             return MO_RESULT_ERROR_UNEXPECTED;
         }
 
@@ -248,19 +267,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
         // Update the heap header.
 
         Instance->Header.AllocatedUnits += RequiredUnits;
-        MO_UINT16 CandidateHintUnit =
-            (MO_UINT16)(SuitableBlockIndex + RequiredUnits);
-        if (CandidateHintUnit >= MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS)
-        {
-            MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
-                Instance,
-                MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS,
-                MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS);
-            if (FirstSuitableBlockIndex)
-            {
-                Instance->Header.HintUnit = FirstSuitableBlockIndex;
-            }
-        }
+        MoMemorySmallHeapUpdateHintUnit(Instance);
 
         // Return the pointer to the user area.
         *Block = (MO_POINTER)(
@@ -346,6 +353,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
         AllocatedUnits,
         MO_FALSE))
     {
+        // This function should not fail here.
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
@@ -355,22 +363,14 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
         MO_MEMORY_SMALL_HEAP_USER_AREA_FREED_BYTE,
         MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE((MO_UINTN)(AllocatedUnits))))
     {
+        // This function should not fail here.
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
     // Update the heap header.
+
     Instance->Header.AllocatedUnits -= AllocatedUnits;
-    if (HeapHeaderOffsetUnits >= MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS)
-    {
-        MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
-            Instance,
-            MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS,
-            MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS);
-        if (FirstSuitableBlockIndex)
-        {
-            Instance->Header.HintUnit = FirstSuitableBlockIndex;
-        }
-    }
+    MoMemorySmallHeapUpdateHintUnit(Instance);
 
     return MO_RESULT_SUCCESS_OK;
 }
@@ -415,15 +415,6 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
     MO_UINT16 OriginalAllocatedSize = MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE(
         OriginalItemHeader->AllocatedUnits);
     MO_UINT16 OriginalRequestedSize = OriginalItemHeader->RequestedSize;
-
-    if (NewSize <= OriginalRequestedSize)
-    {
-        // If the new size is less than or equal to the original size,
-        // return the same block.
-        *UpdatedBlock = Block;
-        return MO_RESULT_SUCCESS_OK;
-    }
-
     MO_UINT16 MaximumSizeWithoutReallocation =
         OriginalAllocatedSize - MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE;
     if (NewSize <= MaximumSizeWithoutReallocation)
@@ -438,6 +429,70 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
         return MO_RESULT_SUCCESS_OK;
     }
 
+    {
+        MO_UINT16 AdditionalRequiredSize = (MO_UINT16)MoRuntimeGetAlignedSize(
+            NewSize - MaximumSizeWithoutReallocation,
+            MO_MEMORY_SMALL_HEAP_UNIT_SIZE);
+        MO_UINT16 AdditionalRequiredUnits =
+            MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(AdditionalRequiredSize);
+        MO_UINT16 NextBlockUnitIndex =
+            OriginalItemHeader->HeapHeaderOffsetUnits +
+            OriginalItemHeader->AllocatedUnits;
+
+        MO_UINTN RunUnits = 0u;
+        MO_BOOL BitValue = MO_FALSE;
+        if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapQueryContinuousRunLength(
+            &RunUnits,
+            &BitValue,
+            Instance->Bitmap,
+            NextBlockUnitIndex,
+            MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS))
+        {
+            // This function should not fail here.
+            return MO_RESULT_ERROR_UNEXPECTED;
+        }
+
+        if (!BitValue && RunUnits >= AdditionalRequiredUnits)
+        {
+            // Expand in place if the next block is free and sufficient.
+            if (MO_RESULT_SUCCESS_OK != MoRuntimeBitmapFillRange(
+                Instance->Bitmap,
+                NextBlockUnitIndex,
+                AdditionalRequiredUnits,
+                MO_TRUE))
+            {
+                // This function should not fail here.
+                return MO_RESULT_ERROR_UNEXPECTED;
+            }
+
+            // Clear the newly allocated area.
+            if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
+                (MO_POINTER)(((MO_UINTN)Block) + OriginalAllocatedSize),
+                MO_MEMORY_SMALL_HEAP_USER_AREA_ALLOCATED_BYTE,
+                AdditionalRequiredSize))
+            {
+                // This function should not fail here.
+                return MO_RESULT_ERROR_UNEXPECTED;
+            }
+
+            // Update the item header.
+
+            OriginalItemHeader->AllocatedUnits += AdditionalRequiredUnits;
+            OriginalItemHeader->RequestedSize = NewSize;
+            OriginalItemHeader->Checksum =
+                MoMemorySmallHeapCalculateItemHeaderChecksum(
+                    OriginalItemHeader);
+
+            // Update the heap header.
+
+            Instance->Header.AllocatedUnits += AdditionalRequiredUnits;
+            MoMemorySmallHeapUpdateHintUnit(Instance);
+
+            *UpdatedBlock = Block;
+            return MO_RESULT_SUCCESS_OK;
+        }
+    }
+
     // Allocate a new block.
     MO_POINTER NewBlock = nullptr;
     MO_RESULT Result = MoMemorySmallHeapAllocate(&NewBlock, Instance, NewSize);
@@ -449,16 +504,21 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
     Result = MoRuntimeMemoryMove(NewBlock, Block, OriginalRequestedSize);
     if (MO_RESULT_SUCCESS_OK != Result)
     {
-        return Result;
+        // This function should not fail here.
+        // Don't free the newly allocated empty block to help the analysis.
+        return MO_RESULT_ERROR_UNEXPECTED;
     }
+
+    // Return the new block after the content is copied.
+    *UpdatedBlock = NewBlock;
 
     Result = MoMemorySmallHeapFree(Instance, Block);
     if (MO_RESULT_SUCCESS_OK != Result)
     {
-        return Result;
+        // This function should not fail here.
+        // Don't free the newly allocated block to avoid data loss.
+        return MO_RESULT_ERROR_UNEXPECTED;
     }
-
-    *UpdatedBlock = NewBlock;
 
     return MO_RESULT_SUCCESS_OK;
 }
