@@ -17,7 +17,8 @@
 #include <Mobility.Uefi.Core.h>
 #include <Mobility.Uefi.Acpi.h>
 #include <Mobility.Runtime.Core.h>
-#include <Mobility.Memory.InternalHeap.h>
+#include <Mobility.Platform.Interface.h>
+#include <Mobility.Memory.SmallHeap.h>
 
 #include <IndustryStandard/Acpi30.h>
 
@@ -25,10 +26,49 @@
     MILE_PROJECT_VERSION_UTF8_STRING " (Build " \
     MILE_PROJECT_MACRO_TO_UTF8_STRING(MILE_PROJECT_VERSION_BUILD) ")"
 
+MO_MEMORY_SMALL_HEAP g_InternalHeap;
+
+EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
+    _Out_ PMO_POINTER Block,
+    _In_ MO_UINTN Size)
+{
+    // Additional check to ensure Size fits in MO_UINT16.
+    if (Size > MO_UINT16_MAX)
+    {
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    return ::MoMemorySmallHeapAllocate(Block, &g_InternalHeap, Size);
+}
+
+EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
+    _In_ MO_POINTER Block)
+{
+    return ::MoMemorySmallHeapFree(&g_InternalHeap, Block);
+}
+
+EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
+    _Out_ PMO_POINTER UpdatedBlock,
+    _In_opt_ MO_POINTER Block,
+    _In_ MO_UINTN NewSize)
+{
+    // Additional check to ensure NewSize fits in MO_UINT16.
+    if (NewSize > MO_UINT16_MAX)
+    {
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    return ::MoMemorySmallHeapReallocate(
+        UpdatedBlock,
+        &g_InternalHeap,
+        Block,
+        NewSize);
+}
+
 void SimpleDemo(
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapInitialize())
+    if (MO_RESULT_SUCCESS_OK != ::MoMemorySmallHeapInitialize(&g_InternalHeap))
     {
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,

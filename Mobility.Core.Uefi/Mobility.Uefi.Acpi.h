@@ -112,7 +112,7 @@ typedef struct _MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM
  *                     contains an array of memory ranges found in the System
  *                     Resource Affinity Table (SRAT). The caller is responsible
  *                     for freeing the allocated memory block using
- *                     MoMemoryInternalHeapFree. If this parameter is nullptr,
+ *                     MoPlatformHeapFree. If this parameter is nullptr,
  *                     the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param MemoryRangesCount The pointer to receive the count of memory ranges
  *                          found in the System Resource Affinity Table (SRAT).
@@ -139,7 +139,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
  *                     contains an array of memory ranges found in the System
  *                     Resource Affinity Table (SRAT). The caller is responsible
  *                     for freeing the allocated memory block using
- *                     MoMemoryInternalHeapFree. If this parameter is nullptr,
+ *                     MoPlatformHeapFree. If this parameter is nullptr,
  *                     the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param MemoryRangesCount The pointer to receive the count of memory ranges
  *                          found in the System Resource Affinity Table (SRAT).
@@ -166,7 +166,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
  *                         which contains an array of memory holes found in the
  *                         System Resource Affinity Table (SRAT). The caller is
  *                         responsible for freeing the allocated memory block
- *                         using MoMemoryInternalHeapFree. If this parameter is
+ *                         using MoPlatformHeapFree. If this parameter is
  *                         nullptr, the function returns
  *                         MO_RESULT_ERROR_INVALID_PARAMETER.
  * @param MemoryHoleRangesCount The pointer to receive the count of memory holes

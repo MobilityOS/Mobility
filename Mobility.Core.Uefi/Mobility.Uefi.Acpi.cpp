@@ -11,7 +11,7 @@
 #include "Mobility.Uefi.Acpi.h"
 
 #include <Mobility.Runtime.Core.h>
-#include <Mobility.Memory.InternalHeap.h>
+#include <Mobility.Platform.Interface.h>
 
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
@@ -86,7 +86,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
         }
 
         using RootTableType = EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER;
-        const MO_UINT64 RootTableSignature = 
+        const MO_UINT64 RootTableSignature =
             EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE;
         const MO_UINT8 RootTableRevision =
             EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION;
@@ -243,7 +243,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
         sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count);
 
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM Ranges = nullptr;
-    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
+    if (MO_RESULT_SUCCESS_OK != ::MoPlatformHeapAllocate(
         reinterpret_cast<PMO_POINTER>(&Ranges),
         Size))
     {
@@ -303,7 +303,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
         nullptr))
     {
         // Cleanup on error.
-        ::MoMemoryInternalHeapFree(Ranges);
+        ::MoPlatformHeapFree(Ranges);
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
@@ -378,18 +378,18 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
     if (!Count)
     {
         // Should not happen.
-        ::MoMemoryInternalHeapFree(MemoryRanges);
+        ::MoPlatformHeapFree(MemoryRanges);
         return MO_RESULT_ERROR_UNEXPECTED;
     }
     MO_UINT16 Size = static_cast<MO_UINT16>(
         sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count);
 
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MergedRanges = nullptr;
-    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
+    if (MO_RESULT_SUCCESS_OK != ::MoPlatformHeapAllocate(
         reinterpret_cast<PMO_POINTER>(&MergedRanges),
         Size))
     {
-        ::MoMemoryInternalHeapFree(MemoryRanges);
+        ::MoPlatformHeapFree(MemoryRanges);
         return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
@@ -398,12 +398,12 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
         MemoryRanges,
         Size))
     {
-        ::MoMemoryInternalHeapFree(MemoryRanges);
-        ::MoMemoryInternalHeapFree(MergedRanges);
+        ::MoPlatformHeapFree(MemoryRanges);
+        ::MoPlatformHeapFree(MergedRanges);
         return MO_RESULT_ERROR_UNEXPECTED;
     }
 
-    ::MoMemoryInternalHeapFree(MemoryRanges);
+    ::MoPlatformHeapFree(MemoryRanges);
 
     *MergedMemoryRanges = MergedRanges;
     *MergedMemoryRangesCount = Count;
@@ -439,7 +439,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
     if (MergedMemoryRangesCount < 2)
     {
         // No memory holes found.
-        ::MoMemoryInternalHeapFree(MergedMemoryRanges);
+        ::MoPlatformHeapFree(MergedMemoryRanges);
         return MO_RESULT_ERROR_NO_INTERFACE;
     }
 
@@ -447,11 +447,11 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
     MO_UINT16 Size = static_cast<MO_UINT16>(
         sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * HoleCount);
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM Holes = nullptr;
-    if (MO_RESULT_SUCCESS_OK != ::MoMemoryInternalHeapAllocate(
+    if (MO_RESULT_SUCCESS_OK != ::MoPlatformHeapAllocate(
         reinterpret_cast<PMO_POINTER>(&Holes),
         Size))
     {
-        ::MoMemoryInternalHeapFree(MergedMemoryRanges);
+        ::MoPlatformHeapFree(MergedMemoryRanges);
         return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
@@ -464,7 +464,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
         Holes[i].Length = CurrentRangeStart - PreviousRangeEnd;
     }
 
-    ::MoMemoryInternalHeapFree(MergedMemoryRanges);
+    ::MoPlatformHeapFree(MergedMemoryRanges);
 
     *MemoryHoleRanges = Holes;
     *MemoryHoleRangesCount = HoleCount;
