@@ -162,37 +162,6 @@ MoPlatformSetDataSegmentSelectors PROC PUBLIC
 MoPlatformSetDataSegmentSelectors ENDP
 
 ;------------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformReloadSegmentSelectors(
-;     MO_UINT16 DataSelector,
-;     MO_UINT16 CodeSelector);
-;------------------------------------------------------------------------------
-MoPlatformReloadSegmentSelectors PROC
-    ; CX = DataSelector
-    ; DX = CodeSelector
-
-    ; Set the data segment selector.
-    mov ds, cx
-    mov es, cx
-    mov fs, cx
-    mov gs, cx
-    mov ss, cx
-
-    lea rcx, NewReturnAddress
-
-    ; Set the code segment selector.
-    movzx rdx, dx
-	push rdx
-
-    ; Set the new return address.
-	push rcx
-
-    ; Perform a far return for switch to the new code segment.
-	retfq
-NewReturnAddress:
-	ret
-MoPlatformReloadSegmentSelectors ENDP
-
-;------------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadTaskRegister(
 ;     MO_UINT16 TssSelector);
 ;------------------------------------------------------------------------------

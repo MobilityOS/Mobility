@@ -845,15 +845,6 @@ EXTERN_C VOID MOAPI MoPlatformSetDataSegmentSelectors(
     _In_ MO_UINT16 DataSelector);
 
 /**
- * @brief Reloads the segment selectors for data and code segments.
- * @param DataSelector The data segment selector.
- * @param CodeSelector The code segment selector.
- */
-EXTERN_C VOID MOAPI MoPlatformReloadSegmentSelectors(
-    MO_UINT16 DataSelector,
-    MO_UINT16 CodeSelector);
-
-/**
  * @brief Registers a new Task State Segment (TSS) for task switching.
  * @param TssSelector The TSS segment selector.
  */
