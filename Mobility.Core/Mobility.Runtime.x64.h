@@ -831,6 +831,20 @@ EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
     _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**
+ * @brief Sets the code segment selector to the specified segment selector.
+ * @param CodeSelector The code segment selector.
+ */
+EXTERN_C VOID MOAPI MoPlatformSetCodeSegmentSelector(
+    _In_ MO_UINT16 CodeSelector);
+
+/**
+ * @brief Sets the data segment selectors to the specified segment selector.
+ * @param DataSelector The data segment selector.
+ */
+EXTERN_C VOID MOAPI MoPlatformSetDataSegmentSelectors(
+    _In_ MO_UINT16 DataSelector);
+
+/**
  * @brief Reloads the segment selectors for data and code segments.
  * @param DataSelector The data segment selector.
  * @param CodeSelector The code segment selector.

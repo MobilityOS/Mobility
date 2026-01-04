@@ -121,6 +121,47 @@ MoPlatformLoadInterruptDescriptorTable PROC
 MoPlatformLoadInterruptDescriptorTable ENDP
 
 ;------------------------------------------------------------------------------
+; EXTERN_C VOID MOAPI MoPlatformSetCodeSegmentSelector(
+;     _In_ MO_UINT16 CodeSelector);
+;------------------------------------------------------------------------------
+MoPlatformSetCodeSegmentSelector PROC PUBLIC
+    ; CX = CodeSelector
+
+    ; Set the new return address.
+    lea rcx, NewReturnAddress
+
+    ; Set the code segment selector.
+    movzx rdx, cx
+	push rdx
+
+    ; Set the new return address.
+	push rcx
+
+    ; Perform a far return for switch to the new code segment.
+	retfq
+
+NewReturnAddress:
+
+    ; Return to the caller.
+	ret
+MoPlatformSetCodeSegmentSelector ENDP
+
+;------------------------------------------------------------------------------
+; EXTERN_C VOID MOAPI MoPlatformSetDataSegmentSelectors(
+;     _In_ MO_UINT16 DataSelector);
+;------------------------------------------------------------------------------
+MoPlatformSetDataSegmentSelectors PROC PUBLIC
+    ; CX = DataSelector
+
+    mov ss, cx
+    mov ds, cx
+    mov es, cx
+    mov fs, cx
+    mov gs, cx
+    ret
+MoPlatformSetDataSegmentSelectors ENDP
+
+;------------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformReloadSegmentSelectors(
 ;     MO_UINT16 DataSelector,
 ;     MO_UINT16 CodeSelector);
