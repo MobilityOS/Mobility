@@ -10,50 +10,50 @@
 
 .CODE
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformPause();
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformPause PROC
     pause
     ret
 MoPlatformPause ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformHalt();
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformHalt PROC
     hlt
     ret
 MoPlatformHalt ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformDebugBreak();
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformDebugBreak PROC
     int 3
     ret
 MoPlatformDebugBreak ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformDisableInterrupts PROC
     cli
     ret
 MoPlatformDisableInterrupts ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformEnableInterrupts PROC
     sti
     ret
 MoPlatformEnableInterrupts ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
 ;     _In_ MO_UINT32 Index);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformReadMsr PROC
     ; RAX = Value
     ; RCX = Index
@@ -64,11 +64,11 @@ MoPlatformReadMsr PROC
     ret
 MoPlatformReadMsr ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformWriteMsr(
 ;     _In_ MO_UINT32 Index,
 ;     _In_ MO_UINT64 Value);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformWriteMsr PROC
     ; RCX = Index
     ; RDX = Value
@@ -79,18 +79,18 @@ MoPlatformWriteMsr PROC
     ret
 MoPlatformWriteMsr ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3();
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformReadCr3 PROC
     mov rax, cr3
     ret
 MoPlatformReadCr3 ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformWriteCr3(
 ;     _In_ MO_UINT64 Value);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformWriteCr3 PROC
     ; RCX = Value
 
@@ -98,10 +98,10 @@ MoPlatformWriteCr3 PROC
     ret
 MoPlatformWriteCr3 ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
 ;     _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformLoadGlobalDescriptorTable PROC
     ; RCX = Descriptor
 
@@ -109,10 +109,10 @@ MoPlatformLoadGlobalDescriptorTable PROC
     ret
 MoPlatformLoadGlobalDescriptorTable ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
 ;     _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformLoadInterruptDescriptorTable PROC
     ; RCX = Descriptor
 
@@ -120,10 +120,10 @@ MoPlatformLoadInterruptDescriptorTable PROC
     ret
 MoPlatformLoadInterruptDescriptorTable ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformSetCodeSegmentSelector(
 ;     _In_ MO_UINT16 CodeSelector);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformSetCodeSegmentSelector PROC PUBLIC
     ; CX = CodeSelector
 
@@ -146,10 +146,10 @@ NewReturnAddress:
 	ret
 MoPlatformSetCodeSegmentSelector ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformSetDataSegmentSelectors(
 ;     _In_ MO_UINT16 DataSelector);
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 MoPlatformSetDataSegmentSelectors PROC PUBLIC
     ; CX = DataSelector
 
@@ -161,10 +161,10 @@ MoPlatformSetDataSegmentSelectors PROC PUBLIC
     ret
 MoPlatformSetDataSegmentSelectors ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadTaskRegister(
-;     MO_UINT16 TssSelector);
-;------------------------------------------------------------------------------
+;     _In_ MO_UINT16 TssSelector);
+; -----------------------------------------------------------------------------
 MoPlatformLoadTaskRegister PROC
     ; RCX = TssSelector
 
@@ -172,11 +172,11 @@ MoPlatformLoadTaskRegister PROC
     ret
 MoPlatformLoadTaskRegister ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformSwitchToNewStack(
-;     MO_POINTER StackAddress,
-;     MO_POINTER FunctionAddress);
-;------------------------------------------------------------------------------
+;     _In_ MO_POINTER StackAddress,
+;     _In_ MO_POINTER FunctionAddress);
+; -----------------------------------------------------------------------------
 MoPlatformSwitchToNewStack PROC
     ; RCX = StackAddress
     ; RDX = FunctionAddress
@@ -196,15 +196,15 @@ HaltLoop:
     jmp HaltLoop
 MoPlatformSwitchToNewStack ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C PMO_RUNTIME_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; The external array of interrupt handlers.
 EXTRN MoPlatformInterruptHandlers: QWORD
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; MoPlatformInterruptCommonEntry
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; The follow algorithm is used for the common interrupt routine.
 MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     .PUSHFRAME CODE
@@ -455,9 +455,9 @@ NonNullValue:
 
 MoPlatformInterruptCommonEntry ENDP
 
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; EXTERN_C MO_POINTER MOAPI MoPlatformInterruptDescriptorTableHandler[256];
-;------------------------------------------------------------------------------
+; -----------------------------------------------------------------------------
 ; These are the actual interrupt vector entry points. The macros below ensure
 ; that the vector always pushes an error code and the vector number to the stack
 ; before calling into MoPlatformInterruptCommonEntry. Some interrupts come
