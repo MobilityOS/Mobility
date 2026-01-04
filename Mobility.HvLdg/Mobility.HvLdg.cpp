@@ -17,6 +17,7 @@
 #include <Mobility.Uefi.Core.h>
 #include <Mobility.Uefi.Acpi.h>
 #include <Mobility.Runtime.Core.h>
+#include "Mobility.Console.Core.h"
 #include <Mobility.Runtime.x64.h>
 #include <Mobility.Platform.Interface.h>
 #include <Mobility.Memory.SmallHeap.h>

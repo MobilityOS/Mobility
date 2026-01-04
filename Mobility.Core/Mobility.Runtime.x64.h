@@ -11,8 +11,8 @@
 #ifndef MOBILITY_RUNTIME_X64
 #define MOBILITY_RUNTIME_X64
 
-#include "Mobility.Runtime.Core.h"
-#include "Mobility.Console.Core.h"
+#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
+#include <Mile.Mobility.Portable.Types.h>
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
