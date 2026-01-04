@@ -15,6 +15,7 @@
 #include <sal.h>
 
 #include <Mobility.Runtime.Core.h>
+#include <Mobility.Platform.Interface.h>
 
 #include <Mobility.Uefi.Core.h>
 #include <Mobility.Uefi.Acpi.h>
@@ -29,6 +30,33 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+
+EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
+    _Out_ PMO_POINTER Block,
+    _In_ MO_UINTN Size)
+{
+    MO_UNREFERENCED_PARAMETER(Block);
+    MO_UNREFERENCED_PARAMETER(Size);
+    return MO_RESULT_ERROR_NOT_IMPLEMENTED;
+}
+
+EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
+    _In_ MO_POINTER Block)
+{
+    MO_UNREFERENCED_PARAMETER(Block);
+    return MO_RESULT_ERROR_NOT_IMPLEMENTED;
+}
+
+EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
+    _Out_ PMO_POINTER UpdatedBlock,
+    _In_opt_ MO_POINTER Block,
+    _In_ MO_UINTN NewSize)
+{
+    MO_UNREFERENCED_PARAMETER(UpdatedBlock);
+    MO_UNREFERENCED_PARAMETER(Block);
+    MO_UNREFERENCED_PARAMETER(NewSize);
+    return MO_RESULT_ERROR_NOT_IMPLEMENTED;
+}
 
 /**
  * @brief Checks the Hyper-V guest support availability.
