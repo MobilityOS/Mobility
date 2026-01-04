@@ -597,6 +597,156 @@ typedef union _MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY
     MO_UINT64 RawData;
 } MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY, *PMO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY;
 
+/**
+ * @brief The interrupt types for x64 architecture.
+ * @remark For more information, see these references:
+ *         - Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+ *           (December 2023)
+ *             Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
+ *               Section 6.3.1 External Interrupts
+ *                 Table 6-1. Protected-Mode Exceptions and Interrupts
+ */
+#ifndef MO_RUNTIME_X64_INTERRUPT_TYPES_DEFINED
+
+/**
+ * @brief Divide Error (#DE)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_DIVIDE_ERROR 0
+/**
+ * @brief Debug Exception (#DB)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_DEBUG_EXCEPTION 1
+/**
+ * @brief NMI Interrupt
+ */
+#define MO_RUNTIME_X64_INTERRUPT_NMI_INTERRUPT 2
+/**
+ * @brief Breakpoint (#BP)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_BREAKPOINT 3
+/**
+ * @brief Overflow (#OF)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_OVERFLOW 4
+/**
+ * @brief BOUND Range Exceeded (#BR)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_BOUND_RANGE_EXCEEDED 5
+/**
+ * @brief Invalid Opcode (Undefined Opcode) (#UD)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_INVALID_OPCODE 6
+/**
+ * @brief Device Not Available (No Math Coprocessor) (#NM)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_DEVICE_NOT_AVAILABLE 7
+/**
+ * @brief Double Fault (#DF)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_DOUBLE_FAULT 8
+/**
+ * @brief Invalid TSS (#TS)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_INVALID_TSS 10
+/**
+ * @brief Segment Not Present (#NP)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_SEGMENT_NOT_PRESENT 11
+/**
+ * @brief Stack-Segment Fault (#SS)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_STACK_SEGMENT_FAULT 12
+/**
+ * @brief General Protection (#GP)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_GENERAL_PROTECTION 13
+/**
+ * @brief Page Fault (#PF)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_PAGE_FAULT 14
+/**
+ * @brief x87 FPU Floating-Point Error (Math Fault) (#MF)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_FPU_FLOATING_POINT_ERROR 16
+/**
+ * @brief Alignment Check (#AC)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_ALIGNMENT_CHECK 17
+/**
+ * @brief Machine Check (#MC)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_MACHINE_CHECK 18
+/**
+ * @brief SIMD Floating-Point Exception (#XM)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_SIMD_FLOATING_POINT_EXCEPTION 19
+/**
+ * @brief Virtualization Exception (#VE)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_VIRTUALIZATION_EXCEPTION 20
+/**
+ * @brief Control Protection Exception (#CP)
+ */
+#define MO_RUNTIME_X64_INTERRUPT_CONTROL_PROTECTION_EXCEPTION 21
+
+#endif // !MO_RUNTIME_X64_INTERRUPT_TYPES_DEFINED
+
+/**
+ * @brief The FXSAVE area for x64 architecture.
+ * @remark For more information, see these references:
+ *         - Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+ *           (December 2023)
+ *             Volume 1: Basic Architecture
+ *               Section 10.5.1 FXSAVE Area
+ *                 Table 10-2.  Format of an FXSAVE Area
+ */
+typedef struct _MO_RUNTIME_X64_FXSAVE_AREA
+{
+    MO_UINT16 Fcw;
+    MO_UINT16 Fsw;
+    MO_UINT8 Ftw;
+    MO_UINT8 Reserved0;
+    MO_UINT16 Fop;
+    MO_UINT64 FpuIp;
+    MO_UINT64 FpuDp;
+    MO_UINT32 MxCsr;
+    MO_UINT32 MxCsrMask;
+    MO_UINT8 St0Mm0[10];
+    MO_UINT8 Reserved1[6];
+    MO_UINT8 St1Mm1[10];
+    MO_UINT8 Reserved2[6];
+    MO_UINT8 St2Mm2[10];
+    MO_UINT8 Reserved3[6];
+    MO_UINT8 St3Mm3[10];
+    MO_UINT8 Reserved4[6];
+    MO_UINT8 St4Mm4[10];
+    MO_UINT8 Reserved5[6];
+    MO_UINT8 St5Mm5[10];
+    MO_UINT8 Reserved6[6];
+    MO_UINT8 St6Mm6[10];
+    MO_UINT8 Reserved7[6];
+    MO_UINT8 St7Mm7[10];
+    MO_UINT8 Reserved8[6];
+    MO_UINT8 Xmm0[16];
+    MO_UINT8 Xmm1[16];
+    MO_UINT8 Xmm2[16];
+    MO_UINT8 Xmm3[16];
+    MO_UINT8 Xmm4[16];
+    MO_UINT8 Xmm5[16];
+    MO_UINT8 Xmm6[16];
+    MO_UINT8 Xmm7[16];
+    MO_UINT8 Xmm8[16];
+    MO_UINT8 Xmm9[16];
+    MO_UINT8 Xmm10[16];
+    MO_UINT8 Xmm11[16];
+    MO_UINT8 Xmm12[16];
+    MO_UINT8 Xmm13[16];
+    MO_UINT8 Xmm14[16];
+    MO_UINT8 Xmm15[16];
+    MO_UINT8 Reserved9[96];
+} MO_RUNTIME_X64_FXSAVE_AREA, *PMO_RUNTIME_X64_FXSAVE_AREA;
+MO_C_STATIC_ASSERT(sizeof(MO_RUNTIME_X64_FXSAVE_AREA) == 512);
+
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
 #pragma warning(pop)
@@ -732,6 +882,77 @@ typedef struct _MO_RUNTIME_X64_GDT_DESCRIPTORS
     MO_RUNTIME_X64_SEGMENT_DESCRIPTOR UserData;
     MO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR Tss;
 } MO_RUNTIME_X64_GDT_DESCRIPTORS, *PMO_RUNTIME_X64_GDT_DESCRIPTORS;
+
+/**
+ * @brief The interrupt for x64 architecture to be hooked.
+ */
+typedef MO_INTN MO_RUNTIME_X64_INTERRUPT_TYPE;
+
+/**
+ * @brief The interrupt context for x64 architecture.
+ */
+typedef struct _MO_RUNTIME_X64_INTERRUPT_CONTEXT
+{
+    MO_UINT64 ExceptionData;
+    MO_RUNTIME_X64_FXSAVE_AREA FxSaveState;
+    MO_UINT64 Dr0;
+    MO_UINT64 Dr1;
+    MO_UINT64 Dr2;
+    MO_UINT64 Dr3;
+    MO_UINT64 Dr6;
+    MO_UINT64 Dr7;
+    MO_UINT64 Cr0;
+    MO_UINT64 Cr1; // Reserved
+    MO_UINT64 Cr2;
+    MO_UINT64 Cr3;
+    MO_UINT64 Cr4;
+    MO_UINT64 Cr8;
+    MO_UINT64 Rflags;
+    MO_UINT64 Ldtr;
+    MO_UINT64 Tr;
+    MO_UINT64 Gdtr[2];
+    MO_UINT64 Idtr[2];
+    MO_UINT64 Rip;
+    MO_UINT64 Gs;
+    MO_UINT64 Fs;
+    MO_UINT64 Es;
+    MO_UINT64 Ds;
+    MO_UINT64 Cs;
+    MO_UINT64 Ss;
+    MO_UINT64 Rdi;
+    MO_UINT64 Rsi;
+    MO_UINT64 Rbp;
+    MO_UINT64 Rsp;
+    MO_UINT64 Rbx;
+    MO_UINT64 Rdx;
+    MO_UINT64 Rcx;
+    MO_UINT64 Rax;
+    MO_UINT64 R8;
+    MO_UINT64 R9;
+    MO_UINT64 R10;
+    MO_UINT64 R11;
+    MO_UINT64 R12;
+    MO_UINT64 R13;
+    MO_UINT64 R14;
+    MO_UINT64 R15;
+} MO_RUNTIME_X64_INTERRUPT_CONTEXT, *PMO_RUNTIME_X64_INTERRUPT_CONTEXT;
+
+/**
+ * @brief The prototype for x64 interrupt handler.
+ * @param InterruptType The type of the interrupt.
+ * @param InterruptContext The context of the interrupt.
+ */
+typedef VOID(MOAPI* PMO_RUNTIME_X64_INTERRUPT_HANDLER)(
+    _In_ MO_RUNTIME_X64_INTERRUPT_TYPE InterruptType,
+    _In_ PMO_RUNTIME_X64_INTERRUPT_CONTEXT InterruptContext);
+
+/**
+ * @brief The interrupt descriptor table handlers for x64 architecture. Because
+ *        each entry must be no more than 8 bytes and must be 8-byte aligned,
+ *        which allows the C code to compute the address of each vector as an
+ *        array index.
+ */
+EXTERN_C MO_POINTER MOAPI MoPlatformInterruptDescriptorTableHandler[256];
 
 #ifndef MO_RUNTIME_X64_PAGE_SIZE
 #define MO_RUNTIME_X64_PAGE_SIZE 0x1000
