@@ -354,31 +354,31 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     cld
 
     ; MO_UINT32  ExceptionData;
-    push    qword ptr [rbp + 16]
+    push qword ptr [rbp + 16]
 
     ; Call into exception handler
-    movzx   rcx, byte ptr [rbp + 8]
-    lea     rax, MoPlatformInterruptHandlers
-    mov     rax, [rax + rcx * 8]
-    test    rax, rax                        ; NULL?
-    jz      NonNullValue;
+    movzx rcx, byte ptr [rbp + 8]
+    lea rax, MoPlatformInterruptHandlers
+    mov rax, [rax + rcx * 8]
+    test rax, rax                        ; NULL?
+    jz NonNullValue;
 
     ; Prepare parameter and call
-    mov     rdx, rsp
+    mov rdx, rsp
 
     ; Per X64 calling convention, allocate maximum parameter stack space and
     ; make sure RSP is 16-byte aligned
 
-    sub     rsp, 4 * 8 + 8
-    call    rax
-    add     rsp, 4 * 8 + 8
+    sub rsp, 4 * 8 + 8
+    call rax
+    add rsp, 4 * 8 + 8
 
 NonNullValue:
     ; BUGBUG: This should not be necessary, but it's currently true that
     ; interrupt handlers enable interrupts
     cli 
     ; MO_UINT64  ExceptionData;
-    add     rsp, 8
+    add rsp, 8
 
     ; MO_RUNTIME_X64_FXSAVE_AREA FxSaveState;
 
