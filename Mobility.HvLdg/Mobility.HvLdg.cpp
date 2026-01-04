@@ -38,7 +38,10 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
         return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
-    return ::MoMemorySmallHeapAllocate(Block, &g_InternalHeap, Size);
+    return ::MoMemorySmallHeapAllocate(
+        Block,
+        &g_InternalHeap,
+        static_cast<MO_UINT16>(Size));
 }
 
 EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
@@ -62,7 +65,7 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
         UpdatedBlock,
         &g_InternalHeap,
         Block,
-        NewSize);
+        static_cast<MO_UINT16>(NewSize));
 }
 
 void SimpleDemo(
