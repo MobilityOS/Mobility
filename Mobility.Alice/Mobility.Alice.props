@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PROJECT:    Mobility
+  FILE:       Mobility.Alice.props
+  PURPOSE:    MSBuild Properties for Mobility.Alice
+
+  LICENSE:    The MIT License
+
+  MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <IncludePath>$(MSBuildThisFileDirectory);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>$(OutDir)Mobility.Alice.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)Mobility.Alice.vcxproj">
+      <Project>{D0918042-BC5F-474A-9561-47212A324182}</Project>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
