@@ -285,7 +285,7 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
             _In_ MO_POINTER Right,
             _In_ MO_POINTER Context) -> MO_INTN MOAPI
     {
-        Context; // Unused parameter.
+        MO_UNREFERENCED_PARAMETER(Context);
         PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM LeftItem =
             reinterpret_cast<PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM>(Left);
         PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM RightItem =
