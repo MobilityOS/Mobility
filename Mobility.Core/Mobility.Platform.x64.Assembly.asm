@@ -1,6 +1,6 @@
 ;
 ; PROJECT:    Mobility
-; FILE:       Mobility.Runtime.x64.Assembly.asm
+; FILE:       Mobility.Platform.x64.Assembly.asm
 ; PURPOSE:    Implementation for Mobility Runtime x64 Specific Assembly Parts
 ;
 ; LICENSE:    The MIT License
@@ -100,7 +100,7 @@ MoPlatformWriteCr3 ENDP
 
 ; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
-;     _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
+;     _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 ; -----------------------------------------------------------------------------
 MoPlatformLoadGlobalDescriptorTable PROC
     ; RCX = Descriptor
@@ -111,7 +111,7 @@ MoPlatformLoadGlobalDescriptorTable ENDP
 
 ; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
-;     _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
+;     _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 ; -----------------------------------------------------------------------------
 MoPlatformLoadInterruptDescriptorTable PROC
     ; RCX = Descriptor
@@ -188,7 +188,7 @@ MoPlatformSwitchToNewStack PROC
     ; Call the function.
     call rdx
 
-    ; If the function returns, we halt because the stack has been switched 
+    ; If the function returns, we halt because the stack has been switched
     ; and we cannot return to the original caller.
     cli
 HaltLoop:
@@ -197,7 +197,7 @@ HaltLoop:
 MoPlatformSwitchToNewStack ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C PMO_RUNTIME_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
+; EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
 ; -----------------------------------------------------------------------------
 ; The external array of interrupt handlers.
 EXTRN MoPlatformInterruptHandlers: QWORD
@@ -240,7 +240,7 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     ; +---------------------+ <-- RBP, 16-byte aligned
 
     ; Since here the stack pointer is 16-byte aligned, so
-    ; MO_RUNTIME_X64_FXSAVE_AREA of PMO_RUNTIME_X64_INTERRUPT_CONTEXT
+    ; MO_PLATFORM_X64_FXSAVE_AREA of PMO_PLATFORM_X64_INTERRUPT_CONTEXT
     ; is 16-byte aligned
 
     ; MO_UINT64 Rdi, Rsi, Rbp, Rsp, Rbx, Rdx, Rcx, Rax;
@@ -343,7 +343,7 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     mov rax, dr0
     push rax
 
-    ; MO_RUNTIME_X64_FXSAVE_AREA FxSaveState;
+    ; MO_PLATFORM_X64_FXSAVE_AREA FxSaveState;
 
     sub rsp, 512
     mov rcx, rsp
@@ -376,11 +376,11 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
 NonNullValue:
     ; BUGBUG: This should not be necessary, but it's currently true that
     ; interrupt handlers enable interrupts
-    cli 
+    cli
     ; MO_UINT64  ExceptionData;
     add rsp, 8
 
-    ; MO_RUNTIME_X64_FXSAVE_AREA FxSaveState;
+    ; MO_PLATFORM_X64_FXSAVE_AREA FxSaveState;
 
     mov rcx, rsp
     fxrstor [rcx]
@@ -504,7 +504,7 @@ ALIGN 8
 
     IF DummyCodeNeeded
         ; Push a dummy error code. Use rax to get a 1-byte instruction to fit.
-        push rax           
+        push rax
     ENDIF
 
     ; Must use LOW(Vector) to ensure only use 2-byte instruction to push vector

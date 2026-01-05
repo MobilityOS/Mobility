@@ -1,6 +1,6 @@
 ﻿/*
  * PROJECT:    Mobility
- * FILE:       Mobility.Runtime.x64.h
+ * FILE:       Mobility.Platform.x64.h
  * PURPOSE:    Definition for Mobility Runtime x64 Specific Parts
  *
  * LICENSE:    The MIT License
@@ -8,8 +8,8 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
-#ifndef MOBILITY_RUNTIME_X64
-#define MOBILITY_RUNTIME_X64
+#ifndef MOBILITY_PLATFORM_X64
+#define MOBILITY_PLATFORM_X64
 
 #define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
@@ -28,20 +28,20 @@
  *             3.4.5.1 Code- and Data-Segment Descriptor Types
  *               Table 3-1. Code- and Data-Segment Types
  */
-#ifndef MO_RUNTIME_X64_SEGMENT_TYPES_DEFINED
-#define MO_RUNTIME_X64_SEGMENT_TYPES_DEFINED
+#ifndef MO_PLATFORM_X64_SEGMENT_TYPES_DEFINED
+#define MO_PLATFORM_X64_SEGMENT_TYPES_DEFINED
 
-#define MO_RUNTIME_X64_SEGMENT_TYPE_DATA_ACCESSED 0x1
-#define MO_RUNTIME_X64_SEGMENT_TYPE_DATA_WRITE_ENABLE 0x2
-#define MO_RUNTIME_X64_SEGMENT_TYPE_DATA_EXPANSION_DIRECTION 0x4
+#define MO_PLATFORM_X64_SEGMENT_TYPE_DATA_ACCESSED 0x1
+#define MO_PLATFORM_X64_SEGMENT_TYPE_DATA_WRITE_ENABLE 0x2
+#define MO_PLATFORM_X64_SEGMENT_TYPE_DATA_EXPANSION_DIRECTION 0x4
 
-#define MO_RUNTIME_X64_SEGMENT_TYPE_CODE_ACCESSED 0x1
-#define MO_RUNTIME_X64_SEGMENT_TYPE_CODE_READ_ENABLE 0x2
-#define MO_RUNTIME_X64_SEGMENT_TYPE_CODE_CONFORMING 0x4
+#define MO_PLATFORM_X64_SEGMENT_TYPE_CODE_ACCESSED 0x1
+#define MO_PLATFORM_X64_SEGMENT_TYPE_CODE_READ_ENABLE 0x2
+#define MO_PLATFORM_X64_SEGMENT_TYPE_CODE_CONFORMING 0x4
 
-#define MO_RUNTIME_X64_SEGMENT_TYPE_CODE 0x8
+#define MO_PLATFORM_X64_SEGMENT_TYPE_CODE 0x8
 
-#endif // !MO_RUNTIME_X64_SEGMENT_TYPES_DEFINED
+#endif // !MO_PLATFORM_X64_SEGMENT_TYPES_DEFINED
 
 /**
  * @brief The definition of 64-Bit Segment Descriptor.
@@ -51,7 +51,7 @@
  *             Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
  *               3.4.5 Segment Descriptors
  */
-typedef union _MO_RUNTIME_X64_SEGMENT_DESCRIPTOR
+typedef union _MO_PLATFORM_X64_SEGMENT_DESCRIPTOR
 {
     struct
     {
@@ -68,7 +68,7 @@ typedef union _MO_RUNTIME_X64_SEGMENT_DESCRIPTOR
          */
         MO_UINT32 BaseMiddle : 8;
         /**
-         * @brief Type field (MO_RUNTIME_X64_SEGMENT_TYPE_*)
+         * @brief Type field (MO_PLATFORM_X64_SEGMENT_TYPE_*)
          */
         MO_UINT32 Type : 4;
         /**
@@ -110,7 +110,7 @@ typedef union _MO_RUNTIME_X64_SEGMENT_DESCRIPTOR
         MO_UINT32 BaseHigh : 8;
     };
     MO_UINT64 RawData;
-} MO_RUNTIME_X64_SEGMENT_DESCRIPTOR, *PMO_RUNTIME_X64_SEGMENT_DESCRIPTOR;
+} MO_PLATFORM_X64_SEGMENT_DESCRIPTOR, *PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR;
 
 /*
  * @remark Intel(R) 64 and IA-32 Architectures Software Developer's Manual
@@ -119,14 +119,14 @@ typedef union _MO_RUNTIME_X64_SEGMENT_DESCRIPTOR
  *             Section 3.5 SYSTEM DESCRIPTOR TYPES
  *               Table 3-2. System-Segment and Gate-Descriptor Types
  */
-#ifndef MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPES_DEFINED
-#define MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPES_DEFINED
+#ifndef MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPES_DEFINED
+#define MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPES_DEFINED
 
-#define MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPE_LDT 0x2
-#define MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPE_TSS_AVAILABLE 0x9
-#define MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPE_TSS_BUSY 0xB
+#define MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPE_LDT 0x2
+#define MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPE_TSS_AVAILABLE 0x9
+#define MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPE_TSS_BUSY 0xB
 
-#endif // !MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPES_DEFINED
+#endif // !MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPES_DEFINED
 
 /**
  * @brief The definition of 64-Bit System Segment Descriptor.
@@ -136,7 +136,7 @@ typedef union _MO_RUNTIME_X64_SEGMENT_DESCRIPTOR
  *             Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
  *               8.2.3 TSS Descriptor in 64-bit mode
  */
-typedef union _MO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR
+typedef union _MO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR
 {
     struct
     {
@@ -153,7 +153,7 @@ typedef union _MO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR
          */
         MO_UINT32 BaseMiddleLow : 8;
         /**
-         * @brief Type field (MO_RUNTIME_X64_SYSTEM_SEGMENT_TYPE_*)
+         * @brief Type field (MO_PLATFORM_X64_SYSTEM_SEGMENT_TYPE_*)
          */
         MO_UINT32 Type : 4;
         /**
@@ -198,9 +198,9 @@ typedef union _MO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR
         MO_UINT32 Reserved2 : 32;
     };
     MO_UINT64 RawData[2];
-} MO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR, *PMO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR;
+} MO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR, *PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR;
 
-#pragma pack(push, MO_RUNTIME_X64_TASK_STATE_SEGMENT_PRAGMA_PACK, 4)
+#pragma pack(push, MO_PLATFORM_X64_TASK_STATE_SEGMENT_PRAGMA_PACK, 4)
 /**
  * @brief The definition of 64-Bit TSS Descriptor.
  * @remark For more information, see these references:
@@ -209,7 +209,7 @@ typedef union _MO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR
  *             Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
  *               8.7 TASK MANAGEMENT IN 64-BIT MODE
  */
-typedef struct _MO_RUNTIME_X64_TASK_STATE_SEGMENT
+typedef struct _MO_PLATFORM_X64_TASK_STATE_SEGMENT
 {
     /**
      * @brief Reserved bits. Set to 0.
@@ -242,8 +242,8 @@ typedef struct _MO_RUNTIME_X64_TASK_STATE_SEGMENT
      *        TSS base.
      */
     MO_UINT16 IoMapBaseAddress;
-} MO_RUNTIME_X64_TASK_STATE_SEGMENT, *PMO_RUNTIME_X64_TASK_STATE_SEGMENT;
-#pragma pack(pop, MO_RUNTIME_X64_TASK_STATE_SEGMENT_PRAGMA_PACK)
+} MO_PLATFORM_X64_TASK_STATE_SEGMENT, *PMO_PLATFORM_X64_TASK_STATE_SEGMENT;
+#pragma pack(pop, MO_PLATFORM_X64_TASK_STATE_SEGMENT_PRAGMA_PACK)
 
 /*
  * @remark Intel(R) 64 and IA-32 Architectures Software Developer's Manual
@@ -252,14 +252,14 @@ typedef struct _MO_RUNTIME_X64_TASK_STATE_SEGMENT
  *             Section 3.5 SYSTEM DESCRIPTOR TYPES
  *               Table 3-2. System-Segment and Gate-Descriptor Types
  */
-#ifndef MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPES_DEFINED
-#define MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPES_DEFINED
+#ifndef MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPES_DEFINED
+#define MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPES_DEFINED
 
-#define MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPE_CALL 0xC
-#define MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPE_INTERRUPT 0xE
-#define MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPE_TRAP 0xF
+#define MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPE_CALL 0xC
+#define MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPE_INTERRUPT 0xE
+#define MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPE_TRAP 0xF
 
-#endif // !MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPES_DEFINED
+#endif // !MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPES_DEFINED
 
 /**
  * @brief The definition of 64-Bit IDT Gate Descriptor.
@@ -269,7 +269,7 @@ typedef struct _MO_RUNTIME_X64_TASK_STATE_SEGMENT
  *             Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
  *               Section 6.14.1 64-Bit Mode IDT
  */
-typedef union _MO_RUNTIME_X64_IDT_GATE_DESCRIPTOR
+typedef union _MO_PLATFORM_X64_IDT_GATE_DESCRIPTOR
 {
     struct
     {
@@ -290,7 +290,7 @@ typedef union _MO_RUNTIME_X64_IDT_GATE_DESCRIPTOR
          */
         MO_UINT8 Reserved0 : 5;
         /**
-        * @brief Type field (MO_RUNTIME_X64_GATE_DESCRIPTOR_TYPE_*)
+        * @brief Type field (MO_PLATFORM_X64_GATE_DESCRIPTOR_TYPE_*)
         */
         MO_UINT8 Type : 4;
         /**
@@ -319,9 +319,9 @@ typedef union _MO_RUNTIME_X64_IDT_GATE_DESCRIPTOR
         MO_UINT32 Reserved2;
     };
     MO_UINT64 RawData[2];
-} MO_RUNTIME_X64_IDT_GATE_DESCRIPTOR, *PMO_RUNTIME_X64_IDT_GATE_DESCRIPTOR;
+} MO_PLATFORM_X64_IDT_GATE_DESCRIPTOR, *PMO_PLATFORM_X64_IDT_GATE_DESCRIPTOR;
 
-#pragma pack(push, MO_RUNTIME_X64_PSEUDO_DESCRIPTOR_PRAGMA_PACK, 1)
+#pragma pack(push, MO_PLATFORM_X64_PSEUDO_DESCRIPTOR_PRAGMA_PACK, 1)
 /**
  * @brief The definition of 64-Bit Pseudo Descriptor.
  * @remark For more information, see these references:
@@ -331,7 +331,7 @@ typedef union _MO_RUNTIME_X64_IDT_GATE_DESCRIPTOR
  *               3.5.1 Segment Descriptor Tables
  *                 Figure 3-11. Pseudo-Descriptor Formats
  */
-typedef struct _MO_RUNTIME_X64_PSEUDO_DESCRIPTOR
+typedef struct _MO_PLATFORM_X64_PSEUDO_DESCRIPTOR
 {
     /**
      * @brief The size of the table in bytes subtracted by 1. This subtraction
@@ -345,8 +345,8 @@ typedef struct _MO_RUNTIME_X64_PSEUDO_DESCRIPTOR
      *        address, paging applies).
      */
     MO_UINT64 Base;
-} MO_RUNTIME_X64_PSEUDO_DESCRIPTOR, *PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR;
-#pragma pack(pop, MO_RUNTIME_X64_PSEUDO_DESCRIPTOR_PRAGMA_PACK)
+} MO_PLATFORM_X64_PSEUDO_DESCRIPTOR, *PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR;
+#pragma pack(pop, MO_PLATFORM_X64_PSEUDO_DESCRIPTOR_PRAGMA_PACK)
 
 /**
  * @brief The definition of Page-Directory Entries that maps a page.
@@ -357,7 +357,7 @@ typedef struct _MO_RUNTIME_X64_PSEUDO_DESCRIPTOR
  *               4.5.4 Linear-Address Translation with 4-Level Paging and
  *               5-Level Paging
  */
-typedef union _MO_RUNTIME_X64_PAGE_TABLE_ENTRY
+typedef union _MO_PLATFORM_X64_PAGE_TABLE_ENTRY
 {
     struct
     {
@@ -377,7 +377,7 @@ typedef union _MO_RUNTIME_X64_PAGE_TABLE_ENTRY
         MO_UINT64 US : 1;
         /**
          * @brief Page-level write-through; indirectly determines the memory
-         *        type used to access the page referenced by this entry 
+         *        type used to access the page referenced by this entry
          */
         MO_UINT64 PWT : 1;
         /**
@@ -525,7 +525,7 @@ typedef union _MO_RUNTIME_X64_PAGE_TABLE_ENTRY
         MO_UINT64 Reserved_1G_3 : 12;
     };
     MO_UINT64 RawData;
-} MO_RUNTIME_X64_PAGE_TABLE_ENTRY, *PMO_RUNTIME_X64_PAGE_TABLE_ENTRY;
+} MO_PLATFORM_X64_PAGE_TABLE_ENTRY, *PMO_PLATFORM_X64_PAGE_TABLE_ENTRY;
 
 /**
  * @brief The definition of Page-Directory Entry that maps a page table.
@@ -536,7 +536,7 @@ typedef union _MO_RUNTIME_X64_PAGE_TABLE_ENTRY
  *               4.5.4 Linear-Address Translation with 4-Level Paging and
  *               5-Level Paging
  */
-typedef union _MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY
+typedef union _MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY
 {
     struct
     {
@@ -595,7 +595,7 @@ typedef union _MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY
         MO_UINT64 XD : 1;
     };
     MO_UINT64 RawData;
-} MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY, *PMO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY;
+} MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY, *PMO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY;
 
 /**
  * @brief The interrupt types for x64 architecture.
@@ -606,90 +606,90 @@ typedef union _MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY
  *               Section 6.3.1 External Interrupts
  *                 Table 6-1. Protected-Mode Exceptions and Interrupts
  */
-#ifndef MO_RUNTIME_X64_INTERRUPT_TYPES_DEFINED
+#ifndef MO_PLATFORM_X64_INTERRUPT_TYPES_DEFINED
 
 /**
  * @brief Divide Error (#DE)
  */
-#define MO_RUNTIME_X64_INTERRUPT_DIVIDE_ERROR 0
+#define MO_PLATFORM_X64_INTERRUPT_DIVIDE_ERROR 0
 /**
  * @brief Debug Exception (#DB)
  */
-#define MO_RUNTIME_X64_INTERRUPT_DEBUG_EXCEPTION 1
+#define MO_PLATFORM_X64_INTERRUPT_DEBUG_EXCEPTION 1
 /**
  * @brief NMI Interrupt
  */
-#define MO_RUNTIME_X64_INTERRUPT_NMI_INTERRUPT 2
+#define MO_PLATFORM_X64_INTERRUPT_NMI_INTERRUPT 2
 /**
  * @brief Breakpoint (#BP)
  */
-#define MO_RUNTIME_X64_INTERRUPT_BREAKPOINT 3
+#define MO_PLATFORM_X64_INTERRUPT_BREAKPOINT 3
 /**
  * @brief Overflow (#OF)
  */
-#define MO_RUNTIME_X64_INTERRUPT_OVERFLOW 4
+#define MO_PLATFORM_X64_INTERRUPT_OVERFLOW 4
 /**
  * @brief BOUND Range Exceeded (#BR)
  */
-#define MO_RUNTIME_X64_INTERRUPT_BOUND_RANGE_EXCEEDED 5
+#define MO_PLATFORM_X64_INTERRUPT_BOUND_RANGE_EXCEEDED 5
 /**
  * @brief Invalid Opcode (Undefined Opcode) (#UD)
  */
-#define MO_RUNTIME_X64_INTERRUPT_INVALID_OPCODE 6
+#define MO_PLATFORM_X64_INTERRUPT_INVALID_OPCODE 6
 /**
  * @brief Device Not Available (No Math Coprocessor) (#NM)
  */
-#define MO_RUNTIME_X64_INTERRUPT_DEVICE_NOT_AVAILABLE 7
+#define MO_PLATFORM_X64_INTERRUPT_DEVICE_NOT_AVAILABLE 7
 /**
  * @brief Double Fault (#DF)
  */
-#define MO_RUNTIME_X64_INTERRUPT_DOUBLE_FAULT 8
+#define MO_PLATFORM_X64_INTERRUPT_DOUBLE_FAULT 8
 /**
  * @brief Invalid TSS (#TS)
  */
-#define MO_RUNTIME_X64_INTERRUPT_INVALID_TSS 10
+#define MO_PLATFORM_X64_INTERRUPT_INVALID_TSS 10
 /**
  * @brief Segment Not Present (#NP)
  */
-#define MO_RUNTIME_X64_INTERRUPT_SEGMENT_NOT_PRESENT 11
+#define MO_PLATFORM_X64_INTERRUPT_SEGMENT_NOT_PRESENT 11
 /**
  * @brief Stack-Segment Fault (#SS)
  */
-#define MO_RUNTIME_X64_INTERRUPT_STACK_SEGMENT_FAULT 12
+#define MO_PLATFORM_X64_INTERRUPT_STACK_SEGMENT_FAULT 12
 /**
  * @brief General Protection (#GP)
  */
-#define MO_RUNTIME_X64_INTERRUPT_GENERAL_PROTECTION 13
+#define MO_PLATFORM_X64_INTERRUPT_GENERAL_PROTECTION 13
 /**
  * @brief Page Fault (#PF)
  */
-#define MO_RUNTIME_X64_INTERRUPT_PAGE_FAULT 14
+#define MO_PLATFORM_X64_INTERRUPT_PAGE_FAULT 14
 /**
  * @brief x87 FPU Floating-Point Error (Math Fault) (#MF)
  */
-#define MO_RUNTIME_X64_INTERRUPT_FPU_FLOATING_POINT_ERROR 16
+#define MO_PLATFORM_X64_INTERRUPT_FPU_FLOATING_POINT_ERROR 16
 /**
  * @brief Alignment Check (#AC)
  */
-#define MO_RUNTIME_X64_INTERRUPT_ALIGNMENT_CHECK 17
+#define MO_PLATFORM_X64_INTERRUPT_ALIGNMENT_CHECK 17
 /**
  * @brief Machine Check (#MC)
  */
-#define MO_RUNTIME_X64_INTERRUPT_MACHINE_CHECK 18
+#define MO_PLATFORM_X64_INTERRUPT_MACHINE_CHECK 18
 /**
  * @brief SIMD Floating-Point Exception (#XM)
  */
-#define MO_RUNTIME_X64_INTERRUPT_SIMD_FLOATING_POINT_EXCEPTION 19
+#define MO_PLATFORM_X64_INTERRUPT_SIMD_FLOATING_POINT_EXCEPTION 19
 /**
  * @brief Virtualization Exception (#VE)
  */
-#define MO_RUNTIME_X64_INTERRUPT_VIRTUALIZATION_EXCEPTION 20
+#define MO_PLATFORM_X64_INTERRUPT_VIRTUALIZATION_EXCEPTION 20
 /**
  * @brief Control Protection Exception (#CP)
  */
-#define MO_RUNTIME_X64_INTERRUPT_CONTROL_PROTECTION_EXCEPTION 21
+#define MO_PLATFORM_X64_INTERRUPT_CONTROL_PROTECTION_EXCEPTION 21
 
-#endif // !MO_RUNTIME_X64_INTERRUPT_TYPES_DEFINED
+#endif // !MO_PLATFORM_X64_INTERRUPT_TYPES_DEFINED
 
 /**
  * @brief The FXSAVE area for x64 architecture.
@@ -700,7 +700,7 @@ typedef union _MO_RUNTIME_X64_PAGE_DIRECTORY_ENTRY
  *               Section 10.5.1 FXSAVE Area
  *                 Table 10-2.  Format of an FXSAVE Area
  */
-typedef struct _MO_RUNTIME_X64_FXSAVE_AREA
+typedef struct _MO_PLATFORM_X64_FXSAVE_AREA
 {
     MO_UINT16 Fcw;
     MO_UINT16 Fsw;
@@ -744,8 +744,8 @@ typedef struct _MO_RUNTIME_X64_FXSAVE_AREA
     MO_UINT8 Xmm14[16];
     MO_UINT8 Xmm15[16];
     MO_UINT8 Reserved9[96];
-} MO_RUNTIME_X64_FXSAVE_AREA, *PMO_RUNTIME_X64_FXSAVE_AREA;
-MO_C_STATIC_ASSERT(sizeof(MO_RUNTIME_X64_FXSAVE_AREA) == 512);
+} MO_PLATFORM_X64_FXSAVE_AREA, *PMO_PLATFORM_X64_FXSAVE_AREA;
+MO_C_STATIC_ASSERT(sizeof(MO_PLATFORM_X64_FXSAVE_AREA) == 512);
 
 #ifdef _MSC_VER
 #if (_MSC_VER >= 1200)
@@ -819,7 +819,7 @@ EXTERN_C VOID MOAPI MoPlatformWriteCr3(
  *                   address and limit of the GDT.
  */
 EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
-    _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
+    _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**
  * @brief Loads the Interrupt Descriptor Table (IDT) with the specified
@@ -828,7 +828,7 @@ EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
  *                   address and limit of the IDT.
  */
 EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
-    _In_ PMO_RUNTIME_X64_PSEUDO_DESCRIPTOR Descriptor);
+    _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**
  * @brief Sets the code segment selector to the specified segment selector.
@@ -865,15 +865,15 @@ EXTERN_C VOID MOAPI MoPlatformSwitchToNewStack(
 /**
  * @brief The interrupt for x64 architecture to be hooked.
  */
-typedef MO_INTN MO_RUNTIME_X64_INTERRUPT_TYPE;
+typedef MO_INTN MO_PLATFORM_X64_INTERRUPT_TYPE;
 
 /**
  * @brief The interrupt context for x64 architecture.
  */
-typedef struct _MO_RUNTIME_X64_INTERRUPT_CONTEXT
+typedef struct _MO_PLATFORM_X64_INTERRUPT_CONTEXT
 {
     MO_UINT64 ExceptionData;
-    MO_RUNTIME_X64_FXSAVE_AREA FxSaveState;
+    MO_PLATFORM_X64_FXSAVE_AREA FxSaveState;
     MO_UINT64 Dr0;
     MO_UINT64 Dr1;
     MO_UINT64 Dr2;
@@ -914,21 +914,21 @@ typedef struct _MO_RUNTIME_X64_INTERRUPT_CONTEXT
     MO_UINT64 R13;
     MO_UINT64 R14;
     MO_UINT64 R15;
-} MO_RUNTIME_X64_INTERRUPT_CONTEXT, *PMO_RUNTIME_X64_INTERRUPT_CONTEXT;
+} MO_PLATFORM_X64_INTERRUPT_CONTEXT, *PMO_PLATFORM_X64_INTERRUPT_CONTEXT;
 
 /**
  * @brief The prototype for x64 interrupt handler.
  * @param InterruptType The type of the interrupt.
  * @param InterruptContext The context of the interrupt.
  */
-typedef VOID(MOAPI* PMO_RUNTIME_X64_INTERRUPT_HANDLER)(
-    _In_ MO_RUNTIME_X64_INTERRUPT_TYPE InterruptType,
-    _In_ PMO_RUNTIME_X64_INTERRUPT_CONTEXT InterruptContext);
+typedef VOID(MOAPI* PMO_PLATFORM_X64_INTERRUPT_HANDLER)(
+    _In_ MO_PLATFORM_X64_INTERRUPT_TYPE InterruptType,
+    _In_ PMO_PLATFORM_X64_INTERRUPT_CONTEXT InterruptContext);
 
 /**
  * @brief The interrupt handlers for x64 architecture.
  */
-EXTERN_C PMO_RUNTIME_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
+EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
 
 /**
  * @brief The interrupt descriptor table handlers for x64 architecture. Because
@@ -944,7 +944,7 @@ EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
  * @param Base The Base value.
  */
 EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
-    _Out_ PMO_RUNTIME_X64_SEGMENT_DESCRIPTOR Descriptor,
+    _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Base);
 
 /**
@@ -953,7 +953,7 @@ EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
  * @param Limit The Limit value which should be 20-Bit.
  */
 EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
-    _Out_ PMO_RUNTIME_X64_SEGMENT_DESCRIPTOR Descriptor,
+    _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Limit);
 
 /**
@@ -962,7 +962,7 @@ EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
  * @param Base The Base value.
  */
 EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
-    _Out_ PMO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
+    _Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT64 Base);
 
 /**
@@ -971,7 +971,7 @@ EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
  * @param Limit The Limit value which should be 20-Bit.
  */
 EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
-    _Out_ PMO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
+    _Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Limit);
 
 /**
@@ -980,7 +980,7 @@ EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
  * @param Base The Offset value.
  */
 EXTERN_C VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
-    _Out_ PMO_RUNTIME_X64_IDT_GATE_DESCRIPTOR Descriptor,
+    _Out_ PMO_PLATFORM_X64_IDT_GATE_DESCRIPTOR Descriptor,
     _In_ MO_UINT64 Offset);
 
-#endif // !MOBILITY_RUNTIME_X64
+#endif // !MOBILITY_PLATFORM_X64
