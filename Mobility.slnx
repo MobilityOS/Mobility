@@ -3,7 +3,11 @@
     <Platform Name="ARM64" />
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="Mobility.Alice/Mobility.Alice.vcxproj" />
+  <Project Path="Mobility.Alice/Mobility.Alice.vcxproj" Id="d0918042-bc5f-474a-9561-47212a324182" />
+  <Project Path="Mobility.Core.HyperV/Mobility.Core.HyperV.vcxproj" Id="8c93371f-b0b1-42c4-9d2c-1129387b3126">
+    <Platform Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
   <Project Path="Mobility.Core.Uefi/Mobility.Core.Uefi.vcxproj" Id="3fbdcf0b-51b2-47d8-990a-381f636add5d" />
   <Project Path="Mobility.Core/Mobility.Core.vcxproj" Id="13e81037-2bc9-4dc8-91ae-6b463759269b" />
   <Project Path="Mobility.HvGcs/Mobility.HvGcs.vcxproj" Id="30b9de98-9479-4e1b-aafa-d754bd5f7182">
