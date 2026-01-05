@@ -9,7 +9,10 @@
     <Platform Project="x64" />
     <Build Solution="*|ARM64" Project="false" />
   </Project>
-  <Project Path="Mobility.HvLdg/Mobility.HvLdg.vcxproj" Id="0394c1dc-71da-4312-ace7-e1cefbfd126a" />
+  <Project Path="Mobility.HvLdg/Mobility.HvLdg.vcxproj" Id="0394c1dc-71da-4312-ace7-e1cefbfd126a">
+    <Platform Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
   <Project Path="Mobility.MinUap/Mobility.MinUap.vcxproj" Id="a158bb1b-480d-4622-b0f1-517d8f366bc1" />
   <Project Path="Mobility.OneCent/Mobility.OneCent.vcxproj" Id="049b9a7f-7074-41fb-8779-fbebedd302f6">
     <Platform Project="x64" />
