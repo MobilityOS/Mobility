@@ -24,11 +24,6 @@ EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
     }
 }
 
-/**
- * @brief Set the Limit value for the specific 64-Bit Segment Descriptor.
- * @param Descriptor The pointer to a 64-Bit Segment Descriptor.
- * @param Limit The Limit value which should be 20-Bit.
- */
 EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
     _Out_ PMO_RUNTIME_X64_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Limit)
@@ -40,11 +35,6 @@ EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
     }
 }
 
-/**
- * @brief Set the Base value for the specific 64-Bit System Segment Descriptor.
- * @param Descriptor The pointer to a 64-Bit System Segment Descriptor.
- * @param Base The Base value.
- */
 EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
     _Out_ PMO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT64 Base)
@@ -58,11 +48,6 @@ EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
     }
 }
 
-/**
- * @brief Set the Limit value for the specific 64-Bit System Segment Descriptor.
- * @param Descriptor The pointer to a 64-Bit System Segment Descriptor.
- * @param Limit The Limit value which should be 20-Bit.
- */
 EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
     _Out_ PMO_RUNTIME_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Limit)
@@ -74,11 +59,6 @@ EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
     }
 }
 
-/**
- * @brief Set the Offset value for the specific 64-Bit IDT Gate Descriptor.
- * @param Descriptor The pointer to a 64-Bit IDT Gate Descriptor.
- * @param Base The Offset value.
- */
 EXTERN_C VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
     _Out_ PMO_RUNTIME_X64_IDT_GATE_DESCRIPTOR Descriptor,
     _In_ MO_UINT64 Offset)
