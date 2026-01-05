@@ -11,6 +11,7 @@
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1827" Project="Mile.Project.Cpp.Default.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1827" Project="Mile.Project.Cpp.props" />
   <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.props" />
+  <Import Project="..\Mobility.Core\Mobility.Core.props" />
   <ItemGroup>
     <None Include="Mobility.Core.HyperV.props" />
   </ItemGroup>
