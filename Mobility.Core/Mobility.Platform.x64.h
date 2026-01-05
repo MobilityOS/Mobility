@@ -784,6 +784,27 @@ EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
 EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
 
 /**
+ * @brief The result of the CPUID instruction for x64 architecture.
+ */
+typedef struct _MO_PLATFORM_X64_CPUID_RESULT
+{
+    MO_UINT32 Eax;
+    MO_UINT32 Ebx;
+    MO_UINT32 Ecx;
+    MO_UINT32 Edx;
+} MO_PLATFORM_X64_CPUID_RESULT, *PMO_PLATFORM_X64_CPUID_RESULT;
+
+/**
+ * @brief Reads the result of the CPUID instruction for the specified index.
+ * @param Result A pointer to the structure that receives the result of the
+ *               CPUID instruction.
+ * @param Index The index of the CPUID instruction to read.
+ */
+EXTERN_C VOID MOAPI MoPlatformReadCpuid(
+    _Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
+    _In_ MO_UINT32 Index);
+
+/**
  * @brief Reads the value of the specified Model-Specific Register (MSR).
  * @param Index The index of the MSR to read.
  * @return The value of the specified MSR.

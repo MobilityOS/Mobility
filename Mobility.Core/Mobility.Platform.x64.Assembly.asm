@@ -51,6 +51,28 @@ MoPlatformEnableInterrupts PROC
 MoPlatformEnableInterrupts ENDP
 
 ; -----------------------------------------------------------------------------
+; EXTERN_C VOID MOAPI MoPlatformReadCpuid(
+;     _Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
+;     _In_ MO_UINT32 Index);
+; -----------------------------------------------------------------------------
+MoPlatformReadCpuid PROC
+    ; RCX = Result
+    ; RDX = Index
+
+    push rbx
+    mov r8, rcx
+    mov eax, edx
+    xor ecx, ecx
+    cpuid
+    mov [r8], eax
+    mov [r8 + 4], ebx
+    mov [r8 + 8], ecx
+    mov [r8 + 12], edx
+    pop rbx
+    ret
+MoPlatformReadCpuid ENDP
+
+; -----------------------------------------------------------------------------
 ; EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
 ;     _In_ MO_UINT32 Index);
 ; -----------------------------------------------------------------------------
