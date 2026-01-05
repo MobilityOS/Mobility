@@ -26,7 +26,6 @@
 
 #include <Mobility.HyperV.Core.h>
 
-#include <intrin.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -56,80 +55,6 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
     MO_UNREFERENCED_PARAMETER(Block);
     MO_UNREFERENCED_PARAMETER(NewSize);
     return MO_RESULT_ERROR_NOT_IMPLEMENTED;
-}
-
-/**
- * @brief Checks the Hyper-V guest support availability.
- * @return If the Hyper-V guest support is available to use, the return value
- *         is true, or the return value is false.
- */
-extern "C" bool MoHvCheckAvailability()
-{
-    // Reference: Requirements for Implementing the Microsoft Hypervisor
-    //            Interface
-    //
-    // The minimal interface set required by compliant hypervisors in order to
-    // support Windows operating systems when running in a guest virtual machine
-    // is summarized below. Details of each requirement are provided in
-    // subsequent sections.
-    // - Hypervisor discovery via the CPUID instruction
-    // - Hypervisor CPUID leaves 0x40000000 - 0x40000005
-    // - Hypervisor interface signature equal to "Hv#1"
-    // - Partition privileges AccessVpIndex, AccessHypercallMsrs
-    // - Hypervisor synthetic MSRs HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL
-    //   and HV_X64_MSR_VP_INDEX.
-    // - A minimal implementation of the hypercall interface
-    //
-    // Software determines the presence of a hypervisor through the CPUID
-    // instruction. Processors conforming to the Intel® 64 architecture have
-    // reserved a feature flag in CPUID Function 0x01 - Feature Information for
-    // this purpose.Bit 31 returned in ECX is defined as Not Used, and will
-    // always return 0 from the physical CPU. A hypervisor conformant with the
-    // Microsoft hypervisor interface will set CPUID.1:ECX[bit 31] = 1 to
-    // indicate its presence to software.
-    //
-    // The Intel® 64 architecture reserves CPUID leaves 0x40000000-0x400000FF
-    // for use by system software. A Microsoft-compliant hypervisor guarantees
-    // leaves 0x40000000 and 0x40000001 are always available.
-    // The hypervisor interface identification is provided at CPUID leaf
-    // 0x40000001. Hypervisors conforming to the Microsoft hypervisor interface
-    // will return the hypervisor interface identification signature 'Hv#1'
-    // (0x31237648) in CPUID.40000001:EAX.
-
-    HV_CPUID_RESULT HvCpuIdResult;
-
-    ::MoRuntimeMemoryFillByte(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
-    ::__cpuid(
-        reinterpret_cast<int*>(&HvCpuIdResult),
-        HvCpuIdFunctionVersionAndFeatures);
-    if (!HvCpuIdResult.VersionAndFeatures.HypervisorPresent)
-    {
-        return false;
-    }
-
-    ::MoRuntimeMemoryFillByte(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
-    ::__cpuid(
-        reinterpret_cast<int*>(&HvCpuIdResult),
-        HvCpuIdFunctionHvInterface);
-    if (HvMicrosoftHypervisorInterface != HvCpuIdResult.HvInterface.Interface)
-    {
-        return false;
-    }
-
-    ::MoRuntimeMemoryFillByte(&HvCpuIdResult, 0, sizeof(HV_CPUID_RESULT));
-    ::__cpuid(
-        reinterpret_cast<int*>(&HvCpuIdResult),
-        HvCpuIdFunctionMsHvFeatures);
-    if (!HvCpuIdResult.MsHvFeatures.PartitionPrivileges.AccessHypercallMsrs)
-    {
-        return false;
-    }
-    if (!HvCpuIdResult.MsHvFeatures.PartitionPrivileges.AccessSynicRegs)
-    {
-        return false;
-    }
-
-    return true;
 }
 
 #define MOBILITY_HVGCS_VERSION_UTF8_STRING \
@@ -451,7 +376,8 @@ EFI_STATUS EFIAPI UefiMain(
     {
         ExtendedSystemDescriptionTable = 0u;
     }
-    if (::MoHvCheckAvailability() && ExtendedSystemDescriptionTable)
+    if (MO_RESULT_SUCCESS_OK == ::MoHyperVCheckAvailability() &&
+        ExtendedSystemDescriptionTable)
     {
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
@@ -611,9 +537,9 @@ EFI_STATUS EFIAPI UefiMain(
             using TableType = EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER;
             TableType* SratHeader = reinterpret_cast<TableType*>(
                 SystemResourceAffinityTable);
-            uint8_t* CurrentSratItemEntry = reinterpret_cast<uint8_t*>(
+            PMO_UINT8 CurrentSratItemEntry = reinterpret_cast<PMO_UINT8>(
                 &SratHeader[1]);
-            uint32_t ProcessedSize =
+            MO_UINT32 ProcessedSize =
                 sizeof(EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER);
             while (ProcessedSize < SratHeader->Header.Length)
             {
@@ -622,7 +548,7 @@ EFI_STATUS EFIAPI UefiMain(
                         CurrentSratItemEntry);
                 if (EFI_ACPI_3_0_MEMORY_AFFINITY == CandidateItem->Type)
                 {
-                    uint64_t AddressBase = CandidateItem->AddressBaseHigh;
+                    MO_UINT64 AddressBase = CandidateItem->AddressBaseHigh;
                     AddressBase <<= 32;
                     AddressBase |= CandidateItem->AddressBaseLow;
                     if (AddressBase >= 0x20000000000ULL)
