@@ -63,11 +63,19 @@ typedef struct _MO_PLATFORM_X64_GDT_DESCRIPTORS
     MO_DECLSPEC_ALIGN(MO_PLATFORM_X64_PAGE_SIZE)
 #endif // !MO_PLATFORM_X64_PAGE_ALIGNED
 
+#define MO_PLATFORM_X64_CONSOLE_WIDTH 128
+#define MO_PLATFORM_X64_CONSOLE_HEIGHT 40
+
+#define MO_PLATFORM_X64_CONSOLE_SIZE \
+    (MO_PLATFORM_X64_CONSOLE_WIDTH * MO_PLATFORM_X64_CONSOLE_HEIGHT)
+
 /**
  * @brief The platform-specific context for x64 architecture.
  */
 typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
 {
+    MO_MEMORY_SMALL_HEAP InternalHeap;
+
     MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY PageMapLevel4Entry[512];
 
     MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY PageDirectoryPointerEntry[512];
@@ -85,10 +93,18 @@ typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
     MO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer;
     MO_UINT8 Reserved0_2[512];
     MO_UINT8 Reserved1[1024];
-    MO_WIDE_CHAR ConsoleCharacterBuffer[128 * 40];
+    MO_WIDE_CHAR ConsoleCharacterBuffer[MO_PLATFORM_X64_CONSOLE_SIZE];
 } MO_PLATFORM_X64_PLATFORM_CONTEXT, *PMO_PLATFORM_X64_PLATFORM_CONTEXT;
 
-MO_MEMORY_SMALL_HEAP g_InternalHeap;
+namespace
+{
+    MO_PLATFORM_X64_PLATFORM_CONTEXT g_PlatformContext;
+    const char g_LogoString[] =
+        "Mobility Hyper-V Lightweight Debugger for Guests"
+        " " MOBILITY_MINUAP_VERSION_UTF8_STRING "\r\n"
+        "(c) Kenji Mouri. All rights reserved.\r\n"
+        "\r\n";
+}
 
 EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
     _Out_ PMO_POINTER Block,
@@ -102,14 +118,14 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
 
     return ::MoMemorySmallHeapAllocate(
         Block,
-        &g_InternalHeap,
+        &g_PlatformContext.InternalHeap,
         static_cast<MO_UINT16>(Size));
 }
 
 EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
     _In_ MO_POINTER Block)
 {
-    return ::MoMemorySmallHeapFree(&g_InternalHeap, Block);
+    return ::MoMemorySmallHeapFree(&g_PlatformContext.InternalHeap, Block);
 }
 
 EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
@@ -125,37 +141,107 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
 
     return ::MoMemorySmallHeapReallocate(
         UpdatedBlock,
-        &g_InternalHeap,
+        &g_PlatformContext.InternalHeap,
         Block,
         static_cast<MO_UINT16>(NewSize));
+}
+
+EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
+    _In_ EFI_BOOT_SERVICES* BootServices)
+{
+    if (MO_RESULT_SUCCESS_OK != ::MoRuntimeMemoryFillByte(
+        &g_PlatformContext,
+        0,
+        sizeof(MO_PLATFORM_X64_PLATFORM_CONTEXT)))
+    {
+        // This function should not fail here.
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+
+    if (MO_RESULT_SUCCESS_OK != ::MoMemorySmallHeapInitialize(
+        &g_PlatformContext.InternalHeap))
+    {
+        // This function should not fail here.
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+
+    // PageMapLevel4Entry
+    // PageDirectoryPointerEntry
+    // PageTableEntry
+    // KernelStack
+    // InterruptDescriptorTable
+    // GlobalDescriptorTable
+    // TaskStateSegment
+
+    if (EFI_SUCCESS != ::MoUefiInitializeDisplayFrameBuffer(
+        &g_PlatformContext.DisplayFrameBuffer,
+        BootServices))
+    {
+        // This function should not fail here.
+        return MO_RESULT_ERROR_UNEXPECTED;
+    }
+
+    ::MoConsoleCoreInitializeScreenBuffer(
+        &g_PlatformContext.ConsoleScreenBuffer,
+        MO_PLATFORM_X64_CONSOLE_WIDTH,
+        MO_PLATFORM_X64_CONSOLE_HEIGHT,
+        MO_CONSOLE_DEFAULT_BACKGROUND_COLOR,
+        MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
+        g_PlatformContext.ConsoleCharacterBuffer);
+
+    MoConsoleCoreWriteString(
+        &g_PlatformContext.ConsoleScreenBuffer,
+        g_LogoString,
+        MO_ARRAY_SIZE(g_LogoString));
+
+    MoConsoleCoreRefreshScreen(
+        &g_PlatformContext.DisplayFrameBuffer,
+        &g_PlatformContext.ConsoleScreenBuffer);
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C VOID MOAPI MoPlatformWriteAsciiString(
+    _In_ MO_CONSTANT_STRING String)
+{
+    MO_CHAR StringTemplate[2] = { 0, 0 };
+    while (*String)
+    {
+        StringTemplate[0] = *String++;
+        ::MoConsoleCoreWriteString(
+            &g_PlatformContext.ConsoleScreenBuffer,
+            StringTemplate,
+            sizeof(StringTemplate));
+    }
+    ::MoConsoleCoreRefreshScreen(
+        &g_PlatformContext.DisplayFrameBuffer,
+        &g_PlatformContext.ConsoleScreenBuffer);
 }
 
 void SimpleDemo(
     _In_ EFI_SYSTEM_TABLE* SystemTable)
 {
-    if (MO_RESULT_SUCCESS_OK != ::MoMemorySmallHeapInitialize(&g_InternalHeap))
+    if (MO_RESULT_SUCCESS_OK != ::MoPlatformInitialize(
+        SystemTable->BootServices))
     {
         ::MoUefiConsoleWriteAsciiString(
             SystemTable->ConOut,
-            "Failed to initialize Internal Heap.\r\n");
+            "Failed to initialize Mobility Platform.\r\n");
         return;
     }
-    ::MoUefiConsoleWriteAsciiString(
-        SystemTable->ConOut,
-        "Internal Heap is initialized successfully.\r\n");
+    ::MoPlatformWriteAsciiString(
+        "Mobility Platform initialized successfully.\r\n");
 
     MO_UINT64 ExtendedSystemDescriptionTable = 0u;
     if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryExtendedSystemDescriptionTable(
         &ExtendedSystemDescriptionTable,
         SystemTable))
     {
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
+        ::MoPlatformWriteAsciiString(
             "Unable to locate ACPI XSDT.\r\n");
         return;
     }
-    ::MoUefiConsoleWriteAsciiString(
-        SystemTable->ConOut,
+    ::MoPlatformWriteAsciiString(
         "ACPI XSDT is located successfully.\r\n");
 
     MO_UINT64 SystemResourceAffinityTable = 0u;
@@ -165,13 +251,11 @@ void SimpleDemo(
         EFI_ACPI_3_0_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
         ExtendedSystemDescriptionTable))
     {
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
+        ::MoPlatformWriteAsciiString(
             "Unable to locate ACPI SRAT.\r\n");
         return;
     }
-    ::MoUefiConsoleWriteAsciiString(
-        SystemTable->ConOut,
+    ::MoPlatformWriteAsciiString(
         "ACPI SRAT is located successfully.\r\n");
 
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MemoryHoleRanges = nullptr;
@@ -181,13 +265,11 @@ void SimpleDemo(
         &MemoryHolesCount,
         SystemResourceAffinityTable))
     {
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
+        ::MoPlatformWriteAsciiString(
             "No Memory Holes found from ACPI SRAT.\r\n");
         return;
     }
-    ::MoUefiConsoleWriteAsciiString(
-        SystemTable->ConOut,
+    ::MoPlatformWriteAsciiString(
         "Memory Holes found from ACPI SRAT:\r\n");
 
     for (MO_UINTN i = 0; i < MemoryHolesCount; ++i)
@@ -195,8 +277,7 @@ void SimpleDemo(
         // 19 characters: "0x" + 16 hex digits + '\0'
         MO_CHAR AddressBuffer[19];
 
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
+        ::MoPlatformWriteAsciiString(
             "Hole Address: ");
         if (MO_RESULT_SUCCESS_OK ==
             ::MoRuntimeConvertUnsignedIntegerToHexString(
@@ -208,18 +289,15 @@ void SimpleDemo(
                 MO_TRUE,
                 MO_TRUE))
         {
-            ::MoUefiConsoleWriteAsciiString(
-                SystemTable->ConOut,
+            ::MoPlatformWriteAsciiString(
                 AddressBuffer);
         }
         else
         {
-            ::MoUefiConsoleWriteAsciiString(
-                SystemTable->ConOut,
+            ::MoPlatformWriteAsciiString(
                 "<Conversion Error>");
         }
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
+        ::MoPlatformWriteAsciiString(
             ", Length: ");
         if (MO_RESULT_SUCCESS_OK ==
             ::MoRuntimeConvertUnsignedIntegerToDecimalString(
@@ -228,18 +306,15 @@ void SimpleDemo(
                 sizeof(AddressBuffer),
                 MemoryHoleRanges[i].Length))
         {
-            ::MoUefiConsoleWriteAsciiString(
-                SystemTable->ConOut,
+            ::MoPlatformWriteAsciiString(
                 AddressBuffer);
         }
         else
         {
-            ::MoUefiConsoleWriteAsciiString(
-                SystemTable->ConOut,
+            ::MoPlatformWriteAsciiString(
                 "<Conversion Error>");
         }
-        ::MoUefiConsoleWriteAsciiString(
-            SystemTable->ConOut,
+        ::MoPlatformWriteAsciiString(
             " Bytes.\r\n");
     }
 }
@@ -258,10 +333,7 @@ EFI_STATUS EFIAPI UefiMain(
 {
     ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,
-        "Mobility Hyper-V Lightweight Debugger for Guests"
-        " " MOBILITY_MINUAP_VERSION_UTF8_STRING "\r\n"
-        "(c) Kenji Mouri. All rights reserved.\r\n"
-        "\r\n");
+        g_LogoString);
 
     ::SimpleDemo(SystemTable);
 
