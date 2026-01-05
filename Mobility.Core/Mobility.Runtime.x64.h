@@ -926,6 +926,11 @@ typedef VOID(MOAPI* PMO_RUNTIME_X64_INTERRUPT_HANDLER)(
     _In_ PMO_RUNTIME_X64_INTERRUPT_CONTEXT InterruptContext);
 
 /**
+ * @brief The interrupt handlers for x64 architecture.
+ */
+EXTERN_C PMO_RUNTIME_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
+
+/**
  * @brief The interrupt descriptor table handlers for x64 architecture. Because
  *        each entry must be no more than 8 bytes and must be 8-byte aligned,
  *        which allows the C code to compute the address of each interrupt as
