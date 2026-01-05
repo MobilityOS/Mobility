@@ -14,15 +14,18 @@
 
 #include <Mile.Project.Version.h>
 
-#include <Mobility.Uefi.Core.h>
-#include <Mobility.Uefi.Acpi.h>
 #include <Mobility.Runtime.Core.h>
 #include "Mobility.Console.Core.h"
 #include <Mobility.Platform.x64.h>
 #include <Mobility.Platform.Interface.h>
 #include <Mobility.Memory.SmallHeap.h>
 
+#include <Mobility.Uefi.Core.h>
+#include <Mobility.Uefi.Acpi.h>
+
 #include <IndustryStandard/Acpi30.h>
+
+#include <Mobility.HyperV.Core.h>
 
 #define MOBILITY_MINUAP_VERSION_UTF8_STRING \
     MILE_PROJECT_VERSION_UTF8_STRING " (Build " \

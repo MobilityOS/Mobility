@@ -14,4 +14,6 @@
 #define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
+#include <Mile.HyperV.VMBus.h>
+
 #endif // !MOBILITY_HYPERV_CORE

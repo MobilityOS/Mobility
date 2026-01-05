@@ -21,6 +21,7 @@
   <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.props" />
   <Import Project="..\Mobility.Core\Mobility.Core.props" />
   <Import Project="..\Mobility.Core.Uefi\Mobility.Core.Uefi.props" />
+  <Import Project="..\Mobility.Core.HyperV\Mobility.Core.HyperV.props" />
   <ItemGroup>
     <ClCompile Include="Mobility.HvLdg.cpp" />
   </ItemGroup>

@@ -24,7 +24,7 @@
 #include <IndustryStandard/Acpi30.h>
 #include <Protocol/LoadedImage.h>
 
-#include <Mile.HyperV.VMBus.h>
+#include <Mobility.HyperV.Core.h>
 
 #include <intrin.h>
 #include <stdint.h>
