@@ -723,13 +723,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
     _In_ MO_CONSTANT_WIDE_STRING WideString,
     _In_ MO_WIDE_CHAR WideCharacter);
 
-
 /**
  * @brief Get the length of a null-terminated string.
  * @param String The input null-terminated string.
  * @return The length of the string excluding the null terminator, or 0 if the
  *         string is empty or invalid.
- * @remarks This is the simplified version of MoRuntimeStringValidate.
+ * @remarks This is the easy version of MoRuntimeStringValidateSimple.
  */
 EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
     _In_ MO_CONSTANT_STRING String);
@@ -739,9 +738,61 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
  * @param WideString The input null-terminated wide string.
  * @return The wide length of the string excluding the null terminator, or 0 if
  *         the string is empty or invalid.
- * @remarks This is the simplified version of MoRuntimeWideStringValidate.
+ * @remarks This is the easy version of MoRuntimeWideStringValidateSimple.
  */
 EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
     _In_ MO_CONSTANT_WIDE_STRING WideString);
+
+/**
+ * @brief Find the first occurrence of a character in a string.
+ * @param String The non-null string to search.
+ * @param Character The character to find.
+ * @return The substring starting from the first occurrence of the character, or
+ *         nullptr if the character is not found or an error occurs.
+ * @remarks This is the easy version of MoRuntimeStringFindFirstCharacterSimple.
+ */
+EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character);
+
+/**
+ * @brief Find the first occurrence of a wide character in a wide string.
+ * @param WideString The non-null wide string to search.
+ * @param WideCharacter The wide character to find.
+ * @return The wide substring starting from the first occurrence of the
+ *         character, or nullptr if the wide character is not found or an error
+ *         occurs.
+ * @remarks This is the easy version of
+ *          MoRuntimeWideStringFindFirstCharacterSimple.
+ */
+EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter);
+
+/**
+ * @brief Find the last occurrence of a character in a string.
+ * @param String The non-null string to search.
+ * @param Character The character to find.
+ * @return The substring starting from the last occurrence of the character, or
+ *         nullptr if the character is not found or an error occurs.
+ * @remarks This is the easy version of MoRuntimeStringFindLastCharacterSimple.
+ */
+EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character);
+
+/**
+ * @brief Find the last occurrence of a wide character in a wide string.
+ * @param WideString The non-null wide string to search.
+ * @param WideCharacter The wide character to find.
+ * @return The wide substring starting from the last occurrence of the
+ *         character, or nullptr if the wide character is not found or an error
+ *         occurs.
+ * @remarks This is the easy version of
+ *          MoRuntimeWideStringFindLastCharacterSimple.
+ */
+EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindLastCharacterEasy(
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter);
 
 #endif // !MOBILITY_RUNTIME_CORE

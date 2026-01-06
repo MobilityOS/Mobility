@@ -1917,3 +1917,63 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
     }
     return 0;
 }
+
+EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character)
+{
+    MO_UINTN Index = 0u;
+    if (MO_RESULT_SUCCESS_OK == MoRuntimeStringFindFirstCharacterSimple(
+        &Index,
+        String,
+        Character))
+    {
+        return (MO_STRING)(&String[Index]);
+    }
+    return nullptr;
+}
+
+EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    MO_UINTN Index = 0u;
+    if (MO_RESULT_SUCCESS_OK == MoRuntimeWideStringFindFirstCharacterSimple(
+        &Index,
+        WideString,
+        WideCharacter))
+    {
+        return (MO_WIDE_STRING)(&WideString[Index]);
+    }
+    return nullptr;
+}
+
+EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character)
+{
+    MO_UINTN Index = 0u;
+    if (MO_RESULT_SUCCESS_OK == MoRuntimeStringFindLastCharacterSimple(
+        &Index,
+        String,
+        Character))
+    {
+        return (MO_STRING)(&String[Index]);
+    }
+    return nullptr;
+}
+
+EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindLastCharacterEasy(
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    MO_UINTN Index = 0u;
+    if (MO_RESULT_SUCCESS_OK == MoRuntimeWideStringFindLastCharacterSimple(
+        &Index,
+        WideString,
+        WideCharacter))
+    {
+        return (MO_WIDE_STRING)(&WideString[Index]);
+    }
+    return nullptr;
+}
