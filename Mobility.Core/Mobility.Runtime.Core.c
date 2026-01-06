@@ -1174,6 +1174,16 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     return MO_RESULT_SUCCESS_OK;
 }
 
+#define MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR \
+    (MO_UINTN_MAX / sizeof(MO_CHAR))
+#define MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR \
+    (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR))
+
+#define MO_RUNTIME_STRING_MAXIMUM_LENGTH \
+    (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR - 1u)
+#define MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH \
+    (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR - 1u)
+
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
     _Out_opt_ PMO_UINTN Length,
     _In_ MO_CONSTANT_STRING String,
@@ -1183,6 +1193,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
     {
         // We need a non-null string and a non-zero maximum length.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    if (MaximumLength < MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
+    {
+        // Limit maximum length to prevent overflow.
+        MaximumLength = MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR;
     }
 
     if (Length)
@@ -1219,6 +1235,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
     {
         // We need a non-null wide string and a non-zero maximum length.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    if (MaximumLength < MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
+    {
+        // Limit maximum length to prevent overflow.
+        MaximumLength = MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR;
     }
 
     if (Length)
@@ -1259,18 +1281,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    // Maximum number of characters that can be stored in destination.
-    CONST MO_UINTN MaximumDestinationCharacters =
-        (MO_UINTN_MAX / sizeof(MO_CHAR));
-
-    // Maximum number of characters that can be copied from source, which is
-    // one less than maximum destination characters to leave space for null
-    // terminator.
-    CONST MO_UINTN MaximumSourceCharacters =
-        MaximumDestinationCharacters - 1u;
-
-    if (MaximumDestinationCharacters < MaximumLength ||
-        MaximumSourceCharacters < SourceLength)
+    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
+        MO_RUNTIME_STRING_MAXIMUM_LENGTH < SourceLength)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1330,18 +1342,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    // Maximum number of characters that can be stored in destination.
-    CONST MO_UINTN MaximumDestinationCharacters =
-        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR));
-
-    // Maximum number of characters that can be copied from source, which is
-    // one less than maximum destination characters to leave space for null
-    // terminator.
-    CONST MO_UINTN MaximumSourceCharacters =
-        MaximumDestinationCharacters - 1u;
-
-    if (MaximumDestinationCharacters < MaximumLength ||
-        MaximumSourceCharacters < SourceLength)
+    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
+        MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < SourceLength)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1401,18 +1403,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    // Maximum number of characters that can be stored in destination.
-    CONST MO_UINTN MaximumDestinationCharacters =
-        (MO_UINTN_MAX / sizeof(MO_CHAR));
-
-    // Maximum number of characters that can be copied from source, which is
-    // one less than maximum destination characters to leave space for null
-    // terminator.
-    CONST MO_UINTN MaximumSourceCharacters =
-        MaximumDestinationCharacters - 1u;
-
-    if (MaximumDestinationCharacters < MaximumLength ||
-        MaximumSourceCharacters < SourceLength)
+    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
+        MO_RUNTIME_STRING_MAXIMUM_LENGTH < SourceLength)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1485,18 +1477,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    // Maximum number of characters that can be stored in destination.
-    CONST MO_UINTN MaximumDestinationCharacters =
-        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR));
-
-    // Maximum number of characters that can be copied from source, which is
-    // one less than maximum destination characters to leave space for null
-    // terminator.
-    CONST MO_UINTN MaximumSourceCharacters =
-        MaximumDestinationCharacters - 1u;
-
-    if (MaximumDestinationCharacters < MaximumLength ||
-        MaximumSourceCharacters < SourceLength)
+    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
+        MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < SourceLength)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1569,11 +1551,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    // Maximum number of characters that can be stored in string, which size is
-    // less than MO_UINTN_MAX to leave space for null terminator.
-    CONST MO_UINTN MaximumCharacters = (MO_UINTN_MAX / sizeof(MO_CHAR)) - 1u;
-
-    if (MaximumCharacters < Length)
+    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH < Length)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1619,12 +1597,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    // Maximum number of characters that can be stored in wide string, which
-    // size is less than MO_UINTN_MAX to leave space for null terminator.
-    CONST MO_UINTN MaximumCharacters =
-        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR)) - 1u;
-
-    if (MaximumCharacters < Length)
+    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < Length)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1670,11 +1643,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    // Maximum number of characters that can be stored in string, which size is
-    // less than MO_UINTN_MAX to leave space for null terminator.
-    CONST MO_UINTN MaximumCharacters = (MO_UINTN_MAX / sizeof(MO_CHAR)) - 1u;
-
-    if (MaximumCharacters < Length)
+    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH < Length)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
@@ -1720,12 +1689,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    // Maximum number of characters that can be stored in wide string, which
-    // size is less than MO_UINTN_MAX to leave space for null terminator.
-    CONST MO_UINTN MaximumCharacters =
-        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR)) - 1u;
-
-    if (MaximumCharacters < Length)
+    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < Length)
     {
         // Prevent overflow when calculating required size.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
