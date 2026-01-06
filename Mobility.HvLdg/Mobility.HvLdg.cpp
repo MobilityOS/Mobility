@@ -152,18 +152,10 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
 EXTERN_C VOID MOAPI MoPlatformWriteAsciiString(
     _In_ MO_CONSTANT_STRING String)
 {
-    MO_UINTN Length = 0u;
-    if (MO_RESULT_SUCCESS_OK != ::MoRuntimeStringValidate(
-        &Length,
-        String,
-        MO_UINT32_MAX / sizeof(MO_CHAR)))
-    {
-        return;
-    }
     ::MoConsoleCoreWriteString(
         &g_PlatformContext.ConsoleScreenBuffer,
         String,
-        static_cast<MO_UINT32>(Length));
+        static_cast<MO_UINT32>(::MoRuntimeStringLength(String)));
     ::MoConsoleCoreRefreshScreen(
         &g_PlatformContext.DisplayFrameBuffer,
         &g_PlatformContext.ConsoleScreenBuffer);

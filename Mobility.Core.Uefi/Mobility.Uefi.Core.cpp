@@ -28,12 +28,14 @@ EXTERN_C VOID MOAPI MoUefiConsoleWriteAsciiString(
     _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
     _In_ MO_CONSTANT_STRING String)
 {
+    MO_UINTN StringLength = ::MoRuntimeStringLength(String);
+
     MO_WIDE_CHAR WideStringTemplate[2] = { 0, 0 };
-    while (*String)
+    for (MO_UINTN Index = 0; Index < StringLength; ++Index)
     {
-        WideStringTemplate[0] = *String > MO_UNICODE_DELETE
+        WideStringTemplate[0] = String[Index] > MO_UNICODE_DELETE
             ? MO_UNICODE_SPACE
-            : *String++;
+            : String[Index];
         ::MoUefiConsoleWriteUcs2String(Output, WideStringTemplate);
     }
 }
