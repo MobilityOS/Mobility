@@ -457,4 +457,92 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
     _In_ MO_CONSTANT_WIDE_STRING Source,
     _In_ MO_UINTN SourceLength);
 
+/**
+ * @brief Find the first occurrence of a character in a string.
+ * @param Index The non-null pointer to receive the index of the first
+ *              occurrence of the character.
+ * @param String The non-null string to search.
+ * @param Length The number of characters of the string to search, excluding the
+ *               null terminator.
+ * @param Character The character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the character is not found in the string, the function returns
+ *          MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX. If the
+ *          string is not valid within the specified length, the function
+ *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
+ *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN Length,
+    _In_ MO_CHAR Character);
+
+/**
+ * @brief Find the first occurrence of a wide character in a wide string.
+ * @param Index The non-null pointer to receive the index of the first
+ *              occurrence of the wide character.
+ * @param WideString The non-null wide string to search.
+ * @param Length The number of wide characters of the wide string to search,
+ *               excluding the null terminator.
+ * @param WideCharacter The wide character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the wide character is not found in the wide string, the function
+ *          returns MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX.
+ *          If the wide string is not valid within the specified length, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
+ *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN Length,
+    _In_ MO_WIDE_CHAR WideCharacter);
+
+/**
+ * @brief Find the last occurrence of a character in a string.
+ * @param Index The non-null pointer to receive the index of the last
+ *              occurrence of the character.
+ * @param String The non-null string to search.
+ * @param Length The number of characters of the string to search, excluding the
+ *               null terminator.
+ * @param Character The character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the character is not found in the string, the function returns
+ *          MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX. If the
+ *          string is not valid within the specified length, the function
+ *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
+ *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN Length,
+    _In_ MO_CHAR Character);
+
+/**
+ * @brief Find the last occurrence of a wide character in a wide string.
+ * @param Index The non-null pointer to receive the index of the last
+ *              occurrence of the wide character.
+ * @param WideString The non-null wide string to search.
+ * @param Length The number of wide characters of the wide string to search,
+ *               excluding the null terminator.
+ * @param WideCharacter The wide character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the wide character is not found in the wide string, the function
+ *          returns MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX.
+ *          If the wide string is not valid within the specified length, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
+ *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN Length,
+    _In_ MO_WIDE_CHAR WideCharacter);
+
 #endif // !MOBILITY_RUNTIME_CORE

@@ -1555,3 +1555,205 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
         Source,
         SourceActualLength);
 }
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN Length,
+    _In_ MO_CHAR Character)
+{
+    if (!Index || !String)
+    {
+        // We need non-null output index and string.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *Index = MO_UINTN_MAX;
+
+    // Maximum number of characters that can be stored in string, which size is
+    // less than MO_UINTN_MAX to leave space for null terminator.
+    CONST MO_UINTN MaximumCharacters = (MO_UINTN_MAX / sizeof(MO_CHAR)) - 1u;
+
+    if (MaximumCharacters < Length)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    MO_UINTN ActualLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+        &ActualLength,
+        String,
+        Length + 1u))
+    {
+        // String is not valid within the specified length.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (Length != ActualLength)
+    {
+        // Length mismatch.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    for (MO_UINTN CurrentIndex = 0u; CurrentIndex < Length; ++CurrentIndex)
+    {
+        if (String[CurrentIndex] == Character)
+        {
+            *Index = CurrentIndex;
+            return MO_RESULT_SUCCESS_OK;
+        }
+    }
+
+    return MO_RESULT_SUCCESS_FALSE;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN Length,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    if (!Index || !WideString)
+    {
+        // We need non-null output index and wide string.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *Index = MO_UINTN_MAX;
+
+    // Maximum number of characters that can be stored in wide string, which
+    // size is less than MO_UINTN_MAX to leave space for null terminator.
+    CONST MO_UINTN MaximumCharacters =
+        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR)) - 1u;
+
+    if (MaximumCharacters < Length)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    MO_UINTN ActualLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+        &ActualLength,
+        WideString,
+        Length + 1u))
+    {
+        // String is not valid within the specified length.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (Length != ActualLength)
+    {
+        // Length mismatch.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    for (MO_UINTN CurrentIndex = 0u; CurrentIndex < Length; ++CurrentIndex)
+    {
+        if (WideString[CurrentIndex] == WideCharacter)
+        {
+            *Index = CurrentIndex;
+            return MO_RESULT_SUCCESS_OK;
+        }
+    }
+
+    return MO_RESULT_SUCCESS_FALSE;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN Length,
+    _In_ MO_CHAR Character)
+{
+    if (!Index || !String)
+    {
+        // We need non-null output index and string.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *Index = MO_UINTN_MAX;
+
+    // Maximum number of characters that can be stored in string, which size is
+    // less than MO_UINTN_MAX to leave space for null terminator.
+    CONST MO_UINTN MaximumCharacters = (MO_UINTN_MAX / sizeof(MO_CHAR)) - 1u;
+
+    if (MaximumCharacters < Length)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    MO_UINTN ActualLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+        &ActualLength,
+        String,
+        Length + 1u))
+    {
+        // String is not valid within the specified length.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (Length != ActualLength)
+    {
+        // Length mismatch.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    for (MO_UINTN CurrentIndex = Length; CurrentIndex > 0u; --CurrentIndex)
+    {
+        if (String[CurrentIndex - 1u] == Character)
+        {
+            *Index = CurrentIndex - 1u;
+            return MO_RESULT_SUCCESS_OK;
+        }
+    }
+
+    return MO_RESULT_SUCCESS_FALSE;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN Length,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    if (!Index || !WideString)
+    {
+        // We need non-null output index and wide string.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *Index = MO_UINTN_MAX;
+
+    // Maximum number of characters that can be stored in wide string, which
+    // size is less than MO_UINTN_MAX to leave space for null terminator.
+    CONST MO_UINTN MaximumCharacters =
+        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR)) - 1u;
+
+    if (MaximumCharacters < Length)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    MO_UINTN ActualLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+        &ActualLength,
+        WideString,
+        Length + 1u))
+    {
+        // String is not valid within the specified length.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (Length != ActualLength)
+    {
+        // Length mismatch.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    for (MO_UINTN CurrentIndex = Length; CurrentIndex > 0u; --CurrentIndex)
+    {
+        if (WideString[CurrentIndex - 1u] == WideCharacter)
+        {
+            *Index = CurrentIndex - 1u;
+            return MO_RESULT_SUCCESS_OK;
+        }
+    }
+
+    return MO_RESULT_SUCCESS_FALSE;
+}
