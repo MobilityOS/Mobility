@@ -1185,7 +1185,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MaximumLength < MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
+    if (MaximumLength > MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
     {
         // Limit maximum length to prevent overflow.
         MaximumLength = MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR;
@@ -1227,7 +1227,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MaximumLength < MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
+    if (MaximumLength > MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
     {
         // Limit maximum length to prevent overflow.
         MaximumLength = MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR;
@@ -1710,4 +1710,210 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     }
 
     return MO_RESULT_SUCCESS_FALSE;
-} 
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_STRING String)
+{
+    return MoRuntimeStringValidate(
+        Length,
+        String,
+        MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_WIDE_STRING WideString)
+{
+    return MoRuntimeWideStringValidate(
+        Length,
+        WideString,
+        MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
+    _Out_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source)
+{
+    MO_UINTN SourceLength = 0u;
+    MO_RESULT Result = MoRuntimeStringValidateSimple(
+        &SourceLength,
+        Source);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeStringCopy(
+            Destination,
+            MaximumLength,
+            Source,
+            SourceLength);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
+    _Out_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source)
+{
+    MO_UINTN SourceLength = 0u;
+    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
+        &SourceLength,
+        Source);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeWideStringCopy(
+            Destination,
+            MaximumLength,
+            Source,
+            SourceLength);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
+    _Inout_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source)
+{
+    MO_UINTN SourceLength = 0u;
+    MO_RESULT Result = MoRuntimeStringValidateSimple(
+        &SourceLength,
+        Source);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeStringConcatenate(
+            Destination,
+            MaximumLength,
+            Source,
+            SourceLength);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
+    _Inout_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source)
+{
+    MO_UINTN SourceLength = 0u;
+    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
+        &SourceLength,
+        Source);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeWideStringConcatenate(
+            Destination,
+            MaximumLength,
+            Source,
+            SourceLength);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character)
+{
+    MO_UINTN Length = 0u;
+    MO_RESULT Result = MoRuntimeStringValidateSimple(
+        &Length,
+        String);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeStringFindFirstCharacter(
+            Index,
+            String,
+            Length,
+            Character);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    MO_UINTN Length = 0u;
+    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
+        &Length,
+        WideString);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeWideStringFindFirstCharacter(
+            Index,
+            WideString,
+            Length,
+            WideCharacter);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character)
+{
+    MO_UINTN Length = 0u;
+    MO_RESULT Result = MoRuntimeStringValidateSimple(
+        &Length,
+        String);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeStringFindLastCharacter(
+            Index,
+            String,
+            Length,
+            Character);
+    }
+    return Result;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    MO_UINTN Length = 0u;
+    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
+        &Length,
+        WideString);
+    if (MO_RESULT_SUCCESS_OK == Result)
+    {
+        Result = MoRuntimeWideStringFindLastCharacter(
+            Index,
+            WideString,
+            Length,
+            WideCharacter);
+    }
+    return Result;
+}
+
+EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
+    _In_ MO_CONSTANT_STRING String)
+{
+    MO_UINTN Length = 0u;
+    if (MO_RESULT_SUCCESS_OK == MoRuntimeStringValidateSimple(
+        &Length,
+        String))
+    {
+        return Length;
+    }
+    return 0;
+}
+
+EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
+    _In_ MO_CONSTANT_WIDE_STRING WideString)
+{
+    MO_UINTN Length = 0u;
+    if (MO_RESULT_SUCCESS_OK == MoRuntimeWideStringValidateSimple(
+        &Length,
+        WideString))
+    {
+        return Length;
+    }
+    return 0;
+}

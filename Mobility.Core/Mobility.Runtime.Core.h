@@ -569,4 +569,179 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     _In_ MO_UINTN Length,
     _In_ MO_WIDE_CHAR WideCharacter);
 
+/**
+ * @brief Validate a null-terminated string within a maximum length, and
+ *        optionally retrieve the length of the string.
+ * @param Length The pointer to receive the length of the string without the
+ *               null terminator. This parameter is optional if the caller only
+ *               wants to validate the string. If the string is invalid, the
+ *               output length will be set to zero.
+ * @param String The non-null pointer to the string to validate.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeStringValidate.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_STRING String);
+
+/**
+ * @brief Validate a null-terminated wide string within a maximum length, and
+ *        optionally retrieve the length of the wide string.
+ * @param Length The pointer to receive the length of the wide string without
+ *               the null terminator. This parameter is optional if the caller
+ *               only wants to validate the wide string. If the wide string is
+ *               invalid, the output length will be set to zero.
+ * @param WideString The non-null pointer to the wide string to validate.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeWideStringValidate.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_WIDE_STRING WideString);
+
+/**
+ * @brief Copies a string from source to destination.
+ * @param Destination The non-null destination string buffer.
+ * @param MaximumLength The non-zero maximum number of characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source string to copy from.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeStringCopy.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
+    _Out_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source);
+
+/**
+ * @brief Copies a wide string from source to destination.
+ * @param Destination The non-null destination wide string buffer.
+ * @param MaximumLength The non-zero maximum number of wide characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source wide string to copy from.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeWideStringCopy.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
+    _Out_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source);
+
+/**
+ * @brief Concatenate source string to the end of destination string.
+ * @param Destination The non-null destination string buffer.
+ * @param MaximumLength The non-zero maximum number of characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source string to concatenate.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeStringConcatenate.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
+    _Inout_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source);
+
+/**
+ * @brief Concatenate source wide string to the end of destination wide string.
+ * @param Destination The non-null destination wide string buffer.
+ * @param MaximumLength The non-zero maximum number of characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source wide string to concatenate.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeWideStringConcatenate.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
+    _Inout_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source);
+
+/**
+ * @brief Find the first occurrence of a character in a string.
+ * @param Index The non-null pointer to receive the index of the first
+ *              occurrence of the character.
+ * @param String The non-null string to search.
+ * @param Character The character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeStringFindFirstCharacter.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character);
+
+/**
+ * @brief Find the first occurrence of a wide character in a wide string.
+ * @param Index The non-null pointer to receive the index of the first
+ *              occurrence of the wide character.
+ * @param WideString The non-null wide string to search.
+ * @param WideCharacter The wide character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of
+ *          MoRuntimeWideStringFindFirstCharacter.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter);
+
+/**
+ * @brief Find the last occurrence of a character in a string.
+ * @param Index The non-null pointer to receive the index of the last
+ *              occurrence of the character.
+ * @param String The non-null string to search.
+ * @param Character The character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of MoRuntimeStringFindLastCharacter.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_CHAR Character);
+
+/**
+ * @brief Find the last occurrence of a wide character in a wide string.
+ * @param Index The non-null pointer to receive the index of the last
+ *              occurrence of the wide character.
+ * @param WideString The non-null wide string to search.
+ * @param WideCharacter The wide character to find.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This is the simplified version of
+ *          MoRuntimeWideStringFindLastCharacter.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_WIDE_CHAR WideCharacter);
+
+
+/**
+ * @brief Get the length of a null-terminated string.
+ * @param String The input null-terminated string.
+ * @return The length of the string excluding the null terminator, or 0 if the
+ *         string is empty or invalid.
+ * @remarks This is the simplified version of MoRuntimeStringValidate.
+ */
+EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
+    _In_ MO_CONSTANT_STRING String);
+
+/**
+ * @brief Get the length of a null-terminated wide string.
+ * @param WideString The input null-terminated wide string.
+ * @return The wide length of the string excluding the null terminator, or 0 if
+ *         the string is empty or invalid.
+ * @remarks This is the simplified version of MoRuntimeWideStringValidate.
+ */
+EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
+    _In_ MO_CONSTANT_WIDE_STRING WideString);
+
 #endif // !MOBILITY_RUNTIME_CORE
