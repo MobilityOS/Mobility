@@ -149,6 +149,26 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
         static_cast<MO_UINT16>(NewSize));
 }
 
+EXTERN_C VOID MOAPI MoPlatformWriteAsciiString(
+    _In_ MO_CONSTANT_STRING String)
+{
+    MO_UINTN Length = 0u;
+    if (MO_RESULT_SUCCESS_OK != ::MoRuntimeStringValidate(
+        &Length,
+        String,
+        MO_UINT32_MAX / sizeof(MO_CHAR)))
+    {
+        return;
+    }
+    ::MoConsoleCoreWriteString(
+        &g_PlatformContext.ConsoleScreenBuffer,
+        String,
+        static_cast<MO_UINT32>(Length));
+    ::MoConsoleCoreRefreshScreen(
+        &g_PlatformContext.DisplayFrameBuffer,
+        &g_PlatformContext.ConsoleScreenBuffer);
+}
+
 EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
     _In_ EFI_BOOT_SERVICES* BootServices)
 {
@@ -192,33 +212,11 @@ EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
         MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
         g_PlatformContext.ConsoleCharacterBuffer);
 
-    MoConsoleCoreWriteString(
-        &g_PlatformContext.ConsoleScreenBuffer,
-        g_LogoString,
-        MO_ARRAY_SIZE(g_LogoString));
-
     MoConsoleCoreRefreshScreen(
         &g_PlatformContext.DisplayFrameBuffer,
         &g_PlatformContext.ConsoleScreenBuffer);
 
     return MO_RESULT_SUCCESS_OK;
-}
-
-EXTERN_C VOID MOAPI MoPlatformWriteAsciiString(
-    _In_ MO_CONSTANT_STRING String)
-{
-    MO_CHAR StringTemplate[2] = { 0, 0 };
-    while (*String)
-    {
-        StringTemplate[0] = *String++;
-        ::MoConsoleCoreWriteString(
-            &g_PlatformContext.ConsoleScreenBuffer,
-            StringTemplate,
-            sizeof(StringTemplate));
-    }
-    ::MoConsoleCoreRefreshScreen(
-        &g_PlatformContext.DisplayFrameBuffer,
-        &g_PlatformContext.ConsoleScreenBuffer);
 }
 
 void SimpleDemo(
@@ -232,8 +230,7 @@ void SimpleDemo(
             "Failed to initialize Mobility Platform.\r\n");
         return;
     }
-    ::MoPlatformWriteAsciiString(
-        "Mobility Platform initialized successfully.\r\n");
+    ::MoPlatformWriteAsciiString(g_LogoString);
 
     MO_UINT64 ExtendedSystemDescriptionTable = 0u;
     if (MO_RESULT_SUCCESS_OK != ::MoUefiAcpiQueryExtendedSystemDescriptionTable(
