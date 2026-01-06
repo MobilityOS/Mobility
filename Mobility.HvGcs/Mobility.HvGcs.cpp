@@ -135,16 +135,8 @@ namespace
             }
 
             // Add the file path string.
-
-            MO_UINTN ActualLength = 0;
-            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
-            if (MO_RESULT_SUCCESS_OK == ::MoRuntimeWideStringValidate(
-                &ActualLength,
-                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName),
-                MO_UINT16_MAX / sizeof(MO_WIDE_CHAR)))
-            {
-                Length += ActualLength;
-            }
+            Length += ::MoRuntimeWideStringLength(
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName));
 
             Source = ::GetNextDevicePathNode(Source);
         }
@@ -180,19 +172,10 @@ namespace
                 break;
             }
 
-            MO_UINTN ActualLength = 0;
-            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
-            if (MO_RESULT_SUCCESS_OK == ::MoRuntimeWideStringValidate(
-                &ActualLength,
-                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName),
-                MO_UINT16_MAX / sizeof(MO_WIDE_CHAR)))
-            {
-                ::MoRuntimeWideStringConcatenate(
-                    Destination,
-                    DestinationLength,
-                    reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName),
-                    ActualLength);
-            }
+            ::MoRuntimeWideStringConcatenateSimple(
+                Destination,
+                DestinationLength,
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName));
 
             Source = ::GetNextDevicePathNode(Source);
         }
@@ -274,19 +257,10 @@ namespace
             RootDevicePath = ::GetNextDevicePathNode(RootDevicePath);
         }
 
-        UINT16 RelativeFilePathLength = 0u;
-        {
-            MO_UINTN ActualLength = 0;
-            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
-            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeWideStringValidate(
-                &ActualLength,
-                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(RelativeFilePath),
-                MO_UINT16_MAX / sizeof(MO_WIDE_CHAR)))
-            {
-                return false;
-            }
-            RelativeFilePathLength = static_cast<UINT16>(ActualLength + 1);
-        }
+        UINT16 RelativeFilePathLength = static_cast<UINT16>(
+            ::MoRuntimeWideStringLength(
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(RelativeFilePath))
+            + 1u);
         FILEPATH_DEVICE_PATH* FilePath =
             reinterpret_cast<FILEPATH_DEVICE_PATH*>(Current);
         FilePath->Header.Type = MEDIA_DEVICE_PATH;
@@ -642,37 +616,15 @@ EFI_STATUS EFIAPI UefiMain(
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
                 "\r\n");
-            PMO_WIDE_CHAR ReplacementStart = nullptr;
-            MO_UINTN ActualLength = 0;
-            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
-            if (MO_RESULT_SUCCESS_OK == ::MoRuntimeWideStringValidate(
-                &ActualLength,
-                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(TargetFileBuffer),
-                sizeof(TargetFileBuffer) / sizeof(*TargetFileBuffer)))
+            MO_WIDE_STRING ReplacementStart =
+                ::MoRuntimeWideStringFindLastCharacterEasy(
+                    reinterpret_cast<MO_CONSTANT_WIDE_STRING>(TargetFileBuffer),
+                    L'\\');
+            if (ReplacementStart)
             {
-                MO_UINTN SlashStartIndex = 0;
-                if (MO_RESULT_SUCCESS_OK ==
-                    ::MoRuntimeWideStringFindLastCharacter(
-                        &SlashStartIndex,
-                        reinterpret_cast<MO_CONSTANT_WIDE_STRING>(TargetFileBuffer),
-                        ActualLength,
-                        L'\\'))
-                {
-                    MO_UINTN DotStartIndex = 0;
-                    if (MO_RESULT_SUCCESS_OK ==
-                        ::MoRuntimeWideStringFindLastCharacter(
-                            &DotStartIndex,
-                            reinterpret_cast<MO_CONSTANT_WIDE_STRING>(
-                                TargetFileBuffer),
-                            ActualLength,
-                            L'.'))
-                    {
-                        if (DotStartIndex > SlashStartIndex)
-                        {
-                            ReplacementStart = TargetFileBuffer + DotStartIndex;
-                        }
-                    }
-                }
+                ReplacementStart = ::MoRuntimeWideStringFindLastCharacterEasy(
+                    reinterpret_cast<MO_CONSTANT_WIDE_STRING>(ReplacementStart),
+                    L'.');
             }
             if (!ReplacementStart)
             {
