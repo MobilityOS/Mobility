@@ -994,7 +994,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
         // At least one output parameter is required.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    const MO_UINTN MaximumValueWidth = sizeof(Value) * 8u;
+    CONST MO_UINTN MaximumValueWidth = sizeof(Value) * 8u;
     if (ValueWidth < 4u || ValueWidth > MaximumValueWidth || ValueWidth & 3u)
     {
         // The value width must be multiple of 4 and between 4 and the number of
@@ -1006,7 +1006,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
         // Use mask to limit the value width.
         Value &= ((MO_UINTN)1u << ValueWidth) - 1u;
     }
-    
+
     MO_UINTN NibbleCount = ValueWidth >> 2u;
     MO_UINTN TotalLength = NibbleCount;
     if (Prefix)
@@ -1172,4 +1172,386 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     }
 
     return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN MaximumLength)
+{
+    if (!String || !MaximumLength)
+    {
+        // We need a non-null string and a non-zero maximum length.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    if (Length)
+    {
+        // Initialize output length if provided.
+        *Length = 0u;
+    }
+
+    MO_UINTN CurrentLength = 0u;
+    while (CurrentLength < MaximumLength)
+    {
+        if ('\0' == String[CurrentLength])
+        {
+            // It's a valid null-terminated string.
+            if (Length)
+            {
+                *Length = CurrentLength;
+            }
+            return MO_RESULT_SUCCESS_OK;
+        }
+        ++CurrentLength;
+    }
+
+    // Reached maximum length without finding null terminator.
+    return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN MaximumLength)
+{
+    if (!WideString || !MaximumLength)
+    {
+        // We need a non-null wide string and a non-zero maximum length.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    if (Length)
+    {
+        // Initialize output length if provided.
+        *Length = 0u;
+    }
+
+    MO_UINTN CurrentLength = 0u;
+    while (CurrentLength < MaximumLength)
+    {
+        if (L'\0' == WideString[CurrentLength])
+        {
+            // It's a valid null-terminated wide string.
+            if (Length)
+            {
+                *Length = CurrentLength;
+            }
+            return MO_RESULT_SUCCESS_OK;
+        }
+        ++CurrentLength;
+    }
+
+    // Reached maximum length without finding null terminator.
+    return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
+    _Out_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    if (!Destination || !MaximumLength || !Source)
+    {
+        // We need non-null destination and source, and non-zero destination
+        // length.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    // Maximum number of characters that can be stored in destination.
+    CONST MO_UINTN MaximumDestinationCharacters =
+        (MO_UINTN_MAX / sizeof(MO_CHAR));
+
+    // Maximum number of characters that can be copied from source, which is
+    // one less than maximum destination characters to leave space for null
+    // terminator.
+    CONST MO_UINTN MaximumSourceCharacters =
+        MaximumDestinationCharacters - 1u;
+
+    if (MaximumDestinationCharacters < MaximumLength ||
+        MaximumSourceCharacters < SourceLength)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    CONST MO_UINTN SourceSize = SourceLength * sizeof(MO_CHAR);
+    CONST MO_UINTN RequiredSize = SourceSize + sizeof(MO_CHAR);
+
+    if (SourceLength > MaximumLength - 1u)
+    {
+        // Not enough space in destination for source and null terminator.
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    MO_UINTN DestinationStart = (MO_UINTN)(Destination);
+    MO_UINTN SourceStart = (MO_UINTN)(Source);
+
+    if (RequiredSize > (MO_UINTN_MAX - DestinationStart) ||
+        RequiredSize > (MO_UINTN_MAX - SourceStart))
+    {
+        // Overflow source or destination range is not allowed.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    if ((DestinationStart < (SourceStart + RequiredSize)) &&
+        (SourceStart < (DestinationStart + RequiredSize)))
+    {
+        // Overlap source or destination is not allowed.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    if (SourceLength)
+    {
+        // Copy the source string to destination.
+        MoRuntimeInternalMemoryCopy(
+            (MO_POINTER)(Destination),
+            (MO_POINTER)(Source),
+            SourceSize);
+    }
+
+    // Null terminate the destination string.
+    Destination[SourceLength] = '\0';
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
+    _Out_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    if (!Destination || !MaximumLength || !Source)
+    {
+        // We need non-null destination and source, and non-zero destination
+        // length.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    // Maximum number of characters that can be stored in destination.
+    CONST MO_UINTN MaximumDestinationCharacters =
+        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR));
+
+    // Maximum number of characters that can be copied from source, which is
+    // one less than maximum destination characters to leave space for null
+    // terminator.
+    CONST MO_UINTN MaximumSourceCharacters =
+        MaximumDestinationCharacters - 1u;
+
+    if (MaximumDestinationCharacters < MaximumLength ||
+        MaximumSourceCharacters < SourceLength)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    CONST MO_UINTN SourceSize = SourceLength * sizeof(MO_WIDE_CHAR);
+    CONST MO_UINTN RequiredSize = SourceSize + sizeof(MO_WIDE_CHAR);
+
+    if (SourceLength > MaximumLength - 1u)
+    {
+        // Not enough space in destination for source and null terminator.
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
+    }
+
+    MO_UINTN DestinationStart = (MO_UINTN)(Destination);
+    MO_UINTN SourceStart = (MO_UINTN)(Source);
+
+    if (RequiredSize > (MO_UINTN_MAX - DestinationStart) ||
+        RequiredSize > (MO_UINTN_MAX - SourceStart))
+    {
+        // Overflow source or destination range is not allowed.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    if ((DestinationStart < (SourceStart + RequiredSize)) &&
+        (SourceStart < (DestinationStart + RequiredSize)))
+    {
+        // Overlap source or destination is not allowed.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    if (SourceLength)
+    {
+        // Copy the source string to destination.
+        MoRuntimeInternalMemoryCopy(
+            (MO_POINTER)(Destination),
+            (MO_POINTER)(Source),
+            SourceSize);
+    }
+
+    // Null terminate the destination string.
+    Destination[SourceLength] = L'\0';
+
+    return MO_RESULT_SUCCESS_OK;
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
+    _Inout_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    if (!Destination || !MaximumLength || !Source)
+    {
+        // We need non-null destination and source, and non-zero destination
+        // length.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    // Maximum number of characters that can be stored in destination.
+    CONST MO_UINTN MaximumDestinationCharacters =
+        (MO_UINTN_MAX / sizeof(MO_CHAR));
+
+    // Maximum number of characters that can be copied from source, which is
+    // one less than maximum destination characters to leave space for null
+    // terminator.
+    CONST MO_UINTN MaximumSourceCharacters =
+        MaximumDestinationCharacters - 1u;
+
+    if (MaximumDestinationCharacters < MaximumLength ||
+        MaximumSourceCharacters < SourceLength)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    // Disallow any overlap between the whole destination buffer range and the
+    // source range (including null terminator).
+    {
+        MO_UINTN DestinationStart = (MO_UINTN)Destination;
+        MO_UINTN DestinationSize = MaximumLength * sizeof(MO_CHAR);
+
+        MO_UINTN SourceStart = (MO_UINTN)Source;
+        MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_CHAR);
+
+        if (DestinationSize > (MO_UINTN_MAX - DestinationStart) ||
+            SourceSize > (MO_UINTN_MAX - SourceStart))
+        {
+            // Overflow source or destination range is not allowed.
+            return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+        }
+
+        if ((DestinationStart < (SourceStart + SourceSize)) &&
+            (SourceStart < (DestinationStart + DestinationSize)))
+        {
+            // Overlap source or destination is not allowed.
+            return MO_RESULT_ERROR_INVALID_PARAMETER;
+        }
+    }
+
+    MO_UINTN DestinationLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+        &DestinationLength,
+        Destination,
+        MaximumLength))
+    {
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    MO_UINTN SourceActualLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+        &SourceActualLength,
+        Source,
+        SourceLength + 1u))
+    {
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (SourceActualLength != SourceLength)
+    {
+        // Source length mismatch.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    return MoRuntimeStringCopy(
+        &Destination[DestinationLength],
+        MaximumLength - DestinationLength,
+        Source,
+        SourceActualLength);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
+    _Inout_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    if (!Destination || !MaximumLength || !Source)
+    {
+        // We need non-null destination and source, and non-zero destination
+        // length.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    // Maximum number of characters that can be stored in destination.
+    CONST MO_UINTN MaximumDestinationCharacters =
+        (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR));
+
+    // Maximum number of characters that can be copied from source, which is
+    // one less than maximum destination characters to leave space for null
+    // terminator.
+    CONST MO_UINTN MaximumSourceCharacters =
+        MaximumDestinationCharacters - 1u;
+
+    if (MaximumDestinationCharacters < MaximumLength ||
+        MaximumSourceCharacters < SourceLength)
+    {
+        // Prevent overflow when calculating required size.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    // Disallow any overlap between the whole destination buffer range and the
+    // source range (including null terminator).
+    {
+        MO_UINTN DestinationStart = (MO_UINTN)Destination;
+        MO_UINTN DestinationSize = MaximumLength * sizeof(MO_WIDE_CHAR);
+
+        MO_UINTN SourceStart = (MO_UINTN)Source;
+        MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_WIDE_CHAR);
+
+        if (DestinationSize > (MO_UINTN_MAX - DestinationStart) ||
+            SourceSize > (MO_UINTN_MAX - SourceStart))
+        {
+            // Overflow source or destination range is not allowed.
+            return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+        }
+
+        if ((DestinationStart < (SourceStart + SourceSize)) &&
+            (SourceStart < (DestinationStart + DestinationSize)))
+        {
+            // Overlap source or destination is not allowed.
+            return MO_RESULT_ERROR_INVALID_PARAMETER;
+        }
+    }
+
+    MO_UINTN DestinationLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+        &DestinationLength,
+        Destination,
+        MaximumLength))
+    {
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+
+    MO_UINTN SourceActualLength = 0u;
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+        &SourceActualLength,
+        Source,
+        SourceLength + 1u))
+    {
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (SourceActualLength != SourceLength)
+    {
+        // Source length mismatch.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+
+    return MoRuntimeWideStringCopy(
+        &Destination[DestinationLength],
+        MaximumLength - DestinationLength,
+        Source,
+        SourceActualLength);
 }

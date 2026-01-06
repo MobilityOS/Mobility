@@ -298,4 +298,163 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     _In_ MO_UINTN BufferSize,
     _In_ MO_UINTN Value);
 
+/**
+ * @brief Validate a null-terminated string within a maximum length, and
+ *        optionally retrieve the length of the string.
+ * @param Length The pointer to receive the length of the string without the
+ *               null terminator. This parameter is optional if the caller only
+ *               wants to validate the string. If the string is invalid, the
+ *               output length will be set to zero.
+ * @param String The non-null pointer to the string to validate.
+ * @param MaximumLength The non-zero maximum number of characters readable from
+ *                      String, which is the accessible buffer length in
+ *                      characters.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the string is invalid which is not null-terminated within the
+ *          maximum length, the function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN MaximumLength);
+
+/**
+ * @brief Validate a null-terminated wide string within a maximum length, and
+ *        optionally retrieve the length of the wide string.
+ * @param Length The pointer to receive the length of the wide string without
+ *               the null terminator. This parameter is optional if the caller
+ *               only wants to validate the wide string. If the wide string is
+ *               invalid, the output length will be set to zero.
+ * @param WideString The non-null pointer to the wide string to validate.
+ * @param MaximumLength The non-zero maximum number of wide characters readable
+ *                      from WideString, which is the accessible buffer length
+ *                      in wide characters.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the wide string is invalid which is not null-terminated within
+ *          the maximum length, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
+    _Out_opt_ PMO_UINTN Length,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN MaximumLength);
+
+/**
+ * @brief Copies a string from source to destination with specified lengths.
+ * @param Destination The non-null destination string buffer.
+ * @param MaximumLength The non-zero maximum number of characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source string to copy from.
+ * @param SourceLength The number of characters to copy from the source,
+ *                     excluding the null terminator.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the number of characters in the source string plus the null
+ *          terminator exceeds the maximum number of characters of the
+ *          destination buffer, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source and destination
+ *          is not allowed and results in MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          If the address ranges of source or destination overflow, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
+    _Out_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength);
+
+/**
+ * @brief Copies a wide string from source to destination with specified
+ *        lengths.
+ * @param Destination The non-null destination wide string buffer.
+ * @param MaximumLength The non-zero maximum number of wide characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source wide string to copy from.
+ * @param SourceLength The number of wide characters to copy from the source,
+ *                     excluding the null terminator.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the number of characters in the source wide string plus the null
+ *          terminator exceeds the maximum number of wide characters of the
+ *          destination buffer, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source and destination
+ *          is not allowed and results in MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          If the address ranges of source or destination overflow, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
+    _Out_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength);
+
+/**
+ * @brief Concatenate source string to the end of destination string.
+ * @param Destination The non-null destination string buffer.
+ * @param MaximumLength The non-zero maximum number of characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source string to concatenate.
+ * @param SourceLength The number of characters to concatenate from source,
+ *                     excluding the null terminator.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the destination string is not a valid null-terminated string
+ *          within the maximum length, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS. If the source string is not a valid
+ *          null-terminated string within the number of characters in the source
+ *          string plus the null terminator, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS. If actual number of characters in the
+ *          source string without the null terminator is not equal to source
+ *          length, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          If the number of characters in the destination string plus the
+ *          number of characters to concatenate from source string plus the null
+ *          terminator exceeds the maximum number of characters of the
+ *          destination buffer, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source and destination
+ *          is not allowed and results in MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          If the address ranges of source or destination overflow, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
+    _Inout_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength);
+
+/**
+ * @brief Concatenate source wide string to the end of destination wide string.
+ * @param Destination The non-null destination wide string buffer.
+ * @param MaximumLength The non-zero maximum number of characters of the
+ *                      destination buffer, including the null terminator.
+ * @param Source The non-null source wide string to concatenate.
+ * @param SourceLength The number of characters to concatenate from source,
+ *                     excluding the null terminator.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the destination wide string is not a valid null-terminated wide
+ *          string within the maximum length, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS. If the source wide string is not a
+ *          valid null-terminated wide string within the number of characters in
+ *          the source wide string plus the null terminator, the function
+ *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If actual number of
+ *          characters in the source wide string without the null terminator is
+ *          not equal to source length, the function returns
+ *          MO_RESULT_ERROR_INVALID_PARAMETER. If the number of characters in
+ *          the destination wide string plus the number of characters to
+ *          concatenate from source wide string plus the null terminator exceeds
+ *          the maximum number of characters of the destination buffer, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source
+ *          and destination is not allowed and results in
+ *          MO_RESULT_ERROR_INVALID_PARAMETER. If the address ranges of source
+ *          or destination overflow, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ */
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
+    _Inout_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength);
+
 #endif // !MOBILITY_RUNTIME_CORE
