@@ -299,6 +299,30 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     _In_ MO_UINTN Value);
 
 /**
+ * @brief The maximum length of a string including the null terminator.
+ */
+#define MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR \
+    (MO_UINTN_MAX / sizeof(MO_CHAR))
+
+/**
+ * @brief The maximum length of a wide string including the null terminator.
+ */
+#define MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR \
+    (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR))
+
+/**
+ * @brief The maximum length of a string excluding the null terminator.
+ */
+#define MO_RUNTIME_STRING_MAXIMUM_LENGTH \
+    (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR - 1u)
+
+/**
+ * @brief The maximum length of a wide string excluding the null terminator.
+ */
+#define MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH \
+    (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR - 1u)
+
+/**
  * @brief Validate a null-terminated string within a maximum length, and
  *        optionally retrieve the length of the string.
  * @param Length The pointer to receive the length of the string without the
