@@ -26,10 +26,6 @@
 
 #include <Mobility.HyperV.Core.h>
 
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-
 EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
     _Out_ PMO_POINTER Block,
     _In_ MO_UINTN Size)
@@ -139,7 +135,16 @@ namespace
             }
 
             // Add the file path string.
-            Length += ::wcslen(reinterpret_cast<wchar_t*>(FilePath->PathName));
+
+            MO_UINTN ActualLength = 0;
+            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
+            if (MO_RESULT_SUCCESS_OK == ::MoRuntimeWideStringValidate(
+                &ActualLength,
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName),
+                MO_UINT16_MAX / sizeof(MO_WIDE_CHAR)))
+            {
+                Length += ActualLength;
+            }
 
             Source = ::GetNextDevicePathNode(Source);
         }
@@ -175,10 +180,19 @@ namespace
                 break;
             }
 
-            ::wcscat_s(
-                Destination,
-                DestinationLength,
-                reinterpret_cast<wchar_t*>(FilePath->PathName));
+            MO_UINTN ActualLength = 0;
+            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
+            if (MO_RESULT_SUCCESS_OK == ::MoRuntimeWideStringValidate(
+                &ActualLength,
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName),
+                MO_UINT16_MAX / sizeof(MO_WIDE_CHAR)))
+            {
+                ::MoRuntimeWideStringConcatenate(
+                    Destination,
+                    DestinationLength,
+                    reinterpret_cast<MO_CONSTANT_WIDE_STRING>(FilePath->PathName),
+                    ActualLength);
+            }
 
             Source = ::GetNextDevicePathNode(Source);
         }
@@ -260,8 +274,19 @@ namespace
             RootDevicePath = ::GetNextDevicePathNode(RootDevicePath);
         }
 
-        UINT16 RelativeFilePathLength = static_cast<UINT16>(
-            ::wcslen(RelativeFilePath) + 1);
+        UINT16 RelativeFilePathLength = 0u;
+        {
+            MO_UINTN ActualLength = 0;
+            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
+            if (MO_RESULT_SUCCESS_OK != ::MoRuntimeWideStringValidate(
+                &ActualLength,
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(RelativeFilePath),
+                MO_UINT16_MAX / sizeof(MO_WIDE_CHAR)))
+            {
+                return false;
+            }
+            RelativeFilePathLength = static_cast<UINT16>(ActualLength + 1);
+        }
         FILEPATH_DEVICE_PATH* FilePath =
             reinterpret_cast<FILEPATH_DEVICE_PATH*>(Current);
         FilePath->Header.Type = MEDIA_DEVICE_PATH;
@@ -317,6 +342,11 @@ namespace
 
         return Status;
     }
+}
+
+namespace
+{
+    MO_UINT8 g_DevicePathBuffer[4096];
 }
 
 /**
@@ -612,10 +642,37 @@ EFI_STATUS EFIAPI UefiMain(
             ::MoUefiConsoleWriteAsciiString(
                 SystemTable->ConOut,
                 "\r\n");
-            wchar_t* ReplacementStart = ::wcsrchr(TargetFileBuffer, L'\\');
-            if (ReplacementStart)
+            PMO_WIDE_CHAR ReplacementStart = nullptr;
+            MO_UINTN ActualLength = 0;
+            // Maximum size is from Length field in EFI_DEVICE_PATH_PROTOCOL.
+            if (MO_RESULT_SUCCESS_OK == ::MoRuntimeWideStringValidate(
+                &ActualLength,
+                reinterpret_cast<MO_CONSTANT_WIDE_STRING>(TargetFileBuffer),
+                sizeof(TargetFileBuffer) / sizeof(*TargetFileBuffer)))
             {
-                ReplacementStart = ::wcsrchr(ReplacementStart, L'.');
+                MO_UINTN SlashStartIndex = 0;
+                if (MO_RESULT_SUCCESS_OK ==
+                    ::MoRuntimeWideStringFindLastCharacter(
+                        &SlashStartIndex,
+                        reinterpret_cast<MO_CONSTANT_WIDE_STRING>(TargetFileBuffer),
+                        ActualLength,
+                        L'\\'))
+                {
+                    MO_UINTN DotStartIndex = 0;
+                    if (MO_RESULT_SUCCESS_OK ==
+                        ::MoRuntimeWideStringFindLastCharacter(
+                            &DotStartIndex,
+                            reinterpret_cast<MO_CONSTANT_WIDE_STRING>(
+                                TargetFileBuffer),
+                            ActualLength,
+                            L'.'))
+                    {
+                        if (DotStartIndex > SlashStartIndex)
+                        {
+                            ReplacementStart = TargetFileBuffer + DotStartIndex;
+                        }
+                    }
+                }
             }
             if (!ReplacementStart)
             {
@@ -629,7 +686,13 @@ EFI_STATUS EFIAPI UefiMain(
                 size_t BufferLength = sizeof(TargetFileBuffer) - sizeof(wchar_t);
                 BufferLength -= ReplacementStart - TargetFileBuffer;
                 BufferLength /= sizeof(wchar_t);
-                ::wcscpy_s(ReplacementStart, BufferLength, L"original.efi");
+                const MO_WIDE_CHAR Suffix[] = L"original.efi";
+                const MO_UINTN SuffixLength = (sizeof(Suffix) / sizeof(*Suffix)) - 1;
+                ::MoRuntimeWideStringCopy(
+                    ReplacementStart,
+                    BufferLength,
+                    Suffix,
+                    SuffixLength);
                 ::MoUefiConsoleWriteAsciiString(
                     SystemTable->ConOut,
                     "Target EFI Image Path = ");
@@ -652,17 +715,16 @@ EFI_STATUS EFIAPI UefiMain(
                 }
                 else
                 {
-                    UINT8 DevicePathBuffer[4096];
                     ::MoRuntimeMemoryFillByte(
-                        DevicePathBuffer,
+                        g_DevicePathBuffer,
                         0,
-                        sizeof(DevicePathBuffer));
+                        sizeof(g_DevicePathBuffer));
                     EFI_DEVICE_PATH_PROTOCOL* TargetDevicePath =
                         reinterpret_cast<EFI_DEVICE_PATH_PROTOCOL*>(
-                            DevicePathBuffer);
+                            g_DevicePathBuffer);
                     if (!::CreateAbsoluteDevicePathForFile(
                         TargetDevicePath,
-                        sizeof(DevicePathBuffer),
+                        sizeof(g_DevicePathBuffer),
                         RootDevicePath,
                         TargetFileBuffer))
                     {
