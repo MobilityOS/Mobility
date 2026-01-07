@@ -17,6 +17,19 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
     return (Size + Alignment - 1) & ~(Alignment - 1);
 }
 
+EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
+    _In_ MO_CONSTANT_POINTER ElementArray,
+    _In_ MO_UINTN ElementSize)
+{
+    if (!ElementArray || !ElementSize)
+    {
+        // Invalid parameters.
+        return 0u;
+    }
+
+    return (MO_UINTN_MAX - ((MO_UINTN)(ElementArray))) / ElementSize;
+}
+
 MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteUnaligned(
     _Out_ MO_POINTER Buffer,
     _In_ MO_UINT8 Value,
@@ -1174,6 +1187,22 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     return MO_RESULT_SUCCESS_OK;
 }
 
+EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
+    _In_ MO_CONSTANT_STRING String)
+{
+    return MoRuntimeMemoryCalculateMaximumValidLength(
+        String,
+        sizeof(MO_CHAR));
+}
+
+EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
+    _In_ MO_CONSTANT_WIDE_STRING WideString)
+{
+    return MoRuntimeMemoryCalculateMaximumValidLength(
+        WideString,
+        sizeof(MO_WIDE_CHAR));
+}
+
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
     _Out_opt_ PMO_UINTN Length,
     _In_ MO_CONSTANT_STRING String,
@@ -1185,10 +1214,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MaximumLength > MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
+    MO_UINTN MaximumValidLength =
+        MoRuntimeStringCalculateMaximumValidLength(String);
+    if (MaximumLength > MaximumValidLength)
     {
         // Limit maximum length to prevent overflow.
-        MaximumLength = MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR;
+        MaximumLength = MaximumValidLength;
     }
 
     if (Length)
@@ -1227,10 +1258,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MaximumLength > MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR)
+    MO_UINTN MaximumValidLength =
+        MoRuntimeWideStringCalculateMaximumValidLength(WideString);
+    if (MaximumLength > MaximumValidLength)
     {
         // Limit maximum length to prevent overflow.
-        MaximumLength = MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR;
+        MaximumLength = MaximumValidLength;
     }
 
     if (Length)
@@ -1258,11 +1291,178 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
     return MO_RESULT_ERROR_OUT_OF_BOUNDS;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
-    _Out_ MO_STRING Destination,
+MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDestinationValidate(
+    _In_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength)
+{
+    MO_UINTN MaximumValidLength =
+        MoRuntimeStringCalculateMaximumValidLength(Destination);
+    if (!MaximumValidLength)
+    {
+        // Destination is not a valid string buffer.
+        return MO_FALSE;
+    }
+    if (MaximumLength > MaximumValidLength)
+    {
+        // Limit lengths to prevent overflow.
+        return MO_FALSE;
+    }
+    // Destination is valid.
+    return MO_TRUE;
+}
+
+MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDestinationValidate(
+    _In_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength)
+{
+    MO_UINTN MaximumValidLength =
+        MoRuntimeWideStringCalculateMaximumValidLength(Destination);
+    if (!MaximumValidLength)
+    {
+        // Destination is not a valid wide string buffer.
+        return MO_FALSE;
+    }
+    if (MaximumLength > MaximumValidLength)
+    {
+        // Limit lengths to prevent overflow.
+        return MO_FALSE;
+    }
+    // Destination is valid.
+    return MO_TRUE;
+}
+
+MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringSourceValidate(
+    _Out_ PMO_UINTN ActualLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength,
+    _In_ MO_BOOL Strict)
+{
+    if (MO_UINTN_MAX == ((MO_UINTN)Source))
+    {
+        // Invalid source pointer.
+        return MO_FALSE;
+    }
+    // Include null terminator in validation.
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+        ActualLength,
+        Source,
+        SourceLength + 1u))
+    {
+        // Source is not a valid string.
+        return MO_FALSE;
+    }
+    if (Strict)
+    {
+        if (*ActualLength != SourceLength)
+        {
+            // Source length does not match actual length.
+            return MO_FALSE;
+        }
+    }
+    else
+    {
+        if (*ActualLength > SourceLength)
+        {
+            // In non-strict mode, if the actual source length exceeds the
+            // provided source length, treat it as invalid.
+            return MO_FALSE;
+        }
+    }
+    // Source is valid.
+    return MO_TRUE;
+}
+
+MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringSourceValidate(
+    _Out_ PMO_UINTN ActualLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength,
+    _In_ MO_BOOL Strict)
+{
+    if (MO_UINTN_MAX == ((MO_UINTN)Source))
+    {
+        // Invalid source pointer.
+        return MO_FALSE;
+    }
+    // Include null terminator in validation.
+    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+        ActualLength,
+        Source,
+        SourceLength + 1u))
+    {
+        // Source is not a valid wide string.
+        return MO_FALSE;
+    }
+    if (Strict)
+    {
+        if (*ActualLength != SourceLength)
+        {
+            // Source length does not match actual length.
+            return MO_FALSE;
+        }
+    }
+    else
+    {
+        if (*ActualLength > SourceLength)
+        {
+            // In non-strict mode, if the actual source length exceeds the
+            // provided source length, treat it as invalid.
+            return MO_FALSE;
+        }
+    }
+    // Source is valid.
+    return MO_TRUE;
+}
+
+MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDetectOverlap(
+    _In_ MO_STRING Destination,
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_STRING Source,
     _In_ MO_UINTN SourceLength)
+{
+    MO_UINTN DestinationStart = (MO_UINTN)Destination;
+    MO_UINTN DestinationSize = MaximumLength * sizeof(MO_CHAR);
+
+    MO_UINTN SourceStart = (MO_UINTN)Source;
+    MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_CHAR);
+
+    if ((DestinationStart < (SourceStart + SourceSize)) &&
+        (SourceStart < (DestinationStart + DestinationSize)))
+    {
+        // Overlap detected.
+        return MO_TRUE;
+    }
+
+    return MO_FALSE;
+}
+
+MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDetectOverlap(
+    _In_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    MO_UINTN DestinationStart = (MO_UINTN)Destination;
+    MO_UINTN DestinationSize = MaximumLength * sizeof(MO_WIDE_CHAR);
+
+    MO_UINTN SourceStart = (MO_UINTN)Source;
+    MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_WIDE_CHAR);
+
+    if ((DestinationStart < (SourceStart + SourceSize)) &&
+        (SourceStart < (DestinationStart + DestinationSize)))
+    {
+        // Overlap detected.
+        return MO_TRUE;
+    }
+
+    return MO_FALSE;
+}
+
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringCopy(
+    _Out_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength,
+    _In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1271,15 +1471,31 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
-        MO_RUNTIME_STRING_MAXIMUM_LENGTH < SourceLength)
+    if (!MoRuntimeInternalStringDestinationValidate(
+        Destination,
+        MaximumLength))
     {
-        // Prevent overflow when calculating required size.
+        // Destination is not a valid string buffer.
+        // Ensure the destination range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    CONST MO_UINTN SourceSize = SourceLength * sizeof(MO_CHAR);
-    CONST MO_UINTN RequiredSize = SourceSize + sizeof(MO_CHAR);
+    MO_UINTN ActualSourceLength = 0u;
+    if (!MoRuntimeInternalStringSourceValidate(
+        &ActualSourceLength,
+        Source,
+        SourceLength,
+        Strict))
+    {
+        // Source is not a valid string within the source length.
+        // Ensure the source range is valid to prevent overflow.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (!Strict)
+    {
+        // In non-strict mode, use the actual source length for copying.
+        SourceLength = ActualSourceLength;
+    }
 
     if (SourceLength > MaximumLength - 1u)
     {
@@ -1287,20 +1503,14 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
         return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
-    MO_UINTN DestinationStart = (MO_UINTN)(Destination);
-    MO_UINTN SourceStart = (MO_UINTN)(Source);
-
-    if (RequiredSize > (MO_UINTN_MAX - DestinationStart) ||
-        RequiredSize > (MO_UINTN_MAX - SourceStart))
+    if (MoRuntimeInternalStringDetectOverlap(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength))
     {
-        // Overflow source or destination range is not allowed.
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-
-    if ((DestinationStart < (SourceStart + RequiredSize)) &&
-        (SourceStart < (DestinationStart + RequiredSize)))
-    {
-        // Overlap source or destination is not allowed.
+        // Any overlap between the whole destination buffer range and the
+        // source range including null terminator is not allowed.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
@@ -1310,7 +1520,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
         MoRuntimeInternalMemoryCopy(
             (MO_POINTER)(Destination),
             (MO_POINTER)(Source),
-            SourceSize);
+            SourceLength * sizeof(MO_CHAR));
     }
 
     // Null terminate the destination string.
@@ -1319,11 +1529,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringCopy(
     _Out_ MO_WIDE_STRING Destination,
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength)
+    _In_ MO_UINTN SourceLength,
+    _In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1332,15 +1543,31 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
-        MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < SourceLength)
+    if (!MoRuntimeInternalWideStringDestinationValidate(
+        Destination,
+        MaximumLength))
     {
-        // Prevent overflow when calculating required size.
+        // Destination is not a valid wide string buffer.
+        // Ensure the destination range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    CONST MO_UINTN SourceSize = SourceLength * sizeof(MO_WIDE_CHAR);
-    CONST MO_UINTN RequiredSize = SourceSize + sizeof(MO_WIDE_CHAR);
+    MO_UINTN ActualSourceLength = 0u;
+    if (!MoRuntimeInternalWideStringSourceValidate(
+        &ActualSourceLength,
+        Source,
+        SourceLength,
+        Strict))
+    {
+        // Source is not a valid wide string within the source length.
+        // Ensure the source range is valid to prevent overflow.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (!Strict)
+    {
+        // In non-strict mode, use the actual source length for copying.
+        SourceLength = ActualSourceLength;
+    }
 
     if (SourceLength > MaximumLength - 1u)
     {
@@ -1348,20 +1575,14 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
         return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
-    MO_UINTN DestinationStart = (MO_UINTN)(Destination);
-    MO_UINTN SourceStart = (MO_UINTN)(Source);
-
-    if (RequiredSize > (MO_UINTN_MAX - DestinationStart) ||
-        RequiredSize > (MO_UINTN_MAX - SourceStart))
+    if (MoRuntimeInternalWideStringDetectOverlap(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength))
     {
-        // Overflow source or destination range is not allowed.
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-
-    if ((DestinationStart < (SourceStart + RequiredSize)) &&
-        (SourceStart < (DestinationStart + RequiredSize)))
-    {
-        // Overlap source or destination is not allowed.
+        // Any overlap between the whole destination buffer range and the
+        // source range including null terminator is not allowed.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
@@ -1371,7 +1592,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
         MoRuntimeInternalMemoryCopy(
             (MO_POINTER)(Destination),
             (MO_POINTER)(Source),
-            SourceSize);
+            SourceLength * sizeof(MO_WIDE_CHAR));
     }
 
     // Null terminate the destination string.
@@ -1380,11 +1601,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringConcatenate(
     _Inout_ MO_STRING Destination,
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength)
+    _In_ MO_UINTN SourceLength,
+    _In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1393,35 +1615,41 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
-        MO_RUNTIME_STRING_MAXIMUM_LENGTH < SourceLength)
+    if (!MoRuntimeInternalStringDestinationValidate(
+        Destination,
+        MaximumLength))
     {
-        // Prevent overflow when calculating required size.
+        // Destination is not a valid string buffer.
+        // Ensure the destination range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    // Disallow any overlap between the whole destination buffer range and the
-    // source range (including null terminator).
+    MO_UINTN ActualSourceLength = 0u;
+    if (!MoRuntimeInternalStringSourceValidate(
+        &ActualSourceLength,
+        Source,
+        SourceLength,
+        Strict))
     {
-        MO_UINTN DestinationStart = (MO_UINTN)Destination;
-        MO_UINTN DestinationSize = MaximumLength * sizeof(MO_CHAR);
+        // Source is not a valid string within the source length.
+        // Ensure the source range is valid to prevent overflow.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (!Strict)
+    {
+        // In non-strict mode, use the actual source length for copying.
+        SourceLength = ActualSourceLength;
+    }
 
-        MO_UINTN SourceStart = (MO_UINTN)Source;
-        MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_CHAR);
-
-        if (DestinationSize > (MO_UINTN_MAX - DestinationStart) ||
-            SourceSize > (MO_UINTN_MAX - SourceStart))
-        {
-            // Overflow source or destination range is not allowed.
-            return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-        }
-
-        if ((DestinationStart < (SourceStart + SourceSize)) &&
-            (SourceStart < (DestinationStart + DestinationSize)))
-        {
-            // Overlap source or destination is not allowed.
-            return MO_RESULT_ERROR_INVALID_PARAMETER;
-        }
+    if (MoRuntimeInternalStringDetectOverlap(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength))
+    {
+        // Any overlap between the whole destination buffer range and the
+        // source range including null terminator is not allowed.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
     MO_UINTN DestinationLength = 0u;
@@ -1433,32 +1661,34 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    MO_UINTN SourceActualLength = 0u;
-    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
-        &SourceActualLength,
-        Source,
-        SourceLength + 1u))
+    if (SourceLength > MaximumLength - 1u - DestinationLength)
     {
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-    if (SourceActualLength != SourceLength)
-    {
-        // Source length mismatch.
-        return MO_RESULT_ERROR_INVALID_PARAMETER;
+        // Not enough space in destination for concatenated string and null
+        // terminator.
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
-    return MoRuntimeStringCopy(
-        &Destination[DestinationLength],
-        MaximumLength - DestinationLength,
-        Source,
-        SourceActualLength);
+    if (SourceLength)
+    {
+        // Copy the source string to the end of destination.
+        MoRuntimeInternalMemoryCopy(
+            (MO_POINTER)(&Destination[DestinationLength]),
+            (MO_POINTER)(Source),
+            SourceLength * sizeof(MO_CHAR));
+    }
+
+    // Null terminate the destination string.
+    Destination[DestinationLength + SourceLength] = '\0';
+
+    return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringConcatenate(
     _Inout_ MO_WIDE_STRING Destination,
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength)
+    _In_ MO_UINTN SourceLength,
+    _In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1467,35 +1697,41 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR < MaximumLength ||
-        MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < SourceLength)
+    if (!MoRuntimeInternalWideStringDestinationValidate(
+        Destination,
+        MaximumLength))
     {
-        // Prevent overflow when calculating required size.
+        // Destination is not a valid wide string buffer.
+        // Ensure the destination range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    // Disallow any overlap between the whole destination buffer range and the
-    // source range (including null terminator).
+    MO_UINTN ActualSourceLength = 0u;
+    if (!MoRuntimeInternalWideStringSourceValidate(
+        &ActualSourceLength,
+        Source,
+        SourceLength,
+        Strict))
     {
-        MO_UINTN DestinationStart = (MO_UINTN)Destination;
-        MO_UINTN DestinationSize = MaximumLength * sizeof(MO_WIDE_CHAR);
+        // Source is not a valid wide string within the source length.
+        // Ensure the source range is valid to prevent overflow.
+        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
+    }
+    if (!Strict)
+    {
+        // In non-strict mode, use the actual source length for copying.
+        SourceLength = ActualSourceLength;
+    }
 
-        MO_UINTN SourceStart = (MO_UINTN)Source;
-        MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_WIDE_CHAR);
-
-        if (DestinationSize > (MO_UINTN_MAX - DestinationStart) ||
-            SourceSize > (MO_UINTN_MAX - SourceStart))
-        {
-            // Overflow source or destination range is not allowed.
-            return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-        }
-
-        if ((DestinationStart < (SourceStart + SourceSize)) &&
-            (SourceStart < (DestinationStart + DestinationSize)))
-        {
-            // Overlap source or destination is not allowed.
-            return MO_RESULT_ERROR_INVALID_PARAMETER;
-        }
+    if (MoRuntimeInternalWideStringDetectOverlap(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength))
+    {
+        // Any overlap between the whole destination buffer range and the
+        // source range including null terminator is not allowed.
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
     MO_UINTN DestinationLength = 0u;
@@ -1507,32 +1743,34 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    MO_UINTN SourceActualLength = 0u;
-    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
-        &SourceActualLength,
-        Source,
-        SourceLength + 1u))
+    if (SourceLength > MaximumLength - 1u - DestinationLength)
     {
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-    if (SourceActualLength != SourceLength)
-    {
-        // Source length mismatch.
-        return MO_RESULT_ERROR_INVALID_PARAMETER;
+        // Not enough space in destination for concatenated wide string and
+        // null terminator.
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
-    return MoRuntimeWideStringCopy(
-        &Destination[DestinationLength],
-        MaximumLength - DestinationLength,
-        Source,
-        SourceActualLength);
+    if (SourceLength)
+    {
+        // Copy the source wide string to the end of destination.
+        MoRuntimeInternalMemoryCopy(
+            (MO_POINTER)(&Destination[DestinationLength]),
+            (MO_POINTER)(Source),
+            SourceLength * sizeof(MO_WIDE_CHAR));
+    }
+
+    // Null terminate the destination wide string.
+    Destination[DestinationLength + SourceLength] = L'\0';
+
+    return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringFindFirstCharacter(
     _Out_ PMO_UINTN Index,
     _In_ MO_CONSTANT_STRING String,
     _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character)
+    _In_ MO_CHAR Character,
+    _In_ MO_BOOL Strict)
 {
     if (!Index || !String)
     {
@@ -1541,25 +1779,21 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH < Length)
-    {
-        // Prevent overflow when calculating required size.
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-
     MO_UINTN ActualLength = 0u;
-    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+    if (!MoRuntimeInternalStringSourceValidate(
         &ActualLength,
         String,
-        Length + 1u))
+        Length,
+        Strict))
     {
-        // String is not valid within the specified length.
+        // String is not a valid string within the length.
+        // Ensure the range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
-    if (Length != ActualLength)
+    if (!Strict)
     {
-        // Length mismatch.
-        return MO_RESULT_ERROR_INVALID_PARAMETER;
+        // In non-strict mode, use the actual length for copying.
+        Length = ActualLength;
     }
 
     for (MO_UINTN CurrentIndex = 0u; CurrentIndex < Length; ++CurrentIndex)
@@ -1574,11 +1808,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
     return MO_RESULT_SUCCESS_FALSE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringFindFirstCharacter(
     _Out_ PMO_UINTN Index,
     _In_ MO_CONSTANT_WIDE_STRING WideString,
     _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter)
+    _In_ MO_WIDE_CHAR WideCharacter,
+    _In_ MO_BOOL Strict)
 {
     if (!Index || !WideString)
     {
@@ -1587,25 +1822,21 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < Length)
-    {
-        // Prevent overflow when calculating required size.
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-
     MO_UINTN ActualLength = 0u;
-    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+    if (!MoRuntimeInternalWideStringSourceValidate(
         &ActualLength,
         WideString,
-        Length + 1u))
+        Length,
+        Strict))
     {
-        // String is not valid within the specified length.
+        // String is not a valid wide string within the length.
+        // Ensure the range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
-    if (Length != ActualLength)
+    if (!Strict)
     {
-        // Length mismatch.
-        return MO_RESULT_ERROR_INVALID_PARAMETER;
+        // In non-strict mode, use the actual length for copying.
+        Length = ActualLength;
     }
 
     for (MO_UINTN CurrentIndex = 0u; CurrentIndex < Length; ++CurrentIndex)
@@ -1620,11 +1851,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
     return MO_RESULT_SUCCESS_FALSE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringFindLastCharacter(
     _Out_ PMO_UINTN Index,
     _In_ MO_CONSTANT_STRING String,
     _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character)
+    _In_ MO_CHAR Character,
+    _In_ MO_BOOL Strict)
 {
     if (!Index || !String)
     {
@@ -1633,25 +1865,21 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    if (MO_RUNTIME_STRING_MAXIMUM_LENGTH < Length)
-    {
-        // Prevent overflow when calculating required size.
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-
     MO_UINTN ActualLength = 0u;
-    if (MO_RESULT_SUCCESS_OK != MoRuntimeStringValidate(
+    if (!MoRuntimeInternalStringSourceValidate(
         &ActualLength,
         String,
-        Length + 1u))
+        Length,
+        Strict))
     {
-        // String is not valid within the specified length.
+        // String is not a valid string within the length.
+        // Ensure the range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
-    if (Length != ActualLength)
+    if (!Strict)
     {
-        // Length mismatch.
-        return MO_RESULT_ERROR_INVALID_PARAMETER;
+        // In non-strict mode, use the actual length for copying.
+        Length = ActualLength;
     }
 
     for (MO_UINTN CurrentIndex = Length; CurrentIndex > 0u; --CurrentIndex)
@@ -1666,11 +1894,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
     return MO_RESULT_SUCCESS_FALSE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
+MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringFindLastCharacter(
     _Out_ PMO_UINTN Index,
     _In_ MO_CONSTANT_WIDE_STRING WideString,
     _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter)
+    _In_ MO_WIDE_CHAR WideCharacter,
+    _In_ MO_BOOL Strict)
 {
     if (!Index || !WideString)
     {
@@ -1679,25 +1908,21 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     }
     *Index = MO_UINTN_MAX;
 
-    if (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH < Length)
-    {
-        // Prevent overflow when calculating required size.
-        return MO_RESULT_ERROR_OUT_OF_BOUNDS;
-    }
-
     MO_UINTN ActualLength = 0u;
-    if (MO_RESULT_SUCCESS_OK != MoRuntimeWideStringValidate(
+    if (!MoRuntimeInternalWideStringSourceValidate(
         &ActualLength,
         WideString,
-        Length + 1u))
+        Length,
+        Strict))
     {
-        // String is not valid within the specified length.
+        // String is not a valid wide string within the length.
+        // Ensure the range is valid to prevent overflow.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
-    if (Length != ActualLength)
+    if (!Strict)
     {
-        // Length mismatch.
-        return MO_RESULT_ERROR_INVALID_PARAMETER;
+        // In non-strict mode, use the actual length for copying.
+        Length = ActualLength;
     }
 
     for (MO_UINTN CurrentIndex = Length; CurrentIndex > 0u; --CurrentIndex)
@@ -1712,24 +1937,130 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     return MO_RESULT_SUCCESS_FALSE;
 }
 
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
+    _Out_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    return MoRuntimeInternalStringCopy(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
+    _Out_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    return MoRuntimeInternalWideStringCopy(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
+    _Inout_ MO_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    return MoRuntimeInternalStringConcatenate(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
+    _Inout_ MO_WIDE_STRING Destination,
+    _In_ MO_UINTN MaximumLength,
+    _In_ MO_CONSTANT_WIDE_STRING Source,
+    _In_ MO_UINTN SourceLength)
+{
+    return MoRuntimeInternalWideStringConcatenate(
+        Destination,
+        MaximumLength,
+        Source,
+        SourceLength,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN Length,
+    _In_ MO_CHAR Character)
+{
+    return MoRuntimeInternalStringFindFirstCharacter(
+        Index,
+        String,
+        Length,
+        Character,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN Length,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    return MoRuntimeInternalWideStringFindFirstCharacter(
+        Index,
+        WideString,
+        Length,
+        WideCharacter,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_STRING String,
+    _In_ MO_UINTN Length,
+    _In_ MO_CHAR Character)
+{
+    return MoRuntimeInternalStringFindLastCharacter(
+        Index,
+        String,
+        Length,
+        Character,
+        MO_TRUE);
+}
+
+EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
+    _Out_ PMO_UINTN Index,
+    _In_ MO_CONSTANT_WIDE_STRING WideString,
+    _In_ MO_UINTN Length,
+    _In_ MO_WIDE_CHAR WideCharacter)
+{
+    return MoRuntimeInternalWideStringFindLastCharacter(
+        Index,
+        WideString,
+        Length,
+        WideCharacter,
+        MO_TRUE);
+}
+
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
     _Out_opt_ PMO_UINTN Length,
     _In_ MO_CONSTANT_STRING String)
 {
-    return MoRuntimeStringValidate(
-        Length,
-        String,
-        MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR);
+    return MoRuntimeStringValidate(Length, String, MO_UINTN_MAX);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
     _Out_opt_ PMO_UINTN Length,
     _In_ MO_CONSTANT_WIDE_STRING WideString)
 {
-    return MoRuntimeWideStringValidate(
-        Length,
-        WideString,
-        MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR);
+    return MoRuntimeWideStringValidate(Length, WideString, MO_UINTN_MAX);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
@@ -1737,19 +2068,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_STRING Source)
 {
-    MO_UINTN SourceLength = 0u;
-    MO_RESULT Result = MoRuntimeStringValidateSimple(
-        &SourceLength,
-        Source);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeStringCopy(
-            Destination,
-            MaximumLength,
-            Source,
-            SourceLength);
-    }
-    return Result;
+    return MoRuntimeInternalStringCopy(
+        Destination,
+        MaximumLength,
+        Source,
+        MoRuntimeStringCalculateMaximumValidLength(Source),
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
@@ -1757,19 +2081,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_WIDE_STRING Source)
 {
-    MO_UINTN SourceLength = 0u;
-    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
-        &SourceLength,
-        Source);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeWideStringCopy(
-            Destination,
-            MaximumLength,
-            Source,
-            SourceLength);
-    }
-    return Result;
+    return MoRuntimeInternalWideStringCopy(
+        Destination,
+        MaximumLength,
+        Source,
+        MoRuntimeWideStringCalculateMaximumValidLength(Source),
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
@@ -1777,19 +2094,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_STRING Source)
 {
-    MO_UINTN SourceLength = 0u;
-    MO_RESULT Result = MoRuntimeStringValidateSimple(
-        &SourceLength,
-        Source);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeStringConcatenate(
-            Destination,
-            MaximumLength,
-            Source,
-            SourceLength);
-    }
-    return Result;
+    return MoRuntimeInternalStringConcatenate(
+        Destination,
+        MaximumLength,
+        Source,
+        MoRuntimeStringCalculateMaximumValidLength(Source),
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
@@ -1797,19 +2107,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
     _In_ MO_UINTN MaximumLength,
     _In_ MO_CONSTANT_WIDE_STRING Source)
 {
-    MO_UINTN SourceLength = 0u;
-    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
-        &SourceLength,
-        Source);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeWideStringConcatenate(
-            Destination,
-            MaximumLength,
-            Source,
-            SourceLength);
-    }
-    return Result;
+    return MoRuntimeInternalWideStringConcatenate(
+        Destination,
+        MaximumLength,
+        Source,
+        MoRuntimeWideStringCalculateMaximumValidLength(Source),
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
@@ -1817,19 +2120,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
     _In_ MO_CONSTANT_STRING String,
     _In_ MO_CHAR Character)
 {
-    MO_UINTN Length = 0u;
-    MO_RESULT Result = MoRuntimeStringValidateSimple(
-        &Length,
-        String);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeStringFindFirstCharacter(
-            Index,
-            String,
-            Length,
-            Character);
-    }
-    return Result;
+    return MoRuntimeInternalStringFindFirstCharacter(
+        Index,
+        String,
+        MoRuntimeStringCalculateMaximumValidLength(String),
+        Character,
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
@@ -1837,19 +2133,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
     _In_ MO_CONSTANT_WIDE_STRING WideString,
     _In_ MO_WIDE_CHAR WideCharacter)
 {
-    MO_UINTN Length = 0u;
-    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
-        &Length,
-        WideString);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeWideStringFindFirstCharacter(
-            Index,
-            WideString,
-            Length,
-            WideCharacter);
-    }
-    return Result;
+    return MoRuntimeInternalWideStringFindFirstCharacter(
+        Index,
+        WideString,
+        MoRuntimeWideStringCalculateMaximumValidLength(WideString),
+        WideCharacter,
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
@@ -1857,19 +2146,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
     _In_ MO_CONSTANT_STRING String,
     _In_ MO_CHAR Character)
 {
-    MO_UINTN Length = 0u;
-    MO_RESULT Result = MoRuntimeStringValidateSimple(
-        &Length,
-        String);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeStringFindLastCharacter(
-            Index,
-            String,
-            Length,
-            Character);
-    }
-    return Result;
+    return MoRuntimeInternalStringFindLastCharacter(
+        Index,
+        String,
+        MoRuntimeStringCalculateMaximumValidLength(String),
+        Character,
+        MO_FALSE);
 }
 
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
@@ -1877,19 +2159,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
     _In_ MO_CONSTANT_WIDE_STRING WideString,
     _In_ MO_WIDE_CHAR WideCharacter)
 {
-    MO_UINTN Length = 0u;
-    MO_RESULT Result = MoRuntimeWideStringValidateSimple(
-        &Length,
-        WideString);
-    if (MO_RESULT_SUCCESS_OK == Result)
-    {
-        Result = MoRuntimeWideStringFindLastCharacter(
-            Index,
-            WideString,
-            Length,
-            WideCharacter);
-    }
-    return Result;
+    return MoRuntimeInternalWideStringFindLastCharacter(
+        Index,
+        WideString,
+        MoRuntimeWideStringCalculateMaximumValidLength(WideString),
+        WideCharacter,
+        MO_FALSE);
 }
 
 EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(

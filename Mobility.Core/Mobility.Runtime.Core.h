@@ -26,6 +26,21 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
     _In_ MO_UINTN Alignment);
 
 /**
+ * @brief Calculate the maximum valid length of an array address that can be
+ *        used for memory operations without causing overflow. It's not a way
+ *        to get the actual length of an array.
+ * @param ElementArray The base address of the element array. The caller must
+ *                     ensure this pointer is valid.
+ * @param ElementSize The size of each element in the array. The caller must
+ *                    ensure this value is non-zero.
+ * @return The maximum length of the array. Returns 0 on invalid parameters or
+ *         no valid length.
+ */
+EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
+    _In_ MO_CONSTANT_POINTER ElementArray,
+    _In_ MO_UINTN ElementSize);
+
+/**
  * @brief Fills a memory buffer with the specified byte value. This function is
  *        implemented with alignment-aware logic to improve performance on
  *        native word boundaries.
@@ -299,28 +314,28 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     _In_ MO_UINTN Value);
 
 /**
- * @brief The maximum length of a string including the null terminator.
+ * @brief Calculate the maximum valid length of a string that can be used for
+ *        memory operations without causing overflow. It's not a way to get the
+ *        actual length of a string.
+ * @param String The base address of the string. The caller must ensure this
+ *               pointer is valid.
+ * @return The maximum length of the string including the null terminator.
+ *         Returns 0 on invalid parameters or no valid length.
  */
-#define MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR \
-    (MO_UINTN_MAX / sizeof(MO_CHAR))
+EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
+    _In_ MO_CONSTANT_STRING String);
 
 /**
- * @brief The maximum length of a wide string including the null terminator.
+ * @brief Calculate the maximum valid length of a wide string that can be used
+ *        for memory operations without causing overflow. It's not a way to get
+ *        the actual length of a wide string.
+ * @param WideString The base address of the wide string. The caller must ensure
+ *                   this pointer is valid.
+ * @return The maximum length of the wide string including the null terminator.
+ *         Returns 0 on invalid parameters or no valid length.
  */
-#define MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR \
-    (MO_UINTN_MAX / sizeof(MO_WIDE_CHAR))
-
-/**
- * @brief The maximum length of a string excluding the null terminator.
- */
-#define MO_RUNTIME_STRING_MAXIMUM_LENGTH \
-    (MO_RUNTIME_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR - 1u)
-
-/**
- * @brief The maximum length of a wide string excluding the null terminator.
- */
-#define MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH \
-    (MO_RUNTIME_WIDE_STRING_MAXIMUM_LENGTH_WITH_TERMINATOR - 1u)
+EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
+    _In_ MO_CONSTANT_WIDE_STRING WideString);
 
 /**
  * @brief Validate a null-terminated string within a maximum length, and
@@ -427,19 +442,17 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
  * @remarks If the destination string is not a valid null-terminated string
  *          within the maximum length, the function returns
  *          MO_RESULT_ERROR_OUT_OF_BOUNDS. If the source string is not a valid
- *          null-terminated string within the number of characters in the source
- *          string plus the null terminator, the function returns
- *          MO_RESULT_ERROR_OUT_OF_BOUNDS. If actual number of characters in the
- *          source string without the null terminator is not equal to source
- *          length, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
- *          If the number of characters in the destination string plus the
- *          number of characters to concatenate from source string plus the null
- *          terminator exceeds the maximum number of characters of the
- *          destination buffer, the function returns
- *          MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source and destination
- *          is not allowed and results in MO_RESULT_ERROR_INVALID_PARAMETER.
- *          If the address ranges of source or destination overflow, the
- *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ *          null-terminated string which the number of characters in the source
+ *          string without the null terminator is not equal, the function
+ *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If the number of characters
+ *          in the destination string plus the number of characters to
+ *          concatenate from source string plus the null terminator exceeds the
+ *          maximum number of characters of the destination buffer, the function
+ *          returns MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source and
+ *          destination is not allowed and results in
+ *          MO_RESULT_ERROR_INVALID_PARAMETER. If the address ranges of source
+ *          or destination overflow, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
     _Inout_ MO_STRING Destination,
@@ -460,20 +473,17 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
  * @remarks If the destination wide string is not a valid null-terminated wide
  *          string within the maximum length, the function returns
  *          MO_RESULT_ERROR_OUT_OF_BOUNDS. If the source wide string is not a
- *          valid null-terminated wide string within the number of characters in
- *          the source wide string plus the null terminator, the function
- *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If actual number of
- *          characters in the source wide string without the null terminator is
- *          not equal to source length, the function returns
- *          MO_RESULT_ERROR_INVALID_PARAMETER. If the number of characters in
- *          the destination wide string plus the number of characters to
- *          concatenate from source wide string plus the null terminator exceeds
- *          the maximum number of characters of the destination buffer, the
- *          function returns MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source
- *          and destination is not allowed and results in
- *          MO_RESULT_ERROR_INVALID_PARAMETER. If the address ranges of source
- *          or destination overflow, the function returns
- *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
+ *          valid null-terminated wide string which the number of characters in
+ *          the source wide string without the null terminator is not equal, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If the number of
+ *          characters in the destination wide string plus the number of
+ *          characters to concatenate from source wide string plus the null
+ *          terminator exceeds the maximum number of characters of the
+ *          destination buffer, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_MEMORY. Overlapping source and destination is
+ *          not allowed and results in MO_RESULT_ERROR_INVALID_PARAMETER. If the
+ *          address ranges of source or destination overflow, the function
+ *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
     _Inout_ MO_WIDE_STRING Destination,
@@ -493,9 +503,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
  *         it returns an MO_RESULT error code.
  * @remarks If the character is not found in the string, the function returns
  *          MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX. If the
- *          string is not valid within the specified length, the function
- *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
- *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          string is not valid with the specified length, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
     _Out_ PMO_UINTN Index,
@@ -515,9 +524,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
  *         it returns an MO_RESULT error code.
  * @remarks If the wide character is not found in the wide string, the function
  *          returns MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX.
- *          If the wide string is not valid within the specified length, the
- *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
- *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          If the wide string is not valid with the specified length, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
     _Out_ PMO_UINTN Index,
@@ -537,9 +545,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
  *         it returns an MO_RESULT error code.
  * @remarks If the character is not found in the string, the function returns
  *          MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX. If the
- *          string is not valid within the specified length, the function
- *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
- *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          string is not valid with the specified length, the function returns
+ *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
     _Out_ PMO_UINTN Index,
@@ -559,9 +566,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
  *         it returns an MO_RESULT error code.
  * @remarks If the wide character is not found in the wide string, the function
  *          returns MO_RESULT_SUCCESS_FALSE, and Index is set to MO_UINTN_MAX.
- *          If the wide string is not valid within the specified length, the
- *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS. If there is a length
- *          mismatch, the function returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ *          If the wide string is not valid with the specified length, the
+ *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
 EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     _Out_ PMO_UINTN Index,
