@@ -84,3 +84,41 @@ EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
 
     return EFI_SUCCESS;
 }
+
+EXTERN_C MO_RESULT MOAPI MoUefiQuerySystemConfigurationTable(
+    _Out_ PMO_POINTER Table,
+    _In_ EFI_SYSTEM_TABLE* SystemTable,
+    _In_ EFI_GUID* Guid)
+{
+    if (!Table || !SystemTable || !Guid)
+    {
+        return MO_RESULT_ERROR_INVALID_PARAMETER;
+    }
+    *Table = nullptr;
+
+    EFI_CONFIGURATION_TABLE* Tables = SystemTable->ConfigurationTable;
+    if (!Tables)
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+
+    for (MO_UINTN i = 0; i < SystemTable->NumberOfTableEntries; ++i)
+    {
+        if (0 != ::MoRuntimeMemoryCompare(
+            &Tables[i].VendorGuid,
+            Guid,
+            sizeof(EFI_GUID)))
+        {
+            continue;
+        }
+
+        // Reference: https://uefi.org/specs/UEFI/2.11/04_EFI_System_Table.html
+        // According to the reference, we will know that the EFI Configuration
+        // Table may contain at most once instance of each table type.
+
+        *Table = reinterpret_cast<MO_POINTER>(Tables[i].VendorTable);
+        return MO_RESULT_SUCCESS_OK;
+    }
+
+    return MO_RESULT_ERROR_NO_INTERFACE;
+}

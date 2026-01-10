@@ -75,66 +75,55 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
     }
     *TableAddress = 0u;
 
-    for (UINTN i = 0; i < SystemTable->NumberOfTableEntries; ++i)
-    {
-        if (0 != ::MoRuntimeMemoryCompare(
-            &SystemTable->ConfigurationTable[i].VendorGuid,
-            &gEfiAcpiTableGuid,
-            sizeof(EFI_GUID)))
-        {
-            continue;
-        }
+    using RootTableType = EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER;
+    const MO_UINT64 RootTableSignature =
+        EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE;
+    const MO_UINT8 RootTableRevision =
+        EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION;
+    RootTableType* RootTable = nullptr;
 
-        using RootTableType = EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER;
-        const MO_UINT64 RootTableSignature =
-            EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE;
-        const MO_UINT8 RootTableRevision =
-            EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION;
-        RootTableType* RootTable = reinterpret_cast<RootTableType*>(
-            SystemTable->ConfigurationTable[i].VendorTable);
-        if (!::MoUefiAcpiStructureValidate(
-            RootTable,
-            OFFSET_OF(RootTableType, Length)))
-        {
-            continue;
-        }
-        if (!::MoUefiAcpiStructureValidate(
-            RootTable,
-            RootTable->Length))
-        {
-            continue;
-        }
-        if (RootTableSignature != RootTable->Signature)
-        {
-            continue;
-        }
-        if (RootTableRevision != RootTable->Revision)
-        {
-            continue;
-        }
-        if (!RootTable->XsdtAddress)
-        {
-            continue;
-        }
-
-        if (!::MoUefiAcpiDescriptionTableValidate(
-            reinterpret_cast<MO_POINTER>(RootTable->XsdtAddress),
-            EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
-            EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION))
-        {
-            continue;
-        }
-
-        *TableAddress = RootTable->XsdtAddress;
-
-        // Break the for loop since we found the table.
-        break;
-    }
-
-    if (!*TableAddress)
+    if (MO_RESULT_SUCCESS_OK != ::MoUefiQuerySystemConfigurationTable(
+        reinterpret_cast<PMO_POINTER>(&RootTable),
+        SystemTable,
+        &gEfiAcpiTableGuid))
     {
         return MO_RESULT_ERROR_NO_INTERFACE;
     }
+
+    if (!::MoUefiAcpiStructureValidate(
+        RootTable,
+        OFFSET_OF(RootTableType, Length)))
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+    if (!::MoUefiAcpiStructureValidate(
+        RootTable,
+        RootTable->Length))
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+    if (RootTableSignature != RootTable->Signature)
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+    if (RootTableRevision != RootTable->Revision)
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+    if (!RootTable->XsdtAddress)
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+
+    if (!::MoUefiAcpiDescriptionTableValidate(
+        reinterpret_cast<MO_POINTER>(RootTable->XsdtAddress),
+        EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+        EFI_ACPI_2_0_EXTENDED_SYSTEM_DESCRIPTION_TABLE_REVISION))
+    {
+        return MO_RESULT_ERROR_NO_INTERFACE;
+    }
+
+    *TableAddress = RootTable->XsdtAddress;
 
     return MO_RESULT_SUCCESS_OK;
 }

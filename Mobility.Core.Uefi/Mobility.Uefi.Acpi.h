@@ -11,11 +11,7 @@
 #ifndef MOBILITY_UEFI_ACPI
 #define MOBILITY_UEFI_ACPI
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
-#include <Mile.Mobility.Portable.Types.h>
-
-#undef NULL
-#include <Uefi.h>
+#include "Mobility.Uefi.Core.h"
 
 /**
  * @brief Validates an ACPI structure by checking its checksum.

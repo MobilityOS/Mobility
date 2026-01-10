@@ -57,5 +57,27 @@ EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
     _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
     _In_ EFI_BOOT_SERVICES* BootServices);
 
+/**
+ * @brief Acquires the specified system configuration table from the UEFI System
+ *        Table based on the provided GUID.
+ * @param Table The pointer to receive the address of the requested system
+ *              configuration table. If this parameter is nullptr, the function
+ *              returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @param SystemTable The pointer to the UEFI system table. If this parameter is
+ *                    nullptr, the function returns
+ *                    MO_RESULT_ERROR_INVALID_PARAMETER
+ * @param Guid The pointer to the GUID that identifies the desired system
+ *             configuration table. If this parameter is nullptr, the function
+ *             returns MO_RESULT_ERROR_INVALID_PARAMETER.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If the specified system configuration table is not found, the function
+ *          returns MO_RESULT_ERROR_NO_INTERFACE.
+ */
+EXTERN_C MO_RESULT MOAPI MoUefiQuerySystemConfigurationTable(
+    _Out_ PMO_POINTER Table,
+    _In_ EFI_SYSTEM_TABLE* SystemTable,
+    _In_ EFI_GUID* Guid);
+
 #endif // !MOBILITY_UEFI_CORE
 
