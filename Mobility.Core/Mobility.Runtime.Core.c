@@ -520,7 +520,7 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareNativeAligned(
 EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     _In_opt_ MO_POINTER Left,
     _In_opt_ MO_POINTER Right,
-    _In_opt_ MO_UINTN Length)
+    _In_ MO_UINTN Length)
 {
     if (!Length)
     {
@@ -2049,6 +2049,134 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
         MO_TRUE);
 }
 
+EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
+    _In_opt_ MO_CONSTANT_STRING Left,
+    _In_opt_ MO_CONSTANT_STRING Right,
+    _In_ MO_UINTN Length)
+{
+    if (!Length)
+    {
+        // For zero length, consider equal.
+        return 0;
+    }
+    if (Left == Right)
+    {
+        // Both are the same address, consider equal.
+        return 0;
+    }
+
+    if (!Left && !Right)
+    {
+        // Both are nullptr, consider equal.
+        return 0;
+    }
+    else if (!Left)
+    {
+        // Left is nullptr, consider less than Right.
+        return -1;
+    }
+    else if (!Right)
+    {
+        // Right is nullptr, consider greater than Left.
+        return 1;
+    }
+
+    MO_UINTN LeftMaximumValidLength =
+        MoRuntimeStringCalculateMaximumValidLength(Left);
+    MO_UINTN RightMaximumValidLength =
+        MoRuntimeStringCalculateMaximumValidLength(Right);
+
+    if (Length > LeftMaximumValidLength)
+    {
+        Length = LeftMaximumValidLength;
+    }
+    if (Length > RightMaximumValidLength)
+    {
+        Length = RightMaximumValidLength;
+    }
+
+    for (MO_UINTN Index = 0u; Index < Length; ++Index)
+    {
+        MO_UINTN CurrentLeft = Left[Index];
+        MO_UINTN CurrentRight = Right[Index];
+        if (CurrentLeft != CurrentRight)
+        {
+            return CurrentLeft > CurrentRight ? 1 : -1;
+        }
+        if ('\0' == CurrentLeft)
+        {
+            // Both strings ended, consider equal.
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
+    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
+    _In_opt_ MO_CONSTANT_WIDE_STRING Right,
+    _In_ MO_UINTN Length)
+{
+    if (!Length)
+    {
+        // For zero length, consider equal.
+        return 0;
+    }
+    if (Left == Right)
+    {
+        // Both are the same address, consider equal.
+        return 0;
+    }
+
+    if (!Left && !Right)
+    {
+        // Both are nullptr, consider equal.
+        return 0;
+    }
+    else if (!Left)
+    {
+        // Left is nullptr, consider less than Right.
+        return -1;
+    }
+    else if (!Right)
+    {
+        // Right is nullptr, consider greater than Left.
+        return 1;
+    }
+
+    MO_UINTN LeftMaximumValidLength =
+        MoRuntimeWideStringCalculateMaximumValidLength(Left);
+    MO_UINTN RightMaximumValidLength =
+        MoRuntimeWideStringCalculateMaximumValidLength(Right);
+
+    if (Length > LeftMaximumValidLength)
+    {
+        Length = LeftMaximumValidLength;
+    }
+    if (Length > RightMaximumValidLength)
+    {
+        Length = RightMaximumValidLength;
+    }
+
+    for (MO_UINTN Index = 0u; Index < Length; ++Index)
+    {
+        MO_UINTN CurrentLeft = Left[Index];
+        MO_UINTN CurrentRight = Right[Index];
+        if (CurrentLeft != CurrentRight)
+        {
+            return CurrentLeft > CurrentRight ? 1 : -1;
+        }
+        if (L'\0' == CurrentLeft)
+        {
+            // Both wide strings ended, consider equal.
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
 EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
     _Out_opt_ PMO_UINTN Length,
     _In_ MO_CONSTANT_STRING String)
@@ -2165,6 +2293,20 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
         MoRuntimeWideStringCalculateMaximumValidLength(WideString),
         WideCharacter,
         MO_FALSE);
+}
+
+EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
+    _In_opt_ MO_CONSTANT_STRING Left,
+    _In_opt_ MO_CONSTANT_STRING Right)
+{
+    return MoRuntimeStringCompare(Left, Right, MO_UINTN_MAX);
+}
+
+EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
+    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
+    _In_opt_ MO_CONSTANT_WIDE_STRING Right)
+{
+    return MoRuntimeWideStringCompare(Left, Right, MO_UINTN_MAX);
 }
 
 EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(

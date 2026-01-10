@@ -102,7 +102,7 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
 EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     _In_opt_ MO_POINTER Left,
     _In_opt_ MO_POINTER Right,
-    _In_opt_ MO_UINTN Length);
+    _In_ MO_UINTN Length);
 
 /**
  * @brief Defines the comparison handler used for sorting operations.
@@ -576,6 +576,52 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
     _In_ MO_WIDE_CHAR WideCharacter);
 
 /**
+ * @brief Compares two strings up to a specified length.
+ * @param Left The pointer to the first string.
+ * @param Right The pointer to the second string.
+ * @param Length The maximum number of characters to compare.
+ * @return Returns 0 if one of the following conditions is met:
+ *         - Left is equal to Right.
+ *         - Left and Right are both nullptr.
+ *         - Length is zero.
+ *         Returns a value less than 0 if one of the following conditions is
+ *         met:
+ *         - Left is less than Right.
+ *         - Left is nullptr and Right is not nullptr.
+ *         Returns a value greater than 0 if one of the following conditions is
+ *         met:
+ *         - Left is greater than Right.
+ *         - Right is nullptr and Left is not nullptr.
+ */
+EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
+    _In_opt_ MO_CONSTANT_STRING Left,
+    _In_opt_ MO_CONSTANT_STRING Right,
+    _In_ MO_UINTN Length);
+
+/**
+ * @brief Compares two wide strings up to a specified length.
+ * @param Left The pointer to the first wide string.
+ * @param Right The pointer to the second wide string.
+ * @param Length The maximum number of wide characters to compare.
+ * @return Returns 0 if one of the following conditions is met:
+ *         - Left is equal to Right.
+ *         - Left and Right are both nullptr.
+ *         - Length is zero.
+ *         Returns a value less than 0 if one of the following conditions is
+ *         met:
+ *         - Left is less than Right.
+ *         - Left is nullptr and Right is not nullptr.
+ *         Returns a value greater than 0 if one of the following conditions is
+ *         met:
+ *         - Left is greater than Right.
+ *         - Right is nullptr and Left is not nullptr.
+ */
+EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
+    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
+    _In_opt_ MO_CONSTANT_WIDE_STRING Right,
+    _In_ MO_UINTN Length);
+
+/**
  * @brief Validate a null-terminated string within a maximum length, and
  *        optionally retrieve the length of the string.
  * @param Length The pointer to receive the length of the string without the
@@ -728,6 +774,50 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
     _Out_ PMO_UINTN Index,
     _In_ MO_CONSTANT_WIDE_STRING WideString,
     _In_ MO_WIDE_CHAR WideCharacter);
+
+/**
+ * @brief Compares two strings up to their maximum valid lengths.
+ * @param Left The pointer to the first string.
+ * @param Right The pointer to the second string.
+ * @return Returns 0 if one of the following conditions is met:
+ *         - Left is equal to Right.
+ *         - Left and Right are both nullptr.
+ *         - Length is zero.
+ *         Returns a value less than 0 if one of the following conditions is
+ *         met:
+ *         - Left is less than Right.
+ *         - Left is nullptr and Right is not nullptr.
+ *         Returns a value greater than 0 if one of the following conditions is
+ *         met:
+ *         - Left is greater than Right.
+ *         - Right is nullptr and Left is not nullptr.
+ * @remarks This is the simplified version of MoRuntimeStringCompare.
+ */
+EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
+    _In_opt_ MO_CONSTANT_STRING Left,
+    _In_opt_ MO_CONSTANT_STRING Right);
+
+/**
+ * @brief Compares two wide strings up to their maximum valid lengths.
+ * @param Left The pointer to the first wide string.
+ * @param Right The pointer to the second wide string.
+ * @return Returns 0 if one of the following conditions is met:
+ *         - Left is equal to Right.
+ *         - Left and Right are both nullptr.
+ *         - Length is zero.
+ *         Returns a value less than 0 if one of the following conditions is
+ *         met:
+ *         - Left is less than Right.
+ *         - Left is nullptr and Right is not nullptr.
+ *         Returns a value greater than 0 if one of the following conditions is
+ *         met:
+ *         - Left is greater than Right.
+ *         - Right is nullptr and Left is not nullptr.
+ * @remarks This is the simplified version of MoRuntimeWideStringCompare.
+ */
+EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
+    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
+    _In_opt_ MO_CONSTANT_WIDE_STRING Right);
 
 /**
  * @brief Get the length of a null-terminated string.
