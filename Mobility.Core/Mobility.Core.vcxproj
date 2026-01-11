@@ -12,7 +12,7 @@
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1827" Project="Mile.Project.Cpp.Default.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1827" Project="Mile.Project.Cpp.props" />
   <Import Condition="'$(Platform)'=='x64'" Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
-  <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.props" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1729" Project="Mile.Uefi.props" />
   <ItemGroup>
     <None Include="Mobility.Core.props" />
   </ItemGroup>
@@ -57,7 +57,7 @@
       <ClCompile Include="Mobility.Platform.x64.c" />
     </ItemGroup>
   </Target>
-  <Import Sdk="Mile.Uefi" Version="1.0.1484" Project="Mile.Uefi.targets" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1729" Project="Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1827" Project="Mile.Project.Cpp.targets" />
   <Import Condition="'$(Platform)'=='x64'" Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
 </Project>
