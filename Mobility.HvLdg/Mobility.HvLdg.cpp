@@ -77,7 +77,11 @@ typedef struct _MO_PLATFORM_X64_GDT_DESCRIPTORS
  */
 typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
 {
+    // Area 1 (64 KiB)
+
     MO_MEMORY_SMALL_HEAP InternalHeap;
+
+    // Area 2 (64 KiB)
 
     MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY PageMapLevel4Entry[512];
 
@@ -85,18 +89,30 @@ typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
 
     MO_PLATFORM_X64_PAGE_TABLE_ENTRY PageTableEntry[512 * 4];
 
-    MO_UINT8 KernelStack[MO_PLATFORM_X64_PAGE_SIZE * 6];
+    HV_MESSAGE InterruptMessagePage[HV_SYNIC_SINT_COUNT];
+
+    HV_SYNIC_EVENT_FLAGS InterruptEventFlagsPage[HV_SYNIC_SINT_COUNT];
+
+    MO_UINT8 Reserved0[MO_PLATFORM_X64_PAGE_SIZE * 3];
 
     MO_PLATFORM_X64_IDT_GATE_DESCRIPTOR InterruptDescriptorTable[256];
 
     MO_PLATFORM_X64_GDT_DESCRIPTORS GlobalDescriptorTable;
     MO_PLATFORM_X64_TASK_STATE_SEGMENT TaskStateSegment;
     MO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer;
-    MO_UINT8 Reserved0_0[48];
+    bool HypercallInitialized;
+    MO_UINT8 Reserved1_0[7];
+    MO_UINT8 Reserved1_1[40];
     MO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer;
-    MO_UINT8 Reserved0_2[512];
-    MO_UINT8 Reserved1[1024];
+    MO_UINT8 Reserved1_2[512];
+    MO_UINT8 Reserved2[1024];
     MO_WIDE_CHAR ConsoleCharacterBuffer[MO_PLATFORM_X64_CONSOLE_SIZE];
+
+    MO_UINT8 HypercallPage[MO_PLATFORM_X64_PAGE_SIZE];
+
+    // Area 3 (64 KiB)
+
+    MO_UINT8 KernelStack[MO_PLATFORM_X64_PAGE_SIZE * 16];
 } MO_PLATFORM_X64_PLATFORM_CONTEXT, *PMO_PLATFORM_X64_PLATFORM_CONTEXT;
 
 namespace
