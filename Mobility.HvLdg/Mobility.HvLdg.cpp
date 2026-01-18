@@ -83,6 +83,9 @@ typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
 
     // Area 2 (64 KiB)
 
+    // Due to the x86 page table design, we can use PML4 Entry (PML4E) page as
+    // the protection page for protecting the platform context from the
+    // corrupted internal heap.
     MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY PageMapLevel4Entry[512];
 
     MO_PLATFORM_X64_PAGE_DIRECTORY_ENTRY PageDirectoryPointerEntry[512];
@@ -93,7 +96,10 @@ typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
 
     HV_SYNIC_EVENT_FLAGS InterruptEventFlagsPage[HV_SYNIC_SINT_COUNT];
 
-    MO_UINT8 Reserved0[MO_PLATFORM_X64_PAGE_SIZE * 3];
+    MO_UINT8 Reserved0_0[MO_PLATFORM_X64_PAGE_SIZE * 2];
+
+    MO_UINT8 Reserved0_1[2048];
+    PMO_PLATFORM_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
 
     MO_PLATFORM_X64_IDT_GATE_DESCRIPTOR InterruptDescriptorTable[256];
 
@@ -108,6 +114,11 @@ typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
     MO_UINT8 Reserved2[1024];
     MO_WIDE_CHAR ConsoleCharacterBuffer[MO_PLATFORM_X64_CONSOLE_SIZE];
 
+    // According to the Hyper-V hypercall page are readable and executable
+    // but not writable by the guest from Hypervisor Top Level Functional
+    // Specification 6.0b, we can use Hyper-V hypercall page here as the
+    // protection page for protecting the platform context from corrupting
+    // via the kernel stack overflow.
     MO_UINT8 HypercallPage[MO_PLATFORM_X64_PAGE_SIZE];
 
     // Area 3 (64 KiB)
