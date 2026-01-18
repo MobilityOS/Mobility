@@ -81,3 +81,62 @@ EXTERN_C MO_RESULT MOAPI MoHyperVCheckAvailability()
 
     return MO_RESULT_SUCCESS_OK;
 }
+
+EXTERN_C MO_UINT64 MoHyperVGetPartitionReferenceCounter()
+{
+    return ::MoPlatformReadMsr(HvSyntheticMsrTimeRefCount);
+}
+
+EXTERN_C MO_UINT64 MoHyperVGetTickCount()
+{
+    return ::MoHyperVGetPartitionReferenceCounter() / 10 / 1000;
+}
+
+EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
+    _In_ MO_UINT64 PhysicalAddress)
+{
+    HV_X64_MSR_HYPERCALL_CONTENTS Config;
+    Config.AsUINT64 = 0;
+    if (PhysicalAddress)
+    {
+        Config.Enable = true;
+        Config.GpaPageNumber = PhysicalAddress >> 12;
+    }
+    ::MoPlatformWriteMsr(HvSyntheticMsrHypercall, Config.AsUINT64);
+
+    Config.AsUINT64 = ::MoPlatformReadMsr(HvSyntheticMsrHypercall);
+    return ((0 != PhysicalAddress) == Config.Enable) ? MO_TRUE : MO_FALSE;
+}
+
+EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
+    _In_ MO_UINT64 PhysicalAddress)
+{
+    HV_SYNIC_SIMP Config;
+    Config.AsUINT64 = 0;
+    if (PhysicalAddress)
+    {
+        Config.SimpEnabled = true;
+        Config.BaseSimpGpa = PhysicalAddress >> 12;
+    }
+    ::MoPlatformWriteMsr(HvSyntheticMsrSimp, Config.AsUINT64);
+
+    Config.AsUINT64 = ::MoPlatformReadMsr(HvSyntheticMsrSimp);
+    return ((0 != PhysicalAddress) == Config.SimpEnabled) ? MO_TRUE : MO_FALSE;
+}
+
+EXTERN_C MO_BOOL MoHyperVSetInterruptEventFlagsPage(
+    _In_ MO_UINT64 PhysicalAddress)
+{
+    HV_SYNIC_SIEFP Config;
+    Config.AsUINT64 = 0;
+    if (PhysicalAddress)
+    {
+        Config.SiefpEnabled = true;
+        Config.BaseSiefpGpa = PhysicalAddress >> 12;
+    }
+    ::MoPlatformWriteMsr(HvSyntheticMsrSiefp, Config.AsUINT64);
+
+    Config.AsUINT64 = ::MoPlatformReadMsr(HvSyntheticMsrSiefp);
+    return ((0 != PhysicalAddress) == Config.SiefpEnabled) ? MO_TRUE : MO_FALSE;
+}
+
