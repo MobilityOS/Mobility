@@ -10,8 +10,6 @@
 
 #include "Mobility.Platform.x64.h"
 
-PMO_PLATFORM_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
-
 EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
     _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Base)

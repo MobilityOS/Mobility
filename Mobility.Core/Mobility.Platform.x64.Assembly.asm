@@ -218,11 +218,17 @@ HaltLoop:
     jmp HaltLoop
 MoPlatformSwitchToNewStack ENDP
 
+.DATA
+
+ALIGN 8
 ; -----------------------------------------------------------------------------
-; EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
+; EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
 ; -----------------------------------------------------------------------------
-; The external array of interrupt handlers.
-EXTRN MoPlatformInterruptHandlers: QWORD
+; The length of the pointed interrupt handler table must be 256 entries.
+PUBLIC MoPlatformInterruptHandlerTable
+MoPlatformInterruptHandlerTable QWORD 0
+
+.CODE
 
 ; -----------------------------------------------------------------------------
 ; MoPlatformInterruptCommonEntry
@@ -380,10 +386,12 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
 
     ; Call into exception handler
     movzx rcx, byte ptr [rbp + 8]
-    lea rax, MoPlatformInterruptHandlers
+    mov rax, qword ptr [MoPlatformInterruptHandlerTable]
+    test rax, rax ; NULL?
+    jz SkipCallInterruptHandler
     mov rax, [rax + rcx * 8]
     test rax, rax ; NULL?
-    jz NonNullValue;
+    jz SkipCallInterruptHandler;
 
     ; Prepare parameter and call
     mov rdx, rsp
@@ -395,7 +403,7 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     call rax
     add rsp, 4 * 8 + 8
 
-NonNullValue:
+SkipCallInterruptHandler:
     ; BUGBUG: This should not be necessary, but it's currently true that
     ; interrupt handlers enable interrupts
     cli

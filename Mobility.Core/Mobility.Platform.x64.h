@@ -947,9 +947,11 @@ typedef VOID(MOAPI* PMO_PLATFORM_X64_INTERRUPT_HANDLER)(
     _In_ PMO_PLATFORM_X64_INTERRUPT_CONTEXT InterruptContext);
 
 /**
- * @brief The interrupt handlers for x64 architecture.
+ * @brief The interrupt handler table for x64 architecture.
+ * @remark The length of the pointed interrupt handler table must be 256
+ *         entries.
  */
-EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER MoPlatformInterruptHandlers[256];
+EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
 
 /**
  * @brief The interrupt descriptor table handlers for x64 architecture. Because
