@@ -236,9 +236,9 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     ; All interrupt handlers are invoked through interrupt gates, so IF flag
     ; automatically cleared at the entry point
 
-    push    rbp
+    push rbp
     .PUSHREG rbp
-    mov     rbp, rsp
+    mov rbp, rsp
     .SETFRAME rbp, 0
     .ENDPROLOG
 
@@ -375,14 +375,14 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     ; clear
     cld
 
-    ; MO_UINT32  ExceptionData;
+    ; MO_UINT32 ExceptionData;
     push qword ptr [rbp + 16]
 
     ; Call into exception handler
     movzx rcx, byte ptr [rbp + 8]
     lea rax, MoPlatformInterruptHandlers
     mov rax, [rax + rcx * 8]
-    test rax, rax                        ; NULL?
+    test rax, rax ; NULL?
     jz NonNullValue;
 
     ; Prepare parameter and call
@@ -399,7 +399,7 @@ NonNullValue:
     ; BUGBUG: This should not be necessary, but it's currently true that
     ; interrupt handlers enable interrupts
     cli
-    ; MO_UINT64  ExceptionData;
+    ; MO_UINT64 ExceptionData;
     add rsp, 8
 
     ; MO_PLATFORM_X64_FXSAVE_AREA FxSaveState;
