@@ -756,6 +756,134 @@ MO_C_STATIC_ASSERT(sizeof(MO_PLATFORM_X64_FXSAVE_AREA) == 512);
 #endif
 
 /**
+ * @brief Performs an atomic compare-and-exchange operation on the specified
+ *        values. The function compares two specified 8-bit values and exchanges
+ *        with another 8-bit value based on the outcome of the comparison.
+ * @param Destination A pointer to the destination value.
+ * @param Exchange The exchange value.
+ * @param Comparand The value to compare to Destination.
+ * @return The function returns the initial value of the Destination parameter.
+ */
+EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
+    _Inout_ MO_UINT8 volatile* Destination,
+    _In_ MO_UINT8 Exchange,
+    _In_ MO_UINT8 Comparand);
+
+/**
+ * @brief Performs an atomic compare-and-exchange operation on the specified
+ *        values. The function compares two specified 16-bit values and
+ *        exchanges with another 16-bit value based on the outcome of the
+ *        comparison.
+ * @param Destination A pointer to the destination value.
+ * @param Exchange The exchange value.
+ * @param Comparand The value to compare to Destination.
+ * @return The function returns the initial value of the Destination parameter.
+ */
+EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
+    _Inout_ MO_UINT16 volatile* Destination,
+    _In_ MO_UINT16 Exchange,
+    _In_ MO_UINT16 Comparand);
+
+/**
+ * @brief Performs an atomic compare-and-exchange operation on the specified
+ *        values. The function compares two specified 32-bit values and
+ *        exchanges with another 32-bit value based on the outcome of the
+ *        comparison.
+ * @param Destination A pointer to the destination value.
+ * @param Exchange The exchange value.
+ * @param Comparand The value to compare to Destination.
+ * @return The function returns the initial value of the Destination parameter.
+ */
+EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
+    _Inout_ MO_UINT32 volatile* Destination,
+    _In_ MO_UINT32 Exchange,
+    _In_ MO_UINT32 Comparand);
+
+/**
+ * @brief Performs an atomic compare-and-exchange operation on the specified
+ *        values. The function compares two specified 64-bit values and
+ *        exchanges with another 64-bit value based on the outcome of the
+ *        comparison.
+ * @param Destination A pointer to the destination value.
+ * @param Exchange The exchange value.
+ * @param Comparand The value to compare to Destination.
+ * @return The function returns the initial value of the Destination parameter.
+ */
+EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
+    _Inout_ MO_UINT64 volatile* Destination,
+    _In_ MO_UINT64 Exchange,
+    _In_ MO_UINT64 Comparand);
+
+/**
+ * @brief Performs an atomic compare-and-exchange operation on the specified
+ *        values. The function compares two specified pointer values and
+ *        exchanges with another pointer value based on the outcome of the
+ *        comparison.
+ * @param Destination A pointer to a pointer to the destination value.
+ * @param Exchange The exchange value.
+ * @param Comparand The value to compare to Destination.
+ * @return The function returns the initial value of the Destination parameter.
+ */
+EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
+    _Inout_ MO_POINTER volatile* Destination,
+    _In_ MO_POINTER Exchange,
+    _In_ MO_POINTER Comparand);
+
+/**
+ * @brief Decrements (decreases by one) the value of the specified 16-bit
+ *        variable as an atomic operation.
+ * @param Addend A pointer to the variable to be decremented.
+ * @return The function returns the resulting decremented value.
+ */
+EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
+    _In_ MO_UINT16 volatile* Addend);
+
+/**
+ * @brief Decrements (decreases by one) the value of the specified 32-bit
+ *        variable as an atomic operation.
+ * @param Addend A pointer to the variable to be decremented.
+ * @return The function returns the resulting decremented value.
+ */
+EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
+    _In_ MO_UINT32 volatile* Addend);
+
+/**
+ * @brief Decrements (decreases by one) the value of the specified 64-bit
+ *        variable as an atomic operation.
+ * @param Addend A pointer to the variable to be decremented.
+ * @return The function returns the resulting decremented value.
+ */
+EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
+    _In_ MO_UINT64 volatile* Addend);
+
+/**
+ * @brief Increments (increases by one) the value of the specified 16-bit
+ *        variable as an atomic operation.
+ * @param Addend A pointer to the variable to be incremented.
+ * @return The function returns the resulting incremented value.
+ */
+EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
+    _In_ MO_UINT16 volatile* Addend);
+
+/**
+ * @brief Increments (increases by one) the value of the specified 32-bit
+ *        variable as an atomic operation.
+ * @param Addend A pointer to the variable to be incremented.
+ * @return The function returns the resulting incremented value.
+ */
+EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
+    _In_ MO_UINT32 volatile* Addend);
+
+/**
+ * @brief Increments (increases by one) the value of the specified 64-bit
+ *        variable as an atomic operation.
+ * @param Addend A pointer to the variable to be incremented.
+ * @return The function returns the resulting incremented value.
+ */
+EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
+    _In_ MO_UINT64 volatile* Addend);
+
+/**
  * @brief Inserts a PAUSE instruction to improve the performance of spin-wait
  *        loops.
  */

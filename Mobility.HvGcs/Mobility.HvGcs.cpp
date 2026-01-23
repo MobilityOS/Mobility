@@ -8,11 +8,10 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
+#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #include <Mile.Project.Version.h>
-
-#include <sal.h>
 
 #include <Mobility.Runtime.Core.h>
 #include <Mobility.Platform.Interface.h>

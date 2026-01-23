@@ -10,6 +10,149 @@
 
 #include "Mobility.Platform.x64.h"
 
+#ifdef _MSC_VER
+
+#ifndef MOBILITY_PLATFORM_X64_PRIVATE
+#define MOBILITY_PLATFORM_X64_PRIVATE
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+char _InterlockedCompareExchange8(
+    char volatile* Destination,
+    char Exchange,
+    char Comparand);
+short _InterlockedCompareExchange16(
+    short volatile* Destination,
+    short Exchange,
+    short Comparand);
+long __cdecl _InterlockedCompareExchange(
+    long volatile* Destination,
+    long Exchange,
+    long Comparand);
+__int64 _InterlockedCompareExchange64(
+    __int64 volatile* Destination,
+    __int64 Exchange,
+    __int64 Comparand);
+void* _InterlockedCompareExchangePointer(
+    void* volatile* Destination,
+    void* Exchange,
+    void* Comparand);
+
+short _InterlockedDecrement16(
+    short volatile* Addend);
+long __cdecl _InterlockedDecrement(
+    long volatile* Addend);
+__int64 _InterlockedDecrement64(
+    __int64 volatile* _Addend);
+
+short _InterlockedIncrement16(
+    short volatile* Addend);
+long __cdecl _InterlockedIncrement(
+    long volatile* Addend);
+__int64 _InterlockedIncrement64(
+    __int64 volatile* Addend);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+#endif // !MOBILITY_PLATFORM_X64_PRIVATE
+
+EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
+    _Inout_ MO_UINT8 volatile* Destination,
+    _In_ MO_UINT8 Exchange,
+    _In_ MO_UINT8 Comparand)
+{
+    return _InterlockedCompareExchange8(
+        (char volatile*)Destination,
+        (char)Exchange,
+        (char)Comparand);
+}
+
+EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
+    _Inout_ MO_UINT16 volatile* Destination,
+    _In_ MO_UINT16 Exchange,
+    _In_ MO_UINT16 Comparand)
+{
+    return _InterlockedCompareExchange16(
+        (short volatile*)Destination,
+        (short)Exchange,
+        (short)Comparand);
+}
+
+EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
+    _Inout_ MO_UINT32 volatile* Destination,
+    _In_ MO_UINT32 Exchange,
+    _In_ MO_UINT32 Comparand)
+{
+    return _InterlockedCompareExchange(
+        (long volatile*)Destination,
+        (long)Exchange,
+        (long)Comparand);
+}
+
+EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
+    _Inout_ MO_UINT64 volatile* Destination,
+    _In_ MO_UINT64 Exchange,
+    _In_ MO_UINT64 Comparand)
+{
+    return _InterlockedCompareExchange64(
+        (__int64 volatile*)Destination,
+        (__int64)Exchange,
+        (__int64)Comparand);
+}
+
+EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
+    _Inout_ MO_POINTER volatile* Destination,
+    _In_ MO_POINTER Exchange,
+    _In_ MO_POINTER Comparand)
+{
+    return _InterlockedCompareExchangePointer(
+        (void* volatile*)Destination,
+        (void*)Exchange,
+        (void*)Comparand);
+}
+
+EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
+    _In_ MO_UINT16 volatile* Addend)
+{
+    return _InterlockedDecrement16((short volatile*)Addend);
+}
+
+EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
+    _In_ MO_UINT32 volatile* Addend)
+{
+    return _InterlockedDecrement((long volatile*)Addend);
+}
+
+EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
+    _In_ MO_UINT64 volatile* Addend)
+{
+    return _InterlockedDecrement64((__int64 volatile*)Addend);
+}
+
+EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
+    _In_ MO_UINT16 volatile* Addend)
+{
+    return _InterlockedIncrement16((short volatile*)Addend);
+}
+
+EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
+    _In_ MO_UINT32 volatile* Addend)
+{
+    return _InterlockedIncrement((long volatile*)Addend);
+}
+
+EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
+    _In_ MO_UINT64 volatile* Addend)
+{
+    return _InterlockedIncrement64((__int64 volatile*)Addend);
+}
+
+#endif // _MSC_VER
+
 EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
     _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
     _In_ MO_UINT32 Base)
