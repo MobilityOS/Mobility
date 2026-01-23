@@ -11,30 +11,6 @@
 .CODE
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformPause();
-; -----------------------------------------------------------------------------
-MoPlatformPause PROC
-    pause
-    ret
-MoPlatformPause ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformHalt();
-; -----------------------------------------------------------------------------
-MoPlatformHalt PROC
-    hlt
-    ret
-MoPlatformHalt ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformDebugBreak();
-; -----------------------------------------------------------------------------
-MoPlatformDebugBreak PROC
-    int 3
-    ret
-MoPlatformDebugBreak ENDP
-
-; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
 ; -----------------------------------------------------------------------------
 MoPlatformDisableInterrupts PROC
@@ -51,76 +27,6 @@ MoPlatformEnableInterrupts PROC
 MoPlatformEnableInterrupts ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformReadCpuid(
-;     _Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
-;     _In_ MO_UINT32 Index);
-; -----------------------------------------------------------------------------
-MoPlatformReadCpuid PROC
-    ; RCX = Result
-    ; RDX = Index
-
-    push rbx
-    mov r8, rcx
-    mov eax, edx
-    xor ecx, ecx
-    cpuid
-    mov [r8], eax
-    mov [r8 + 4], ebx
-    mov [r8 + 8], ecx
-    mov [r8 + 12], edx
-    pop rbx
-    ret
-MoPlatformReadCpuid ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
-;     _In_ MO_UINT32 Index);
-; -----------------------------------------------------------------------------
-MoPlatformReadMsr PROC
-    ; RAX = Value
-    ; RCX = Index
-
-    rdmsr
-    shl rdx, 32
-    or rax, rdx
-    ret
-MoPlatformReadMsr ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformWriteMsr(
-;     _In_ MO_UINT32 Index,
-;     _In_ MO_UINT64 Value);
-; -----------------------------------------------------------------------------
-MoPlatformWriteMsr PROC
-    ; RCX = Index
-    ; RDX = Value
-
-    mov rax, rdx
-    shr rdx, 32
-    wrmsr
-    ret
-MoPlatformWriteMsr ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3();
-; -----------------------------------------------------------------------------
-MoPlatformReadCr3 PROC
-    mov rax, cr3
-    ret
-MoPlatformReadCr3 ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformWriteCr3(
-;     _In_ MO_UINT64 Value);
-; -----------------------------------------------------------------------------
-MoPlatformWriteCr3 PROC
-    ; RCX = Value
-
-    mov cr3, rcx
-    ret
-MoPlatformWriteCr3 ENDP
-
-; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
 ;     _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 ; -----------------------------------------------------------------------------
@@ -130,17 +36,6 @@ MoPlatformLoadGlobalDescriptorTable PROC
     lgdt FWORD PTR [rcx]
     ret
 MoPlatformLoadGlobalDescriptorTable ENDP
-
-; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
-;     _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
-; -----------------------------------------------------------------------------
-MoPlatformLoadInterruptDescriptorTable PROC
-    ; RCX = Descriptor
-
-    lidt FWORD PTR [rcx]
-    ret
-MoPlatformLoadInterruptDescriptorTable ENDP
 
 ; -----------------------------------------------------------------------------
 ; EXTERN_C VOID MOAPI MoPlatformSetCodeSegmentSelector(

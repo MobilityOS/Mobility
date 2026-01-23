@@ -54,6 +54,22 @@ long __cdecl _InterlockedIncrement(
 __int64 _InterlockedIncrement64(
     __int64 volatile* Addend);
 
+void _mm_pause();
+
+void __halt();
+
+void __cdecl __debugbreak();
+
+void __cpuid(int[4], int);
+
+unsigned __int64 __readmsr(unsigned long);
+void __writemsr(unsigned long, unsigned __int64);
+
+unsigned __int64 __readcr3();
+void __writecr3(unsigned __int64);
+
+void __lidt(void*);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
@@ -149,6 +165,58 @@ EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
     _In_ MO_UINT64 volatile* Addend)
 {
     return _InterlockedIncrement64((__int64 volatile*)Addend);
+}
+
+EXTERN_C VOID MOAPI MoPlatformPause()
+{
+    _mm_pause();
+}
+
+EXTERN_C VOID MOAPI MoPlatformHalt()
+{
+    __halt();
+}
+
+EXTERN_C VOID MOAPI MoPlatformDebugBreak()
+{
+    __debugbreak();
+}
+
+EXTERN_C VOID MOAPI MoPlatformReadCpuid(
+    _Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
+    _In_ MO_UINT32 Index)
+{
+    __cpuid((int*)Result, (int)Index);
+}
+
+EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
+    _In_ MO_UINT32 Index)
+{
+    return __readmsr(Index);
+}
+
+EXTERN_C VOID MOAPI MoPlatformWriteMsr(
+    _In_ MO_UINT32 Index,
+    _In_ MO_UINT64 Value)
+{
+    __writemsr(Index, Value);
+}
+
+EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3()
+{
+    return __readcr3();
+}
+
+EXTERN_C VOID MOAPI MoPlatformWriteCr3(
+    _In_ MO_UINT64 Value)
+{
+    __writecr3(Value);
+}
+
+EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
+    _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor)
+{
+    __lidt(Descriptor);
 }
 
 #endif // _MSC_VER
