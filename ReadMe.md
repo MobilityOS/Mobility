@@ -44,7 +44,27 @@ to create this project as the middle stage of the whole Mobility project.
 ## Supported Platforms
 
 - Hyper-V Generation 2 Virtual Machines
-  - x86-64 guests with minimum 64 MiB of memory
+  - x86-64 guests with minimum 48 MiB of memory  
+
+> [!NOTE]
+> Why is the minimum memory size requirement 48 MiB?
+>
+> Although 32 MiB is the minimum memory size supported by Hyper-V Generation 2
+> Virtual Machines, it may not be sufficient in some scenarios:
+> - On Windows 11 or later hosts, the Hyper-V UEFI firmware requires more than
+>   32 MiB of memory to load UEFI binaries larger than 1 MiB.
+> - On x86-64 CPUs that report more than 39 physical address bits, the UEFI
+>   firmware consumes more memory due to its use of a 1:1 identity page table.
+> However, requiring 64 MiB would be excessive for the project design, and
+> 40 MiB may not be enough for future Windows versions. Here are some notes 
+> based on running a customized 900 KiB size UEFI shell.
+> - Intel Core i7-7700K with Windows 10, version 2004 host: CPU reports 39
+>   physical address bits, and 8 MiB free memory for 32 MiB virtual machines.
+> - Intel Core i7-11800H with Windows 11, version 25H2 host: CPU reports 39
+>   physical address bits, and 2 MiB free memory for 32 MiB virtual machines.
+> - AMD Ryzen 9 9950X with Windows 11, version 25H2 host: CPU reports 48
+>   physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
+>   because 32 MiB virtual machines will crash silently.
 
 ## Documents
 
