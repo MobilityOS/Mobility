@@ -43,8 +43,18 @@ to create this project as the middle stage of the whole Mobility project.
 
 ## Supported Platforms
 
-- Hyper-V Generation 2 Virtual Machines
+- Hyper-V Generation 2 Virtual Machines as the prototype and reference platform
   - x86-64 guests with minimum 48 MiB of memory  
+
+> [!NOTE]
+> Why choose Hyper-V Generation 2 Virtual Machines as the prototype and
+> reference platform?
+>
+> Hyper-V Generation 2 Virtual Machines are one of the most popular
+> para-virtualization platforms, and arguably the most aggressively
+> para-virtualized:
+> - No CSM support. Only provides 64-bit UEFI Class 3 firmware.
+> - Only COM ports, RTC, x2APIC, and VMBus devices are available.
 
 > [!NOTE]
 > Why is the minimum memory size requirement 48 MiB for Hyper-V Generation 2
