@@ -10,7 +10,7 @@
     },
     "GuestStateFile": "Mobility.TestVM.vmgs",
     "GuestType": "Windows",
-    "MemorySize": 64,
+    "MemorySize": 48,
     "Name": "Mobility.TestVM",
     "NetworkAdapters": [
       {
