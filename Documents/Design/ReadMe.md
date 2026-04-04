@@ -4,28 +4,43 @@ Work In Progress
 
 ## Why choose Hyper-V Generation 2 Virtual Machines as the reference platform?
 
-- Hyper-V is a validated popular para-virtualization platform via history, and
-  its Generation 2 Virtual Machines design should be the only one with an
-  aggressive, lightweight para-virtualization design in the current stage, which
-  help Kenji Mouri implement smaller bootable bare-metal instances that may
-  exceed his expectations:
-  - No CSM support. Only provides 64-Bit UEFI Class 3 firmware.
-  - No emulated devices. Only devices based on VMBus are available.
-  - No legacy x86 devices like the floppy controller, the DMA controller, the
-    PCI Bus, the legacy Programmable Interrupt Controller (PIC), the legacy
-    Programmable Interval Timer (PIT), and the Super I/O device. Needs guest
-    operating systems to adapt explicitly.
-- NanaBox, created by Kenji Mouri, and already in highly daily use by him, is a
-  third-party lightweight XAML-based out-of-box-experience oriented Hyper-V
-  virtualization software based on Host Compute System API, Remote Desktop
-  ActiveX control, and XAML Islands.
-- Kenji Mouri plans to write a technical book about the Hyper-V guest
-  interfaces in the recent years, which needs a comprehensive, practical
-  bare-metal example.
-- Kenji Mouri has already made an out-of-box UEFI SDK for Visual Studio.
-- Kenji Mouri is also a proud Microsoft MVP, he needs some Microsoft-related
-  community contributions to help him continue to be in this role in the next
-  years.
+- Hyper-V Generation 2 Virtual Machines represent one of the most widely adopted
+  para-virtualization platforms, and arguably the most aggressively
+  para-virtualized. This makes them an ideal foundation for Kenji Mouri to
+  implement compact, bootable bare-metal instances with potentially
+  beyond-expectation results:
+  - No CSM support. Only 64-bit UEFI Class 3 firmware is provided.
+  - Only COM ports, RTC, x2APIC, and VMBus devices are available.
+- NanaBox, created by Kenji Mouri and already part of his daily workflow, is a
+  third-party, lightweight, XAML-based, out-of-the-box experience-oriented
+  Hyper-V virtualization client built on the Host Compute System API, Remote
+  Desktop ActiveX control, and XAML Islands.
+- Kenji Mouri plans to author a technical book on Hyper-V guest interfaces in
+  the coming years, which calls for a comprehensive and practical bare-metal
+  reference implementation.
+- Kenji Mouri has already developed a ready-to-use UEFI SDK for Visual Studio.
+- As a proud Microsoft MVP, Kenji Mouri also seeks meaningful Microsoft-related
+  community contributions to support his continued participation in the program
+  in the years ahead.
+
+## Why require minimum 48 MiB memory for Hyper-V Generation 2 Virtual Machines?
+
+- Although 32 MiB is the minimum memory size supported by Hyper-V Generation 2
+  Virtual Machines, it may not be sufficient in some scenarios:
+  - On Windows 11 or later hosts, the Hyper-V UEFI firmware requires more than
+    32 MiB of memory to load UEFI binaries larger than 1 MiB.
+  - On x86-64 CPUs that report more than 39 physical address bits, the UEFI
+    firmware consumes more memory due to its use of a 1:1 identity page table.
+- However, requiring 64 MiB would be excessive for the project design, and
+  40 MiB may not be enough for future Windows versions. Here are some notes 
+  based on running a customized 900 KiB size UEFI shell.
+    - Intel Core i7-7700K with Windows 10, version 2004 host: CPU reports 39
+      physical address bits, and 8 MiB free memory for 32 MiB virtual machines.
+    - Intel Core i7-11800H with Windows 11, version 25H2 host: CPU reports 39
+      physical address bits, and 2 MiB free memory for 32 MiB virtual machines.
+    - AMD Ryzen 9 9950X with Windows 11, version 25H2 host: CPU reports 48
+      physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
+      because 32 MiB virtual machines will crash silently.
 
 ## Why choose WebAssembly as the bytecode ecosystem for Mobility?
 
@@ -57,3 +72,50 @@ Work In Progress
 - Kenji Mouri hopes to provide a fallback solution that can make hardware
   vendors reduce legacy things easier and more reasonably, which he thinks can
   help the industry.
+
+## The simple specification for Mobility Retrovisor (Retro-V)
+
+- Style: Type 1 Emulator (the term salute to Type 1 Hypervisor)
+- Memory layout
+  - 1:1 identity page table for running the emulator
+  - Maximum page table defined address is 4 GiB
+  - Retro-V will use 8 MiB memory for itself and video memory
+- Emulated Hardware
+  - CPU: Intel Pentium Overdrive
+    - Interpreter with limited just in time binary translation
+    - No translation cache, which is good for self modified code and reduce
+      attack surface and errors
+    - ISA Level: 586 without MMX
+  - Motherboard: 486 and pure ISA
+    - Intel Pentium Overdrive is designed for that
+    - Much simplified but enough for most old software
+  - Input: PS/2 Keyboard & Mouse
+  - Graphics: Cirrus Logic Compatible 54xx Compatible
+    - Because Windows XP also supports that
+    - Cirrus Logic 5432 4 MiB, for 1024x768 support
+      - Windows 2000 and Windows XP can identify 4 MiB video memory, but only
+        supports 1024x768 16bpp like the 2 MiB video memory.
+      - Windows 98 can use 1024x768 24bpp with 4 MiB video memory.
+  - Sound: Sound Blaster 16 Compatible
+  - Network: Novell NE2000 Compatible
+  - Firmware: High Level Emulation BIOS, 
+    - Only with necessary stubs in guest
+    - Reduce the maintenance cost
+    - Improve the performance
+- Guest OS Support
+  - DOS
+  - Windows XP or earlier
+    - Windows 98 and Windows 2000 should have out-of-the-box experience.
+    - You need to use upgrade installation from Windows 2000 if you want to use
+      Windows XP with proper configured graphics and network drivers.
+- User Experience
+  - Ctrl+Alt+Del for runtime menu
+    - Send Ctrl+Alt+Del to guest
+    - Cancel
+    - Change guest resource settings like floppy and cdrom
+    - Force Poweroff
+    - Force Restart
+  - Version notice and Ctrl+Alt+Del notice at initialization
+  - Support Hyper-V Basic Session and Enhanced Session
+  - If the legacy OS partition is FAT series, we can add /EFI/Boot/bootx64.efi
+    a.k.a. Retro-V itself to make the legacy OS great again
