@@ -89,10 +89,12 @@ Work In Progress
   - Motherboard: 486 and pure ISA
     - Intel Pentium Overdrive is designed for that
     - Much simplified but enough for most old software
+    - Also good for passthrough PCI and ACPI if users want to use bare-metal
+    - Some emulated devices can be disabled if bare-metal has alternatives
   - Input: PS/2 Keyboard & Mouse
   - Graphics: Cirrus Logic Compatible 54xx Compatible
     - Because Windows XP also supports that
-    - Cirrus Logic 5432 4 MiB, for 1024x768 support
+    - Cirrus Logic 5434 4 MiB, for 1024x768 support
       - Windows 2000 and Windows XP can identify 4 MiB video memory, but only
         supports 1024x768 16bpp like the 2 MiB video memory.
       - Windows 98 can use 1024x768 24bpp with 4 MiB video memory.
@@ -102,12 +104,18 @@ Work In Progress
     - Only with necessary stubs in guest
     - Reduce the maintenance cost
     - Improve the performance
+    - Optional MO-DOS mode (Mobility DOS, High Level Emulation DOS)
 - Guest OS Support
   - DOS
+  - DOS Applications if MO-DOS mode enabled
   - Windows XP or earlier
     - Windows 98 and Windows 2000 should have out-of-the-box experience.
     - You need to use upgrade installation from Windows 2000 if you want to use
       Windows XP with proper configured graphics and network drivers.
+- Host Support
+  - Hyper-V Generation 2 Virtual Machines (maintained by Kenji Mouri)
+  - UEFI without calling ExitBootServices (maintained by Kenji Mouri)
+  - VirtIO compatible platform like KVM and Xen (maintained by community)
 - User Experience
   - Ctrl+Alt+Del for runtime menu
     - Send Ctrl+Alt+Del to guest
