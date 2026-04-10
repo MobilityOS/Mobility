@@ -8,15 +8,6 @@ Work In Progress
 
 ## Flavors
 
-### Mobility OneCent (Otokonoko-based Core)
-
-Lightweight bare-metal WebAssembly Virtual Machine Manager.
-
-The WebAssembly Virtual Machine used in the Mobility project will finally be an
-independent implementation called Otokonoko.
-
-[Mobility.OneCent](Mobility.OneCent)
-
 ### Mobility Retrovisor (Retro-V)
 
 Immersive bare-metal legacy x86-32 virtualization solution for modern x86-64

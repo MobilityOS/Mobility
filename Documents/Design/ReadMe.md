@@ -42,28 +42,6 @@ Work In Progress
       physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
       because 32 MiB virtual machines will crash silently.
 
-## Why choose WebAssembly as the bytecode ecosystem for Mobility?
-
-- Kenji Mouri wants to use the hardware-neutral virtual bytecode ISA solution.
-  He had tried to choose RISC-V as the bytecode solution, but he found many
-  people hoped to do passthrough or AOT. He thinks binary portability are
-  important, and he doesn't want to introduce any risk of breaking the binary
-  portability.
-- Kenji Mouri doesn't want to introduce something like RISC-V C extension, ELF
-  binary format, etc. Although he is not satisfied with WASI, it's reasonable to
-  not use WASI in WebAssembly, especially the embedded and IoT scenarios.
-- Kenji Mouri hopes to have a more friendly interoperability mechanism between
-  privileged environments and unprivileged environments. WebAssembly's export
-  and import is much more friendly than the RISC-V's environment call.
-- Kenji Mouri thinks the RISC-V ISA design is not friendly for implementing a
-  portability, lightweight, software-based virtual machine environment.
-- Kenji Mouri thinks we should hug to the Web-based ecosystem because most
-  developers do the Web-based development scenarios. Also, WebAssembly is
-  broadly used in Cloud (FaaS) and IoT (Embedded), which matches the designed
-  scenario for him.
-- Kenji Mouri also wants to use this project as the external extension
-  infrastructure in NanaZip and AptxZip (NanaZip for POSIX).
-
 ## Why Mobility also has a bare-metal legacy x86-32 emulator flavor?
 
 - Kenji Mouri hopes to have an immersive experience for legacy x86-32 operating
