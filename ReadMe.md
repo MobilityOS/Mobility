@@ -1,15 +1,25 @@
 ﻿# Mobility
 
 Mobility is a unikernel-style operating system project created by Kenji Mouri
-for achieving his childhood operating system dreams:
+to realize his childhood operating system dream:
 
-- He doesn't want to make a duplicate POSIX-based toy OS implementation.
+- He does not want to build yet another POSIX-based toy OS.
 - He wants to see an ecosystem with binary-level portability.
-- He wants to enlighten the industry via solving the real issues.
+- He wants to push the industry forward by solving real problems.
+
+Kenji Mouri has pursued this idea since 2012. Given the practical limits of his
+time, resources, and technical capacity, he concluded that the most feasible way
+to realize this vision is through a specialized Type-1 Emulator, a term coined
+in homage to the Type-1 Hypervisor. It is an emulator that runs directly on bare
+metal while emulating a pure legacy x86 ISA base platform, effectively a
+486-class ISA machine paired with a 586-class Pentium OverDrive CPU. This pure
+ISA base is intentional: rather than making newer standards such as PCI, AGP,
+or PCIe part of the canonical platform, it leaves open the possibility of direct
+passthrough for those who wish to experiment with modern, real hardware.
 
 **Work In Progress**
 
-## Flavors
+## Components
 
 ### Mobility Retrovisor (Retro-V)
 

@@ -52,7 +52,7 @@ Work In Progress
     vendors reduce legacy things easier and more reasonably, which he thinks can
     help the industry.
   - Kenji Mouri hopes to have a portable DOS platform.
-- Style: Type 1 Emulator (the term salute to Type 1 Hypervisor)
+- Style: Type-1 Emulator, a term coined in homage to the Type-1 Hypervisor
 - Memory layout
   - 1:1 identity page table for running the emulator
   - Maximum page table defined address is 4 GiB
