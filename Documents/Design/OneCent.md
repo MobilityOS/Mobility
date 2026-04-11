@@ -13,6 +13,11 @@ called Otokonoko.
 > - Kenji Mouri think he should put his precious efforts to Mobility Retrovisor.
 > This design document will be kept for historic purpose.
 
+Originally, the whole Mobility project was the rebirth of the original MobOS
+created by Kenji Mouri around  2012. MobOS is an abandoned toy operating system
+project because he doesn't want to make a duplicate POSIX-based toy OS
+implementation.
+
 ## Why choose WebAssembly as the bytecode ecosystem for Mobility?
 
 - Kenji Mouri wants to use the hardware-neutral virtual bytecode ISA solution.

@@ -42,17 +42,16 @@ Work In Progress
       physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
       because 32 MiB virtual machines will crash silently.
 
-## Why Mobility also has a bare-metal legacy x86-32 emulator flavor?
-
-- Kenji Mouri hopes to have an immersive experience for legacy x86-32 operating
-  systems on modern hardware with the UEFI Class 3 firmware.
-- Kenji Mouri hopes to push the limits for ultra-lightweight system emulators.
-- Kenji Mouri hopes to provide a fallback solution that can make hardware
-  vendors reduce legacy things easier and more reasonably, which he thinks can
-  help the industry.
-
 ## The simple specification for Mobility Retrovisor (Retro-V)
 
+- Goals
+  - Kenji Mouri hopes to have an immersive experience for legacy x86-32 
+    operating systems on modern hardware with the UEFI Class 3 firmware.
+  - Kenji Mouri hopes to push the limits for ultra-lightweight system emulators.
+  - Kenji Mouri hopes to provide a fallback solution that can make hardware
+    vendors reduce legacy things easier and more reasonably, which he thinks can
+    help the industry.
+  - Kenji Mouri hopes to have a portable DOS platform.
 - Style: Type 1 Emulator (the term salute to Type 1 Hypervisor)
 - Memory layout
   - 1:1 identity page table for running the emulator

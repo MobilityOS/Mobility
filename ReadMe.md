@@ -1,10 +1,13 @@
 ﻿# Mobility
 
-Mobility is the rebirth of the original MobOS created by Kenji Mouri around 
-2012. MobOS is an abandoned toy operating system project because he doesn't 
-want to make a duplicate POSIX-based toy OS implementation.
+Mobility is a unikernel-style operating system project created by Kenji Mouri
+for achieving his childhood operating system dreams:
 
-Work In Progress
+- He doesn't want to make a duplicate POSIX-based toy OS implementation.
+- He wants to see an ecosystem with binary-level portability.
+- He wants to enlighten the industry via solving the real issues.
+
+**Work In Progress**
 
 ## Flavors
 
