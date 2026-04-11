@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Mobility.Retrovisor.Windows/Mobility.Retrovisor.Windows.vcxproj" Id="1a7367c1-5a6d-4ea4-b8f4-50ea90defe7c" />
+</Solution>
