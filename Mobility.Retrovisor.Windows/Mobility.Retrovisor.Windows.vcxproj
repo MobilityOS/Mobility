@@ -28,6 +28,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="8086tiny.c" />
     <ClCompile Include="Mobility.Retrovisor.Windows.cpp" />
   </ItemGroup>
   <ItemGroup>

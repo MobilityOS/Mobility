@@ -1,4 +1,12 @@
-﻿// 8086tiny: a tiny, highly functional, highly portable PC emulator/VM
+﻿#define _CRT_SECURE_NO_WARNINGS
+#define NO_GRAPHICS
+#pragma warning(disable:4013)
+#pragma warning(disable:4018)
+#pragma warning(disable:4146)
+#pragma warning(disable:4244)
+#pragma warning(disable:4389)
+
+// 8086tiny: a tiny, highly functional, highly portable PC emulator/VM
 // Copyright 2013-14, Adrian Cable (adrian.cable@gmail.com) - http://www.megalith.co.uk/8086tiny
 //
 // Revision 1.25
@@ -256,7 +264,7 @@ void audio_callback(void *data, unsigned char *stream, int len)
 #endif
 
 // Emulator entry point
-int main(int argc, char **argv)
+int main_8086tiny(int argc, char **argv)
 {
 #ifndef NO_GRAPHICS
 	// Initialise SDL
