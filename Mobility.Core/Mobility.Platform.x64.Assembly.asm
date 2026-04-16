@@ -272,8 +272,7 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     mov rcx, rsp
     fxsave [rcx]
 
-    ; UEFI calling convention for x64 requires that Direction flag in EFLAGs is
-    ; clear
+    ; Calling convention requires that Direction flag is clear
     cld
 
     ; MO_UINT32 ExceptionData;
@@ -312,7 +311,7 @@ SkipCallInterruptHandler:
     add rsp, 512
 
     ; MO_UINT64 Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    ; Skip restoration of DRx registers to support in-circuit emualators or
+    ; Skip restoration of DRx registers to support in-circuit emulators or
     ; debuggers set breakpoint in interrupt/exception context
     add rsp, 8 * 6
 
@@ -334,7 +333,7 @@ SkipCallInterruptHandler:
 
     ; MO_UINT64 Ldtr, Tr;
     ; MO_UINT64 Gdtr[2], Idtr[2];
-    ; Best not let anyone mess with these particular registers...
+    ; Do not let these registers change.
     add rsp, 48
 
     ; MO_UINT64 Rip;
@@ -345,13 +344,13 @@ SkipCallInterruptHandler:
     ; mov gs, rax ; not for gs
     pop rax
     ; mov fs, rax ; not for fs
-    ; (X64 will not use fs and gs, so we do not restore it)
+    ; (FS and GS are not used, so not restored.)
     pop rax
     mov es, rax
     pop rax
     mov ds, rax
-    pop qword ptr [rbp + 32] ; for cs
-    pop qword ptr [rbp + 56] ; for ss
+    pop qword ptr [rbp + 32] ; cs for iretq
+    pop qword ptr [rbp + 56] ; ss for iretq
 
     ; MO_UINT64 Rdi, Rsi, Rbp, Rsp, Rbx, Rdx, Rcx, Rax;
     ; MO_UINT64 R8, R9, R10, R11, R12, R13, R14, R15;
@@ -359,7 +358,7 @@ SkipCallInterruptHandler:
     pop rdi
     pop rsi
     add rsp, 8 ; not for rbp
-    pop qword ptr [rbp + 48] ; for rsp
+    pop qword ptr [rbp + 48] ; rsp for iretq
     pop rbx
     pop rdx
     pop rcx
