@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D0918042-BC5F-474A-9561-47212A324182}</ProjectGuid>
@@ -11,7 +11,7 @@
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Platform.ARM64.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Cpp.Default.props" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Cpp.props" />
-  <Import Sdk="Mile.Uefi" Version="1.0.1729" Project="Mile.Uefi.props" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1824" Project="Mile.Uefi.props" />
   <ItemGroup>
     <None Include="Mobility.Alice.props" />
   </ItemGroup>
@@ -26,6 +26,6 @@
   <ItemGroup>
     <ClInclude Include="Mobility.Alice.h" />
   </ItemGroup>
-  <Import Sdk="Mile.Uefi" Version="1.0.1729" Project="Mile.Uefi.targets" />
+  <Import Sdk="Mile.Uefi" Version="1.0.1824" Project="Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Cpp.targets" />
 </Project>
