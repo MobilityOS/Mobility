@@ -3,5 +3,6 @@
     <Platform Name="ARM64" />
     <Platform Name="x64" />
   </Configurations>
+  <Project Path="Mobility.Alice.Windows/Mobility.Alice.Windows.vcxproj" Id="f00ddc46-d78a-4225-b5ea-da2f1de1f47c" />
   <Project Path="Mobility.Retrovisor.Windows/Mobility.Retrovisor.Windows.vcxproj" Id="1a7367c1-5a6d-4ea4-b8f4-50ea90defe7c" />
 </Solution>
