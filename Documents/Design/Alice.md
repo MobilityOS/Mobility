@@ -1,4 +1,4 @@
-﻿# Mobility.Alice
+﻿# Mobility Alice
 
 The lightweight implementation of Microsoft Remote Desktop Protocol (RDP) server
 for embedded and bare-metal environments.
