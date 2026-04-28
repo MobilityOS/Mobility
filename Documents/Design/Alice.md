@@ -1,7 +1,7 @@
-﻿# Mobility Alice
+﻿# Mobility Alice Design Documents
 
-The lightweight implementation of Microsoft Remote Desktop Protocol (RDP) server
-for embedded and bare-metal environments.
+Mobility Alice is a lightweight implementation of Microsoft Remote Desktop
+Protocol (RDP) server for embedded and bare-metal environments.
 
 **Work In Progress**
 
