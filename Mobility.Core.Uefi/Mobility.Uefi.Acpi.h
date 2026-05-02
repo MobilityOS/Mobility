@@ -20,9 +20,9 @@
  * @return If the ACPI structure is valid, the return value is MO_TRUE.
  *         Otherwise, the return value is MO_FALSE.
  */
-EXTERN_C MO_BOOL MoUefiAcpiStructureValidate(
-    _In_ MO_POINTER Structure,
-    _In_ MO_UINTN Size);
+MO_EXTERN_C MO_BOOL MoUefiAcpiStructureValidate(
+    _Mo_In_ MO_POINTER Structure,
+    _Mo_In_ MO_UINTN Size);
 
 /**
  * @brief Validates an ACPI description table by checking its signature,
@@ -35,10 +35,10 @@ EXTERN_C MO_BOOL MoUefiAcpiStructureValidate(
  * @return If the ACPI description table is valid, the return value is MO_TRUE.
  *         Otherwise, the return value is MO_FALSE.
  */
-EXTERN_C MO_BOOL MoUefiAcpiDescriptionTableValidate(
-    _In_ MO_POINTER DescriptionTable,
-    _In_ MO_UINT32 ExpectedSignature,
-    _In_ MO_UINT8 MinimumRevision);
+MO_EXTERN_C MO_BOOL MoUefiAcpiDescriptionTableValidate(
+    _Mo_In_ MO_POINTER DescriptionTable,
+    _Mo_In_ MO_UINT32 ExpectedSignature,
+    _Mo_In_ MO_UINT8 MinimumRevision);
 
 /**
  * @brief Acquires the physical address of the Extended System Description Table
@@ -55,9 +55,9 @@ EXTERN_C MO_BOOL MoUefiAcpiDescriptionTableValidate(
  * @remarks If the Extended System Description Table (XSDT) is not found, the
  *          function returns MO_RESULT_ERROR_NO_INTERFACE.
  */
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
-    _Out_ PMO_UINT64 TableAddress,
-    _In_ EFI_SYSTEM_TABLE* SystemTable);
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
+    _Mo_Out_ PMO_UINT64 TableAddress,
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable);
 
 /**
  * @brief Acquires the physical address of an ACPI description table from the
@@ -80,11 +80,11 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
  *          If the Extended System Description Table (XSDT) is invalid, the
  *          function returns MO_RESULT_ERROR_INVALID_POINTER.
  */
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
-    _Out_ PMO_UINT64 TableAddress,
-    _In_ MO_UINT32 ExpectedSignature,
-    _In_ MO_UINT8 MinimumRevision,
-    _In_ MO_UINT64 ExtendedSystemDescriptionTable);
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
+    _Mo_Out_ PMO_UINT64 TableAddress,
+    _Mo_In_ MO_UINT32 ExpectedSignature,
+    _Mo_In_ MO_UINT8 MinimumRevision,
+    _Mo_In_ MO_UINT64 ExtendedSystemDescriptionTable);
 
 /**
  * @brief The simple memory range item structure for ACPI memory queries.
@@ -123,10 +123,10 @@ typedef struct _MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM
  *          If the System Resource Affinity Table (SRAT) is invalid, the
  *          function returns MO_RESULT_ERROR_INVALID_POINTER.
  */
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
-    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryRanges,
-    _Out_ PMO_UINTN MemoryRangesCount,
-    _In_ MO_UINT64 SystemResourceAffinityTable);
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
+    _Mo_Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryRanges,
+    _Mo_Out_ PMO_UINTN MemoryRangesCount,
+    _Mo_In_ MO_UINT64 SystemResourceAffinityTable);
 
 /**
  * @brief Queries the sorted merged memory ranges definitions from the System
@@ -150,10 +150,10 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
  *          If the System Resource Affinity Table (SRAT) is invalid, the
  *          function returns MO_RESULT_ERROR_INVALID_POINTER.
  */
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
-    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MergedMemoryRanges,
-    _Out_ PMO_UINTN MergedMemoryRangesCount,
-    _In_ MO_UINT64 SystemResourceAffinityTable);
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
+    _Mo_Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MergedMemoryRanges,
+    _Mo_Out_ PMO_UINTN MergedMemoryRangesCount,
+    _Mo_In_ MO_UINT64 SystemResourceAffinityTable);
 
 /**
  * @brief Queries the sorted merged memory holes definitions from the System
@@ -179,9 +179,9 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
  *          If the System Resource Affinity Table (SRAT) is invalid, the
  *          function returns MO_RESULT_ERROR_INVALID_POINTER.
  */
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
-    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryHoleRanges,
-    _Out_ PMO_UINTN MemoryHoleRangesCount,
-    _In_ MO_UINT64 SystemResourceAffinityTable);
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
+    _Mo_Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryHoleRanges,
+    _Mo_Out_ PMO_UINTN MemoryHoleRangesCount,
+    _Mo_In_ MO_UINT64 SystemResourceAffinityTable);
 
 #endif // !MOBILITY_UEFI_ACPI

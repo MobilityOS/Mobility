@@ -10,7 +10,7 @@
 
 #include "Mobility.Alice.h"
 
-EXTERN_C VOID MOAPI MoAliceSimpleFunction()
+MO_EXTERN_C MO_VOID MOAPI MoAliceSimpleFunction()
 {
 
 }

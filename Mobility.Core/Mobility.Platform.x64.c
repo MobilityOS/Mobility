@@ -76,10 +76,10 @@ void __lidt(void*);
 
 #endif // !MOBILITY_PLATFORM_X64_PRIVATE
 
-EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
-    _Inout_ MO_UINT8 volatile* Destination,
-    _In_ MO_UINT8 Exchange,
-    _In_ MO_UINT8 Comparand)
+MO_EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
+    _Mo_InOut_ MO_UINT8 volatile* Destination,
+    _Mo_In_ MO_UINT8 Exchange,
+    _Mo_In_ MO_UINT8 Comparand)
 {
     return _InterlockedCompareExchange8(
         (char volatile*)Destination,
@@ -87,10 +87,10 @@ EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
         (char)Comparand);
 }
 
-EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
-    _Inout_ MO_UINT16 volatile* Destination,
-    _In_ MO_UINT16 Exchange,
-    _In_ MO_UINT16 Comparand)
+MO_EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
+    _Mo_InOut_ MO_UINT16 volatile* Destination,
+    _Mo_In_ MO_UINT16 Exchange,
+    _Mo_In_ MO_UINT16 Comparand)
 {
     return _InterlockedCompareExchange16(
         (short volatile*)Destination,
@@ -98,10 +98,10 @@ EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
         (short)Comparand);
 }
 
-EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
-    _Inout_ MO_UINT32 volatile* Destination,
-    _In_ MO_UINT32 Exchange,
-    _In_ MO_UINT32 Comparand)
+MO_EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
+    _Mo_InOut_ MO_UINT32 volatile* Destination,
+    _Mo_In_ MO_UINT32 Exchange,
+    _Mo_In_ MO_UINT32 Comparand)
 {
     return _InterlockedCompareExchange(
         (long volatile*)Destination,
@@ -109,10 +109,10 @@ EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
         (long)Comparand);
 }
 
-EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
-    _Inout_ MO_UINT64 volatile* Destination,
-    _In_ MO_UINT64 Exchange,
-    _In_ MO_UINT64 Comparand)
+MO_EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
+    _Mo_InOut_ MO_UINT64 volatile* Destination,
+    _Mo_In_ MO_UINT64 Exchange,
+    _Mo_In_ MO_UINT64 Comparand)
 {
     return _InterlockedCompareExchange64(
         (__int64 volatile*)Destination,
@@ -120,10 +120,10 @@ EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
         (__int64)Comparand);
 }
 
-EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
-    _Inout_ MO_POINTER volatile* Destination,
-    _In_ MO_POINTER Exchange,
-    _In_ MO_POINTER Comparand)
+MO_EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
+    _Mo_InOut_ MO_POINTER volatile* Destination,
+    _Mo_In_ MO_POINTER Exchange,
+    _Mo_In_ MO_POINTER Comparand)
 {
     return _InterlockedCompareExchangePointer(
         (void* volatile*)Destination,
@@ -131,99 +131,99 @@ EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
         (void*)Comparand);
 }
 
-EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
-    _In_ MO_UINT16 volatile* Addend)
+MO_EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
+    _Mo_In_ MO_UINT16 volatile* Addend)
 {
     return _InterlockedDecrement16((short volatile*)Addend);
 }
 
-EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
-    _In_ MO_UINT32 volatile* Addend)
+MO_EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
+    _Mo_In_ MO_UINT32 volatile* Addend)
 {
     return _InterlockedDecrement((long volatile*)Addend);
 }
 
-EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
-    _In_ MO_UINT64 volatile* Addend)
+MO_EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
+    _Mo_In_ MO_UINT64 volatile* Addend)
 {
     return _InterlockedDecrement64((__int64 volatile*)Addend);
 }
 
-EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
-    _In_ MO_UINT16 volatile* Addend)
+MO_EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
+    _Mo_In_ MO_UINT16 volatile* Addend)
 {
     return _InterlockedIncrement16((short volatile*)Addend);
 }
 
-EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
-    _In_ MO_UINT32 volatile* Addend)
+MO_EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
+    _Mo_In_ MO_UINT32 volatile* Addend)
 {
     return _InterlockedIncrement((long volatile*)Addend);
 }
 
-EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
-    _In_ MO_UINT64 volatile* Addend)
+MO_EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
+    _Mo_In_ MO_UINT64 volatile* Addend)
 {
     return _InterlockedIncrement64((__int64 volatile*)Addend);
 }
 
-EXTERN_C VOID MOAPI MoPlatformPause()
+MO_EXTERN_C MO_VOID MOAPI MoPlatformPause()
 {
     _mm_pause();
 }
 
-EXTERN_C VOID MOAPI MoPlatformHalt()
+MO_EXTERN_C MO_VOID MOAPI MoPlatformHalt()
 {
     __halt();
 }
 
-EXTERN_C VOID MOAPI MoPlatformDebugBreak()
+MO_EXTERN_C MO_VOID MOAPI MoPlatformDebugBreak()
 {
     __debugbreak();
 }
 
-EXTERN_C VOID MOAPI MoPlatformReadCpuid(
-    _Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
-    _In_ MO_UINT32 Index)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformReadCpuid(
+    _Mo_Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
+    _Mo_In_ MO_UINT32 Index)
 {
     __cpuid((int*)Result, (int)Index);
 }
 
-EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
-    _In_ MO_UINT32 Index)
+MO_EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
+    _Mo_In_ MO_UINT32 Index)
 {
     return __readmsr(Index);
 }
 
-EXTERN_C VOID MOAPI MoPlatformWriteMsr(
-    _In_ MO_UINT32 Index,
-    _In_ MO_UINT64 Value)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteMsr(
+    _Mo_In_ MO_UINT32 Index,
+    _Mo_In_ MO_UINT64 Value)
 {
     __writemsr(Index, Value);
 }
 
-EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3()
+MO_EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3()
 {
     return __readcr3();
 }
 
-EXTERN_C VOID MOAPI MoPlatformWriteCr3(
-    _In_ MO_UINT64 Value)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteCr3(
+    _Mo_In_ MO_UINT64 Value)
 {
     __writecr3(Value);
 }
 
-EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
-    _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
+    _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor)
 {
     __lidt(Descriptor);
 }
 
 #endif // _MSC_VER
 
-EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
-    _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT32 Base)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSegmentDescriptorBase(
+    _Mo_Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT32 Base)
 {
     if (Descriptor)
     {
@@ -233,9 +233,9 @@ EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
     }
 }
 
-EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
-    _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT32 Limit)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
+    _Mo_Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT32 Limit)
 {
     if (Descriptor)
     {
@@ -244,9 +244,9 @@ EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
     }
 }
 
-EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
-    _Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT64 Base)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
+    _Mo_Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT64 Base)
 {
     if (Descriptor)
     {
@@ -257,9 +257,9 @@ EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
     }
 }
 
-EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
-    _Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT32 Limit)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
+    _Mo_Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT32 Limit)
 {
     if (Descriptor)
     {
@@ -268,9 +268,9 @@ EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
     }
 }
 
-EXTERN_C VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
-    _Out_ PMO_PLATFORM_X64_IDT_GATE_DESCRIPTOR Descriptor,
-    _In_ MO_UINT64 Offset)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
+    _Mo_Out_ PMO_PLATFORM_X64_IDT_GATE_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT64 Offset)
 {
     if (Descriptor)
     {

@@ -11,7 +11,6 @@
 #ifndef MOBILITY_DISPLAY_CORE
 #define MOBILITY_DISPLAY_CORE
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #define MO_DISPLAY_BGRA32_MAKE(R, G, B, A) ((MO_UINT32)( \
@@ -68,7 +67,7 @@ typedef struct _MO_DISPLAY_BGRA32_FRAMEBUFFER
  * @return If the BGRA32 frame buffer structure is valid, the return value is
  *         MO_TRUE. Otherwise, the return value is MO_FALSE.
  */
-EXTERN_C MO_BOOL MOAPI MoDisplayFrameBufferValidate(
-    _In_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer);
+MO_EXTERN_C MO_BOOL MOAPI MoDisplayFrameBufferValidate(
+    _Mo_In_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer);
 
 #endif // !MOBILITY_DISPLAY_CORE

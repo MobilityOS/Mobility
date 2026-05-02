@@ -11,7 +11,6 @@
 #ifndef MOBILITY_PLATFORM_INTERFACE
 #define MOBILITY_PLATFORM_INTERFACE
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 /**
@@ -21,9 +20,9 @@
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
-    _Out_ PMO_POINTER Block,
-    _In_ MO_UINTN Size);
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
+    _Mo_Out_ PMO_POINTER Block,
+    _Mo_In_ MO_UINTN Size);
 
 /**
  * @brief Frees a memory block back to the Platform Heap instance.
@@ -31,8 +30,8 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
-    _In_ MO_POINTER Block);
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
+    _Mo_In_ MO_POINTER Block);
 
 /**
  * @brief Reallocates a memory block in the Platform Heap instance.
@@ -43,9 +42,9 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
-    _Out_ PMO_POINTER UpdatedBlock,
-    _In_opt_ MO_POINTER Block,
-    _In_ MO_UINTN NewSize);
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
+    _Mo_Out_ PMO_POINTER UpdatedBlock,
+    _Mo_In_Opt_ MO_POINTER Block,
+    _Mo_In_ MO_UINTN NewSize);
 
 #endif // !MOBILITY_PLATFORM_INTERFACE

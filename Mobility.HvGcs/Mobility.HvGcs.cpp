@@ -8,7 +8,6 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #include <Mile.Project.Version.h>
@@ -25,26 +24,26 @@
 
 #include <Mobility.HyperV.Core.h>
 
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
-    _Out_ PMO_POINTER Block,
-    _In_ MO_UINTN Size)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
+    _Mo_Out_ PMO_POINTER Block,
+    _Mo_In_ MO_UINTN Size)
 {
     MO_UNREFERENCED_PARAMETER(Block);
     MO_UNREFERENCED_PARAMETER(Size);
     return MO_RESULT_ERROR_NOT_IMPLEMENTED;
 }
 
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
-    _In_ MO_POINTER Block)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
+    _Mo_In_ MO_POINTER Block)
 {
     MO_UNREFERENCED_PARAMETER(Block);
     return MO_RESULT_ERROR_NOT_IMPLEMENTED;
 }
 
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
-    _Out_ PMO_POINTER UpdatedBlock,
-    _In_opt_ MO_POINTER Block,
-    _In_ MO_UINTN NewSize)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
+    _Mo_Out_ PMO_POINTER UpdatedBlock,
+    _Mo_In_Opt_ MO_POINTER Block,
+    _Mo_In_ MO_UINTN NewSize)
 {
     MO_UNREFERENCED_PARAMETER(UpdatedBlock);
     MO_UNREFERENCED_PARAMETER(Block);
@@ -59,7 +58,7 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
 namespace
 {
     static bool IsDevicePathEndNode(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
         return Node
             && END_DEVICE_PATH_TYPE == Node->Type
@@ -67,7 +66,7 @@ namespace
     }
 
     static bool IsDevicePathFilePathNode(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
         return Node
             && MEDIA_DEVICE_PATH == Node->Type
@@ -75,7 +74,7 @@ namespace
     }
 
     static UINT16 GetDevicePathNodeLength(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
         return Node
             ? (static_cast<UINT16>(Node->Length[1]) << 8) | Node->Length[0]
@@ -83,8 +82,8 @@ namespace
     }
 
     static bool SetDevicePathNodeLength(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Node,
-        _In_ UINT16 Length)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Node,
+        _Mo_In_ UINT16 Length)
     {
         if (!Node)
         {
@@ -96,7 +95,7 @@ namespace
     }
 
     static EFI_DEVICE_PATH_PROTOCOL* GetNextDevicePathNode(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
         return Node
             ? reinterpret_cast<EFI_DEVICE_PATH_PROTOCOL*>(
@@ -106,7 +105,7 @@ namespace
     }
 
     static FILEPATH_DEVICE_PATH* DevicePathNodeToFilePathNode(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Node)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Node)
     {
         return (Node && ::IsDevicePathFilePathNode(Node))
             ? reinterpret_cast<FILEPATH_DEVICE_PATH*>(Node)
@@ -114,7 +113,7 @@ namespace
     }
 
     static UINTN GetFilePathLengthFromDevicePath(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Source)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Source)
     {
         // Initial length includes the null terminator.
         UINTN Length = 1;
@@ -143,9 +142,9 @@ namespace
     }
 
     static bool GetFilePathFromDevicePath(
-        _Out_ wchar_t* Destination,
-        _In_ UINTN DestinationLength,
-        _In_ EFI_DEVICE_PATH_PROTOCOL* Source)
+        _Mo_Out_ wchar_t* Destination,
+        _Mo_In_ UINTN DestinationLength,
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* Source)
     {
         if (!Destination || !DestinationLength || !Source)
         {
@@ -183,8 +182,8 @@ namespace
     }
 
     EFI_DEVICE_PATH_PROTOCOL* GetDevicePathFromDeviceHandle(
-        _In_ EFI_BOOT_SERVICES* BootServices,
-        _In_ EFI_HANDLE DeviceHandle)
+        _Mo_In_ EFI_BOOT_SERVICES* BootServices,
+        _Mo_In_ EFI_HANDLE DeviceHandle)
     {
         EFI_DEVICE_PATH_PROTOCOL* DevicePath = nullptr;
         EFI_STATUS Status = BootServices->HandleProtocol(
@@ -195,8 +194,8 @@ namespace
     }
 
     static UINTN GetAbsoluteDevicePathLengthForFile(
-        _In_ EFI_DEVICE_PATH_PROTOCOL* RootDevicePath,
-        _In_ wchar_t* RelativeFilePath)
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* RootDevicePath,
+        _Mo_In_ wchar_t* RelativeFilePath)
     {
         if (!RootDevicePath || !RelativeFilePath)
         {
@@ -224,10 +223,10 @@ namespace
     }
 
     static bool CreateAbsoluteDevicePathForFile(
-        _Out_ EFI_DEVICE_PATH_PROTOCOL* DevicePathBuffer,
-        _In_ size_t DevicePathBufferLength,
-        _In_ EFI_DEVICE_PATH_PROTOCOL* RootDevicePath,
-        _In_ wchar_t* RelativeFilePath)
+        _Mo_Out_ EFI_DEVICE_PATH_PROTOCOL* DevicePathBuffer,
+        _Mo_In_ size_t DevicePathBufferLength,
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* RootDevicePath,
+        _Mo_In_ wchar_t* RelativeFilePath)
     {
         if (!DevicePathBuffer || !DevicePathBufferLength ||
             !RootDevicePath || !RelativeFilePath)
@@ -281,9 +280,9 @@ namespace
     }
 
     static EFI_STATUS LaunchImage(
-        _In_ EFI_BOOT_SERVICES* BootServices,
-        _In_ EFI_HANDLE ParentImageHandle,
-        _In_ EFI_DEVICE_PATH_PROTOCOL* ImageDevicePath)
+        _Mo_In_ EFI_BOOT_SERVICES* BootServices,
+        _Mo_In_ EFI_HANDLE ParentImageHandle,
+        _Mo_In_ EFI_DEVICE_PATH_PROTOCOL* ImageDevicePath)
     {
         EFI_HANDLE ImageHandle = nullptr;
         EFI_STATUS Status = BootServices->LoadImage(
@@ -331,8 +330,8 @@ namespace
  *         EFI_SUCCESS.
  */
 EFI_STATUS EFIAPI UefiMain(
-    _In_ EFI_HANDLE ImageHandle,
-    _In_ EFI_SYSTEM_TABLE* SystemTable)
+    _Mo_In_ EFI_HANDLE ImageHandle,
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable)
 {
     ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,

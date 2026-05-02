@@ -11,7 +11,6 @@
 #ifndef MOBILITY_UEFI_CORE
 #define MOBILITY_UEFI_CORE
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #undef NULL
@@ -24,18 +23,18 @@
  * @param Output The pointer to the UEFI Simple Text Output Protocol.
  * @param String The UCS-2 string to be written.
  */
-EXTERN_C VOID MOAPI MoUefiConsoleWriteUcs2String(
-    _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
-    _In_ MO_CONSTANT_WIDE_STRING String);
+MO_EXTERN_C MO_VOID MOAPI MoUefiConsoleWriteUcs2String(
+    _Mo_In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING String);
 
 /**
  * @brief Write an ASCII string to the console.
  * @param Output The pointer to the UEFI Simple Text Output Protocol.
  * @param String The ASCII string to be written.
  */
-EXTERN_C VOID MOAPI MoUefiConsoleWriteAsciiString(
-    _In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
-    _In_ MO_CONSTANT_STRING String);
+MO_EXTERN_C MO_VOID MOAPI MoUefiConsoleWriteAsciiString(
+    _Mo_In_ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* Output,
+    _Mo_In_ MO_CONSTANT_STRING String);
 
 /**
  * @brief Initializes the BGRA32 display frame buffer information from UEFI Boot
@@ -53,9 +52,9 @@ EXTERN_C VOID MOAPI MoUefiConsoleWriteAsciiString(
  *          the display frame buffer information is invalid, the function
  *          returns EFI_UNSUPPORTED.
  */
-EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
-    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
-    _In_ EFI_BOOT_SERVICES* BootServices);
+MO_EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
+    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_In_ EFI_BOOT_SERVICES* BootServices);
 
 /**
  * @brief Acquires the specified system configuration table from the UEFI System
@@ -74,10 +73,10 @@ EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
  * @remarks If the specified system configuration table is not found, the function
  *          returns MO_RESULT_ERROR_NO_INTERFACE.
  */
-EXTERN_C MO_RESULT MOAPI MoUefiQuerySystemConfigurationTable(
-    _Out_ PMO_POINTER Table,
-    _In_ EFI_SYSTEM_TABLE* SystemTable,
-    _In_ EFI_GUID* Guid);
+MO_EXTERN_C MO_RESULT MOAPI MoUefiQuerySystemConfigurationTable(
+    _Mo_Out_ PMO_POINTER Table,
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable,
+    _Mo_In_ EFI_GUID* Guid);
 
 #endif // !MOBILITY_UEFI_CORE
 

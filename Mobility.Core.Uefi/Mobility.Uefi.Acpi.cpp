@@ -16,9 +16,9 @@
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi20.h>
 
-EXTERN_C MO_BOOL MoUefiAcpiStructureValidate(
-    _In_ MO_POINTER Structure,
-    _In_ MO_UINTN Size)
+MO_EXTERN_C MO_BOOL MoUefiAcpiStructureValidate(
+    _Mo_In_ MO_POINTER Structure,
+    _Mo_In_ MO_UINTN Size)
 {
     if (!Structure || !Size)
     {
@@ -39,10 +39,10 @@ EXTERN_C MO_BOOL MoUefiAcpiStructureValidate(
     return MO_TRUE;
 }
 
-EXTERN_C MO_BOOL MoUefiAcpiDescriptionTableValidate(
-    _In_ MO_POINTER DescriptionTable,
-    _In_ MO_UINT32 ExpectedSignature,
-    _In_ MO_UINT8 MinimumRevision)
+MO_EXTERN_C MO_BOOL MoUefiAcpiDescriptionTableValidate(
+    _Mo_In_ MO_POINTER DescriptionTable,
+    _Mo_In_ MO_UINT32 ExpectedSignature,
+    _Mo_In_ MO_UINT8 MinimumRevision)
 {
     if (!DescriptionTable)
     {
@@ -65,9 +65,9 @@ EXTERN_C MO_BOOL MoUefiAcpiDescriptionTableValidate(
     return MO_TRUE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
-    _Out_ PMO_UINT64 TableAddress,
-    _In_ EFI_SYSTEM_TABLE* SystemTable)
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
+    _Mo_Out_ PMO_UINT64 TableAddress,
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable)
 {
     if (!TableAddress || !SystemTable)
     {
@@ -128,11 +128,11 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryExtendedSystemDescriptionTable(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
-    _Out_ PMO_UINT64 TableAddress,
-    _In_ MO_UINT32 ExpectedSignature,
-    _In_ MO_UINT8 MinimumRevision,
-    _In_ MO_UINT64 ExtendedSystemDescriptionTable)
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
+    _Mo_Out_ PMO_UINT64 TableAddress,
+    _Mo_In_ MO_UINT32 ExpectedSignature,
+    _Mo_In_ MO_UINT8 MinimumRevision,
+    _Mo_In_ MO_UINT64 ExtendedSystemDescriptionTable)
 {
     if (!TableAddress || !ExtendedSystemDescriptionTable)
     {
@@ -179,10 +179,10 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryDescriptionTable(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
-    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryRanges,
-    _Out_ PMO_UINTN MemoryRangesCount,
-    _In_ MO_UINT64 SystemResourceAffinityTable)
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
+    _Mo_Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryRanges,
+    _Mo_Out_ PMO_UINTN MemoryRangesCount,
+    _Mo_In_ MO_UINT64 SystemResourceAffinityTable)
 {
     if (!MemoryRanges ||
         !MemoryRangesCount ||
@@ -270,9 +270,9 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
         Count,
         sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM),
         [](
-            _In_ MO_POINTER Left,
-            _In_ MO_POINTER Right,
-            _In_ MO_POINTER Context) -> MO_INTN MOAPI
+            _Mo_In_ MO_POINTER Left,
+            _Mo_In_ MO_POINTER Right,
+            _Mo_In_ MO_POINTER Context) -> MO_INTN MOAPI
     {
         MO_UNREFERENCED_PARAMETER(Context);
         PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM LeftItem =
@@ -302,10 +302,10 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
-    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MergedMemoryRanges,
-    _Out_ PMO_UINTN MergedMemoryRangesCount,
-    _In_ MO_UINT64 SystemResourceAffinityTable)
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
+    _Mo_Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MergedMemoryRanges,
+    _Mo_Out_ PMO_UINTN MergedMemoryRangesCount,
+    _Mo_In_ MO_UINT64 SystemResourceAffinityTable)
 {
     if (!MergedMemoryRanges ||
         !MergedMemoryRangesCount ||
@@ -400,10 +400,10 @@ EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
-    _Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryHoleRanges,
-    _Out_ PMO_UINTN MemoryHoleRangesCount,
-    _In_ MO_UINT64 SystemResourceAffinityTable)
+MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
+    _Mo_Out_ PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM* MemoryHoleRanges,
+    _Mo_Out_ PMO_UINTN MemoryHoleRangesCount,
+    _Mo_In_ MO_UINT64 SystemResourceAffinityTable)
 {
     if (!MemoryHoleRanges ||
         !MemoryHoleRangesCount ||

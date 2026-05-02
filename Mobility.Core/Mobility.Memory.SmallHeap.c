@@ -12,8 +12,8 @@
 
 #include "Mobility.Runtime.Core.h"
 
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
-    _Out_ PMO_MEMORY_SMALL_HEAP Instance)
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
+    _Mo_Out_ PMO_MEMORY_SMALL_HEAP Instance)
 {
     if (!Instance)
     {
@@ -58,7 +58,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
 }
 
 MO_FORCEINLINE MO_BOOL MoMemorySmallHeapHeaderValidate(
-    _In_ PMO_MEMORY_SMALL_HEAP Instance)
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance)
 {
     PMO_MEMORY_SMALL_HEAP_HEADER Header = &Instance->Header;
 
@@ -82,9 +82,9 @@ MO_FORCEINLINE MO_BOOL MoMemorySmallHeapHeaderValidate(
     return MO_TRUE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
-    _Out_ PMO_MEMORY_SMALL_HEAP_SUMMARY Summary,
-    _In_ PMO_MEMORY_SMALL_HEAP Instance)
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
+    _Mo_Out_ PMO_MEMORY_SMALL_HEAP_SUMMARY Summary,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance)
 {
     if (!Summary || !Instance)
     {
@@ -136,7 +136,7 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
 }
 
 MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapCalculateItemHeaderChecksum(
-    _In_ PMO_MEMORY_SMALL_HEAP_ITEM_HEADER ItemHeader)
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP_ITEM_HEADER ItemHeader)
 {
     MO_UINT32 Checksum = 0;
     Checksum += ItemHeader->HeapHeaderOffsetUnits;
@@ -146,9 +146,9 @@ MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapCalculateItemHeaderChecksum(
 }
 
 MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapFindSuitableBlock(
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ MO_UINT16 RequiredUnits,
-    _In_ MO_UINT16 StartIndex)
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_ MO_UINT16 RequiredUnits,
+    _Mo_In_ MO_UINT16 StartIndex)
 {
     MO_UINT16 CurrentIndex = StartIndex;
     while (CurrentIndex < MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
@@ -181,8 +181,8 @@ MO_FORCEINLINE MO_UINT16 MoMemorySmallHeapFindSuitableBlock(
     return 0;
 }
 
-MO_FORCEINLINE VOID MoMemorySmallHeapUpdateHintUnit(
-    _In_ PMO_MEMORY_SMALL_HEAP Instance)
+MO_FORCEINLINE MO_VOID MoMemorySmallHeapUpdateHintUnit(
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance)
 {
     MO_UINT16 FirstSuitableBlockIndex = MoMemorySmallHeapFindSuitableBlock(
         Instance,
@@ -194,10 +194,10 @@ MO_FORCEINLINE VOID MoMemorySmallHeapUpdateHintUnit(
     }
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
-    _Out_ PMO_POINTER Block,
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ MO_UINT16 Size)
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
+    _Mo_Out_ PMO_POINTER Block,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_ MO_UINT16 Size)
 {
     if (!Block || !Instance || Size == 0)
     {
@@ -281,8 +281,8 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
 }
 
 MO_FORCEINLINE MO_BOOL MoMemorySmallHeapItemHeaderValidate(
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ PMO_MEMORY_SMALL_HEAP_ITEM_HEADER Header)
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP_ITEM_HEADER Header)
 {
     MO_UINT16 Checksum = MoMemorySmallHeapCalculateItemHeaderChecksum(Header);
     if (Header->Checksum != Checksum)
@@ -317,9 +317,9 @@ MO_FORCEINLINE MO_BOOL MoMemorySmallHeapItemHeaderValidate(
     return MO_TRUE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ MO_POINTER Block)
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_ MO_POINTER Block)
 {
     if (!Instance || !Block)
     {
@@ -375,11 +375,11 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
-    _Out_ PMO_POINTER UpdatedBlock,
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_opt_ MO_POINTER Block,
-    _In_ MO_UINT16 NewSize)
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
+    _Mo_Out_ PMO_POINTER UpdatedBlock,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_Opt_ MO_POINTER Block,
+    _Mo_In_ MO_UINT16 NewSize)
 {
     if (!UpdatedBlock || !Instance || !NewSize)
     {

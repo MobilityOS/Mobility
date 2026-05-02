@@ -12,8 +12,8 @@
 
 #include "Mobility.BitmapFont.LaffStd.h"
 
-EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
-    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
+MO_EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
+    _Mo_In_Opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
 {
     if (!ConsoleScreenBuffer)
     {
@@ -23,8 +23,8 @@ EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
     return ConsoleScreenBuffer->ColorLookupTable[0][0];
 }
 
-EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
-    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
+MO_EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
+    _Mo_In_Opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
 {
     if (!ConsoleScreenBuffer)
     {
@@ -34,10 +34,10 @@ EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
     return ConsoleScreenBuffer->ColorLookupTable[8][0];
 }
 
-EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
-    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_UINT32 BackgroundColor,
-    _In_ MO_UINT32 ForegroundColor)
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreUpdateColorSettings(
+    _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_UINT32 BackgroundColor,
+    _Mo_In_ MO_UINT32 ForegroundColor)
 {
     if (!ConsoleScreenBuffer)
     {
@@ -57,13 +57,13 @@ EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
     }
 }
 
-EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
-    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_UINT32 MaximumColumn,
-    _In_ MO_UINT32 MaximumRow,
-    _In_ MO_UINT32 BackgroundColor,
-    _In_ MO_UINT32 ForegroundColor,
-    _In_ PMO_WIDE_CHAR CharacterBuffer)
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
+    _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_UINT32 MaximumColumn,
+    _Mo_In_ MO_UINT32 MaximumRow,
+    _Mo_In_ MO_UINT32 BackgroundColor,
+    _Mo_In_ MO_UINT32 ForegroundColor,
+    _Mo_In_ PMO_WIDE_CHAR CharacterBuffer)
 {
     if (!ConsoleScreenBuffer)
     {
@@ -85,11 +85,11 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
     ConsoleScreenBuffer->CharacterBufferStartOffset = 0;
 }
 
-EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
-    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
-    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
-    _In_ MO_WIDE_CHAR Character)
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
+    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
+    _Mo_In_ MO_WIDE_CHAR Character)
 {
     if (!DisplayFrameBuffer || !ConsoleScreenBuffer)
     {
@@ -167,9 +167,9 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
     }
 }
 
-EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
-    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
-    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreRefreshScreen(
+    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
 {
     if (!DisplayFrameBuffer || !ConsoleScreenBuffer)
     {
@@ -197,10 +197,10 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
     }
 }
 
-EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
-    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINT32 StringLength)
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreWriteString(
+    _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINT32 StringLength)
 {
     if (!ConsoleScreenBuffer || !String || !StringLength)
     {

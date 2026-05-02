@@ -11,7 +11,6 @@
 #ifndef MOBILITY_UNICODE_CORE
 #define MOBILITY_UNICODE_CORE
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 /* Basic Latin (ASCII) */
@@ -168,9 +167,9 @@
  *         If Source points to a character out of the UCS-2 range, the return
  *         value is -1.
  */
-EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUcs2FromUtf8(
-    _Out_opt_ PMO_WIDE_CHAR Destination,
-    _In_ PMO_CHAR Source,
-    _In_ MO_UINTN SourceLength);
+MO_EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUcs2FromUtf8(
+    _Mo_Out_Opt_ PMO_WIDE_CHAR Destination,
+    _Mo_In_ PMO_CHAR Source,
+    _Mo_In_ MO_UINTN SourceLength);
 
 #endif // !MOBILITY_UNICODE_CORE

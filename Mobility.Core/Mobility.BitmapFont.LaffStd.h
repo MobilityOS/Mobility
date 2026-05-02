@@ -11,20 +11,19 @@
 #ifndef MOBILITY_BITMAPFONT_LAFFSTD
 #define MOBILITY_BITMAPFONT_LAFFSTD
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 /**
  * @brief Gets the width of the LaffStd font.
  * @return The width of the LaffStd font.
  */
-EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetWidth();
+MO_EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetWidth();
 
 /**
  * @brief Gets the height of the LaffStd font.
  * @return The height of the LaffStd font.
  */
-EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight();
+MO_EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight();
 
 /**
  * @brief Queries the glyph data of the LaffStd font.
@@ -32,7 +31,7 @@ EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight();
  * @return The glyph data of the LaffStd font. If the character is not found,
  *         the return value is nullptr.
  */
-EXTERN_C CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
-    _In_ MO_WIDE_CHAR Character);
+MO_EXTERN_C MO_CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
+    _Mo_In_ MO_WIDE_CHAR Character);
 
 #endif // !MOBILITY_BITMAPFONT_LAFFSTD

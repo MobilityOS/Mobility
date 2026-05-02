@@ -11,7 +11,7 @@
 .CODE
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformDisableInterrupts();
 ; -----------------------------------------------------------------------------
 MoPlatformDisableInterrupts PROC
     cli
@@ -19,7 +19,7 @@ MoPlatformDisableInterrupts PROC
 MoPlatformDisableInterrupts ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformEnableInterrupts();
 ; -----------------------------------------------------------------------------
 MoPlatformEnableInterrupts PROC
     sti
@@ -27,8 +27,8 @@ MoPlatformEnableInterrupts PROC
 MoPlatformEnableInterrupts ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
-;     _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
+;     _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 ; -----------------------------------------------------------------------------
 MoPlatformLoadGlobalDescriptorTable PROC
     ; RCX = Descriptor
@@ -38,8 +38,8 @@ MoPlatformLoadGlobalDescriptorTable PROC
 MoPlatformLoadGlobalDescriptorTable ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformSetCodeSegmentSelector(
-;     _In_ MO_UINT16 CodeSelector);
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformSetCodeSegmentSelector(
+;     _Mo_In_ MO_UINT16 CodeSelector);
 ; -----------------------------------------------------------------------------
 MoPlatformSetCodeSegmentSelector PROC PUBLIC
     ; CX = CodeSelector
@@ -64,8 +64,8 @@ NewReturnAddress:
 MoPlatformSetCodeSegmentSelector ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformSetDataSegmentSelectors(
-;     _In_ MO_UINT16 DataSelector);
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformSetDataSegmentSelectors(
+;     _Mo_In_ MO_UINT16 DataSelector);
 ; -----------------------------------------------------------------------------
 MoPlatformSetDataSegmentSelectors PROC PUBLIC
     ; CX = DataSelector
@@ -79,8 +79,8 @@ MoPlatformSetDataSegmentSelectors PROC PUBLIC
 MoPlatformSetDataSegmentSelectors ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformLoadTaskRegister(
-;     _In_ MO_UINT16 TssSelector);
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadTaskRegister(
+;     _Mo_In_ MO_UINT16 TssSelector);
 ; -----------------------------------------------------------------------------
 MoPlatformLoadTaskRegister PROC
     ; RCX = TssSelector
@@ -90,9 +90,9 @@ MoPlatformLoadTaskRegister PROC
 MoPlatformLoadTaskRegister ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C VOID MOAPI MoPlatformSwitchToNewStack(
-;     _In_ MO_POINTER StackAddress,
-;     _In_ MO_POINTER FunctionAddress);
+; MO_EXTERN_C MO_VOID MOAPI MoPlatformSwitchToNewStack(
+;     _Mo_In_ MO_POINTER StackAddress,
+;     _Mo_In_ MO_POINTER FunctionAddress);
 ; -----------------------------------------------------------------------------
 MoPlatformSwitchToNewStack PROC
     ; RCX = StackAddress
@@ -117,7 +117,7 @@ MoPlatformSwitchToNewStack ENDP
 
 ALIGN 8
 ; -----------------------------------------------------------------------------
-; EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
+; MO_EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
 ; -----------------------------------------------------------------------------
 ; The length of the pointed interrupt handler table must be 256 entries.
 PUBLIC MoPlatformInterruptHandlerTable
@@ -380,7 +380,7 @@ SkipCallInterruptHandler:
 MoPlatformInterruptCommonEntry ENDP
 
 ; -----------------------------------------------------------------------------
-; EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
+; MO_EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
 ; -----------------------------------------------------------------------------
 ; These are the actual interrupt vector entry points. The macros below ensure
 ; that the vector always pushes an error code and the vector number to the stack

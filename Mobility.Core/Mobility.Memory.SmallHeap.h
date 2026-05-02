@@ -11,7 +11,6 @@
 #ifndef MOBILITY_MEMORY_SMALLHEAP
 #define MOBILITY_MEMORY_SMALLHEAP
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 /*
@@ -182,8 +181,8 @@ MO_C_STATIC_ASSERT(sizeof(MO_MEMORY_SMALL_HEAP_ITEM_HEADER) \
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
-    _Out_ PMO_MEMORY_SMALL_HEAP Instance);
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
+    _Mo_Out_ PMO_MEMORY_SMALL_HEAP Instance);
 
 /**
  * @brief The summary structure for Small Heap (v1).
@@ -212,9 +211,9 @@ typedef struct _MO_MEMORY_SMALL_HEAP_SUMMARY
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
-    _Out_ PMO_MEMORY_SMALL_HEAP_SUMMARY Summary,
-    _In_ PMO_MEMORY_SMALL_HEAP Instance);
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
+    _Mo_Out_ PMO_MEMORY_SMALL_HEAP_SUMMARY Summary,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance);
 
 /**
  * @brief Allocates a memory block from the Small Heap (v1) instance.
@@ -224,10 +223,10 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapSummary(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
-    _Out_ PMO_POINTER Block,
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ MO_UINT16 Size);
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
+    _Mo_Out_ PMO_POINTER Block,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_ MO_UINT16 Size);
 
 /**
  * @brief Frees a memory block back to the Small Heap (v1) instance.
@@ -236,9 +235,9 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_ MO_POINTER Block);
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_ MO_POINTER Block);
 
 /**
  * @brief Reallocates a memory block in the Small Heap (v1) instance.
@@ -250,10 +249,10 @@ EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
-    _Out_ PMO_POINTER UpdatedBlock,
-    _In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _In_opt_ MO_POINTER Block,
-    _In_ MO_UINT16 NewSize);
+MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
+    _Mo_Out_ PMO_POINTER UpdatedBlock,
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
+    _Mo_In_Opt_ MO_POINTER Block,
+    _Mo_In_ MO_UINT16 NewSize);
 
 #endif // !MOBILITY_MEMORY_SMALLHEAP

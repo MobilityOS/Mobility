@@ -8,7 +8,6 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #include <Mile.Project.Version.h>
@@ -28,8 +27,8 @@
  *         EFI_SUCCESS.
  */
 EFI_STATUS EFIAPI UefiMain(
-    _In_ EFI_HANDLE ImageHandle,
-    _In_ EFI_SYSTEM_TABLE* SystemTable)
+    _Mo_In_ EFI_HANDLE ImageHandle,
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable)
 {
     ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,

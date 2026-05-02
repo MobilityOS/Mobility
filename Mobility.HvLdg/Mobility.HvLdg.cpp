@@ -9,7 +9,6 @@
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #include <Mile.Project.Version.h>
@@ -136,9 +135,9 @@ namespace
         "\r\n";
 }
 
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
-    _Out_ PMO_POINTER Block,
-    _In_ MO_UINTN Size)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
+    _Mo_Out_ PMO_POINTER Block,
+    _Mo_In_ MO_UINTN Size)
 {
     // Additional check to ensure Size fits in MO_UINT16.
     if (Size > MO_UINT16_MAX)
@@ -152,16 +151,16 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapAllocate(
         static_cast<MO_UINT16>(Size));
 }
 
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
-    _In_ MO_POINTER Block)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapFree(
+    _Mo_In_ MO_POINTER Block)
 {
     return ::MoMemorySmallHeapFree(&g_PlatformContext.InternalHeap, Block);
 }
 
-EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
-    _Out_ PMO_POINTER UpdatedBlock,
-    _In_opt_ MO_POINTER Block,
-    _In_ MO_UINTN NewSize)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
+    _Mo_Out_ PMO_POINTER UpdatedBlock,
+    _Mo_In_Opt_ MO_POINTER Block,
+    _Mo_In_ MO_UINTN NewSize)
 {
     // Additional check to ensure NewSize fits in MO_UINT16.
     if (NewSize > MO_UINT16_MAX)
@@ -176,8 +175,8 @@ EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
         static_cast<MO_UINT16>(NewSize));
 }
 
-EXTERN_C VOID MOAPI MoPlatformWriteAsciiString(
-    _In_ MO_CONSTANT_STRING String)
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteAsciiString(
+    _Mo_In_ MO_CONSTANT_STRING String)
 {
     ::MoConsoleCoreWriteString(
         &g_PlatformContext.ConsoleScreenBuffer,
@@ -188,8 +187,8 @@ EXTERN_C VOID MOAPI MoPlatformWriteAsciiString(
         &g_PlatformContext.ConsoleScreenBuffer);
 }
 
-EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
-    _In_ EFI_BOOT_SERVICES* BootServices)
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
+    _Mo_In_ EFI_BOOT_SERVICES* BootServices)
 {
     if (MO_RESULT_SUCCESS_OK != ::MoRuntimeMemoryFillByte(
         &g_PlatformContext,
@@ -239,7 +238,7 @@ EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
 }
 
 void SimpleDemo(
-    _In_ EFI_SYSTEM_TABLE* SystemTable)
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable)
 {
     if (MO_RESULT_SUCCESS_OK != ::MoPlatformInitialize(
         SystemTable->BootServices))
@@ -347,8 +346,8 @@ void SimpleDemo(
  *         EFI_SUCCESS.
  */
 EFI_STATUS EFIAPI UefiMain(
-    _In_ EFI_HANDLE ImageHandle,
-    _In_ EFI_SYSTEM_TABLE* SystemTable)
+    _Mo_In_ EFI_HANDLE ImageHandle,
+    _Mo_In_ EFI_SYSTEM_TABLE* SystemTable)
 {
     ::MoUefiConsoleWriteAsciiString(
         SystemTable->ConOut,

@@ -11,7 +11,6 @@
 #ifndef MOBILITY_PLATFORM_X64
 #define MOBILITY_PLATFORM_X64
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #ifdef _MSC_VER
@@ -764,10 +763,10 @@ MO_C_STATIC_ASSERT(sizeof(MO_PLATFORM_X64_FXSAVE_AREA) == 512);
  * @param Comparand The value to compare to Destination.
  * @return The function returns the initial value of the Destination parameter.
  */
-EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
-    _Inout_ MO_UINT8 volatile* Destination,
-    _In_ MO_UINT8 Exchange,
-    _In_ MO_UINT8 Comparand);
+MO_EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
+    _Mo_InOut_ MO_UINT8 volatile* Destination,
+    _Mo_In_ MO_UINT8 Exchange,
+    _Mo_In_ MO_UINT8 Comparand);
 
 /**
  * @brief Performs an atomic compare-and-exchange operation on the specified
@@ -779,10 +778,10 @@ EXTERN_C MO_UINT8 MoPlatformInterlockedCompareExchange8(
  * @param Comparand The value to compare to Destination.
  * @return The function returns the initial value of the Destination parameter.
  */
-EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
-    _Inout_ MO_UINT16 volatile* Destination,
-    _In_ MO_UINT16 Exchange,
-    _In_ MO_UINT16 Comparand);
+MO_EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
+    _Mo_InOut_ MO_UINT16 volatile* Destination,
+    _Mo_In_ MO_UINT16 Exchange,
+    _Mo_In_ MO_UINT16 Comparand);
 
 /**
  * @brief Performs an atomic compare-and-exchange operation on the specified
@@ -794,10 +793,10 @@ EXTERN_C MO_UINT16 MoPlatformInterlockedCompareExchange16(
  * @param Comparand The value to compare to Destination.
  * @return The function returns the initial value of the Destination parameter.
  */
-EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
-    _Inout_ MO_UINT32 volatile* Destination,
-    _In_ MO_UINT32 Exchange,
-    _In_ MO_UINT32 Comparand);
+MO_EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
+    _Mo_InOut_ MO_UINT32 volatile* Destination,
+    _Mo_In_ MO_UINT32 Exchange,
+    _Mo_In_ MO_UINT32 Comparand);
 
 /**
  * @brief Performs an atomic compare-and-exchange operation on the specified
@@ -809,10 +808,10 @@ EXTERN_C MO_UINT32 MoPlatformInterlockedCompareExchange32(
  * @param Comparand The value to compare to Destination.
  * @return The function returns the initial value of the Destination parameter.
  */
-EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
-    _Inout_ MO_UINT64 volatile* Destination,
-    _In_ MO_UINT64 Exchange,
-    _In_ MO_UINT64 Comparand);
+MO_EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
+    _Mo_InOut_ MO_UINT64 volatile* Destination,
+    _Mo_In_ MO_UINT64 Exchange,
+    _Mo_In_ MO_UINT64 Comparand);
 
 /**
  * @brief Performs an atomic compare-and-exchange operation on the specified
@@ -824,10 +823,10 @@ EXTERN_C MO_UINT64 MoPlatformInterlockedCompareExchange64(
  * @param Comparand The value to compare to Destination.
  * @return The function returns the initial value of the Destination parameter.
  */
-EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
-    _Inout_ MO_POINTER volatile* Destination,
-    _In_ MO_POINTER Exchange,
-    _In_ MO_POINTER Comparand);
+MO_EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
+    _Mo_InOut_ MO_POINTER volatile* Destination,
+    _Mo_In_ MO_POINTER Exchange,
+    _Mo_In_ MO_POINTER Comparand);
 
 /**
  * @brief Decrements (decreases by one) the value of the specified 16-bit
@@ -835,8 +834,8 @@ EXTERN_C MO_POINTER MoPlatformInterlockedCompareExchangePointer(
  * @param Addend A pointer to the variable to be decremented.
  * @return The function returns the resulting decremented value.
  */
-EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
-    _In_ MO_UINT16 volatile* Addend);
+MO_EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
+    _Mo_In_ MO_UINT16 volatile* Addend);
 
 /**
  * @brief Decrements (decreases by one) the value of the specified 32-bit
@@ -844,8 +843,8 @@ EXTERN_C MO_UINT16 MoPlatformInterlockedDecrement16(
  * @param Addend A pointer to the variable to be decremented.
  * @return The function returns the resulting decremented value.
  */
-EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
-    _In_ MO_UINT32 volatile* Addend);
+MO_EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
+    _Mo_In_ MO_UINT32 volatile* Addend);
 
 /**
  * @brief Decrements (decreases by one) the value of the specified 64-bit
@@ -853,8 +852,8 @@ EXTERN_C MO_UINT32 MoPlatformInterlockedDecrement32(
  * @param Addend A pointer to the variable to be decremented.
  * @return The function returns the resulting decremented value.
  */
-EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
-    _In_ MO_UINT64 volatile* Addend);
+MO_EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
+    _Mo_In_ MO_UINT64 volatile* Addend);
 
 /**
  * @brief Increments (increases by one) the value of the specified 16-bit
@@ -862,8 +861,8 @@ EXTERN_C MO_UINT64 MoPlatformInterlockedDecrement64(
  * @param Addend A pointer to the variable to be incremented.
  * @return The function returns the resulting incremented value.
  */
-EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
-    _In_ MO_UINT16 volatile* Addend);
+MO_EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
+    _Mo_In_ MO_UINT16 volatile* Addend);
 
 /**
  * @brief Increments (increases by one) the value of the specified 32-bit
@@ -871,8 +870,8 @@ EXTERN_C MO_UINT16 MoPlatformInterlockedIncrement16(
  * @param Addend A pointer to the variable to be incremented.
  * @return The function returns the resulting incremented value.
  */
-EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
-    _In_ MO_UINT32 volatile* Addend);
+MO_EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
+    _Mo_In_ MO_UINT32 volatile* Addend);
 
 /**
  * @brief Increments (increases by one) the value of the specified 64-bit
@@ -880,36 +879,36 @@ EXTERN_C MO_UINT32 MoPlatformInterlockedIncrement32(
  * @param Addend A pointer to the variable to be incremented.
  * @return The function returns the resulting incremented value.
  */
-EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
-    _In_ MO_UINT64 volatile* Addend);
+MO_EXTERN_C MO_UINT64 MoPlatformInterlockedIncrement64(
+    _Mo_In_ MO_UINT64 volatile* Addend);
 
 /**
  * @brief Inserts a PAUSE instruction to improve the performance of spin-wait
  *        loops.
  */
-EXTERN_C VOID MOAPI MoPlatformPause();
+MO_EXTERN_C MO_VOID MOAPI MoPlatformPause();
 
 /**
  * @brief Halts the current processor until the next external interrupt arrives.
  */
-EXTERN_C VOID MOAPI MoPlatformHalt();
+MO_EXTERN_C MO_VOID MOAPI MoPlatformHalt();
 
 /**
  * @brief Triggers a breakpoint exception.
  */
-EXTERN_C VOID MOAPI MoPlatformDebugBreak();
+MO_EXTERN_C MO_VOID MOAPI MoPlatformDebugBreak();
 
 /**
  * @brief Disables interrupts on the current processor.
  * @remarks Implemented in the assembly parts.
  */
-EXTERN_C VOID MOAPI MoPlatformDisableInterrupts();
+MO_EXTERN_C MO_VOID MOAPI MoPlatformDisableInterrupts();
 
 /**
  * @brief Enables interrupts on the current processor.
  * @remarks Implemented in the assembly parts.
  */
-EXTERN_C VOID MOAPI MoPlatformEnableInterrupts();
+MO_EXTERN_C MO_VOID MOAPI MoPlatformEnableInterrupts();
 
 /**
  * @brief The result of the CPUID instruction for x64 architecture.
@@ -928,47 +927,47 @@ typedef struct _MO_PLATFORM_X64_CPUID_RESULT
  *               CPUID instruction.
  * @param Index The index of the CPUID instruction to read.
  */
-EXTERN_C VOID MOAPI MoPlatformReadCpuid(
-    _Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
-    _In_ MO_UINT32 Index);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformReadCpuid(
+    _Mo_Out_ PMO_PLATFORM_X64_CPUID_RESULT Result,
+    _Mo_In_ MO_UINT32 Index);
 
 /**
  * @brief Reads the value of the specified Model-Specific Register (MSR).
  * @param Index The index of the MSR to read.
  * @return The value of the specified MSR.
  */
-EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
-    _In_ MO_UINT32 Index);
+MO_EXTERN_C MO_UINT64 MOAPI MoPlatformReadMsr(
+    _Mo_In_ MO_UINT32 Index);
 
 /**
  * @brief Writes a value to the specified Model-Specific Register (MSR).
  * @param Index The index of the MSR to write.
  * @param Value The value to write to the MSR.
  */
-EXTERN_C VOID MOAPI MoPlatformWriteMsr(
-    _In_ MO_UINT32 Index,
-    _In_ MO_UINT64 Value);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteMsr(
+    _Mo_In_ MO_UINT32 Index,
+    _Mo_In_ MO_UINT64 Value);
 
 /**
  * @brief Reads the value of the CR3 register.
  * @return The value of the CR3 register.
  */
-EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3();
+MO_EXTERN_C MO_UINT64 MOAPI MoPlatformReadCr3();
 
 /**
  * @brief Writes a value to the CR3 register.
  * @param Value The value to write to the CR3 register.
  */
-EXTERN_C VOID MOAPI MoPlatformWriteCr3(
-    _In_ MO_UINT64 Value);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteCr3(
+    _Mo_In_ MO_UINT64 Value);
 
 /**
  * @brief Loads the Global Descriptor Table (GDT) with the specified descriptor.
  * @param Descriptor A pointer to the pseudo-descriptor that contains the base
  *                   address and limit of the GDT.
  */
-EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
-    _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
+    _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**
  * @brief Loads the Interrupt Descriptor Table (IDT) with the specified
@@ -976,28 +975,28 @@ EXTERN_C VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
  * @param Descriptor A pointer to the pseudo-descriptor that contains the base
  *                   address and limit of the IDT.
  */
-EXTERN_C VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
-    _In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
+    _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**
  * @brief Sets the code segment selector to the specified segment selector.
  * @param CodeSelector The code segment selector.
  */
-EXTERN_C VOID MOAPI MoPlatformSetCodeSegmentSelector(
-    _In_ MO_UINT16 CodeSelector);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetCodeSegmentSelector(
+    _Mo_In_ MO_UINT16 CodeSelector);
 
 /**
  * @brief Sets the data segment selectors to the specified segment selector.
  * @param DataSelector The data segment selector.
  */
-EXTERN_C VOID MOAPI MoPlatformSetDataSegmentSelectors(
-    _In_ MO_UINT16 DataSelector);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetDataSegmentSelectors(
+    _Mo_In_ MO_UINT16 DataSelector);
 
 /**
  * @brief Registers a new Task State Segment (TSS) for task switching.
  * @param TssSelector The TSS segment selector.
  */
-EXTERN_C VOID MOAPI MoPlatformLoadTaskRegister(
+MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadTaskRegister(
     MO_UINT16 TssSelector);
 
 /**
@@ -1007,7 +1006,7 @@ EXTERN_C VOID MOAPI MoPlatformLoadTaskRegister(
  * @param FunctionAddress The address of the function to jump to after switching
  *                        to the new stack.
  */
-EXTERN_C VOID MOAPI MoPlatformSwitchToNewStack(
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSwitchToNewStack(
     MO_POINTER StackAddress,
     MO_POINTER FunctionAddress);
 
@@ -1070,16 +1069,16 @@ typedef struct _MO_PLATFORM_X64_INTERRUPT_CONTEXT
  * @param InterruptType The type of the interrupt.
  * @param InterruptContext The context of the interrupt.
  */
-typedef VOID(MOAPI* PMO_PLATFORM_X64_INTERRUPT_HANDLER)(
-    _In_ MO_PLATFORM_X64_INTERRUPT_TYPE InterruptType,
-    _In_ PMO_PLATFORM_X64_INTERRUPT_CONTEXT InterruptContext);
+typedef MO_VOID(MOAPI* PMO_PLATFORM_X64_INTERRUPT_HANDLER)(
+    _Mo_In_ MO_PLATFORM_X64_INTERRUPT_TYPE InterruptType,
+    _Mo_In_ PMO_PLATFORM_X64_INTERRUPT_CONTEXT InterruptContext);
 
 /**
  * @brief The interrupt handler table for x64 architecture.
  * @remark The length of the pointed interrupt handler table must be 256
  *         entries.
  */
-EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
+MO_EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
 
 /**
  * @brief The interrupt descriptor table handlers for x64 architecture. Because
@@ -1087,51 +1086,51 @@ EXTERN_C PMO_PLATFORM_X64_INTERRUPT_HANDLER* MoPlatformInterruptHandlerTable;
  *        which allows the C code to compute the address of each interrupt as
  *        &MoPlatformInterruptDescriptorTableHandlers[Interrupt] directly.
  */
-EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
+MO_EXTERN_C MO_UINT64 MoPlatformInterruptDescriptorTableHandlers[256];
 
 /**
  * @brief Set the Base value for the specific 64-Bit Segment Descriptor.
  * @param Descriptor The pointer to a 64-Bit Segment Descriptor.
  * @param Base The Base value.
  */
-EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorBase(
-    _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT32 Base);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSegmentDescriptorBase(
+    _Mo_Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT32 Base);
 
 /**
  * @brief Set the Limit value for the specific 64-Bit Segment Descriptor.
  * @param Descriptor The pointer to a 64-Bit Segment Descriptor.
  * @param Limit The Limit value which should be 20-Bit.
  */
-EXTERN_C VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
-    _Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT32 Limit);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSegmentDescriptorLimit(
+    _Mo_Out_ PMO_PLATFORM_X64_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT32 Limit);
 
 /**
  * @brief Set the Base value for the specific 64-Bit System Segment Descriptor.
  * @param Descriptor The pointer to a 64-Bit System Segment Descriptor.
  * @param Base The Base value.
  */
-EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
-    _Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT64 Base);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSystemSegmentDescriptorBase(
+    _Mo_Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT64 Base);
 
 /**
  * @brief Set the Limit value for the specific 64-Bit System Segment Descriptor.
  * @param Descriptor The pointer to a 64-Bit System Segment Descriptor.
  * @param Limit The Limit value which should be 20-Bit.
  */
-EXTERN_C VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
-    _Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
-    _In_ MO_UINT32 Limit);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetSystemSegmentDescriptorLimit(
+    _Mo_Out_ PMO_PLATFORM_X64_SYSTEM_SEGMENT_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT32 Limit);
 
 /**
  * @brief Set the Offset value for the specific 64-Bit IDT Gate Descriptor.
  * @param Descriptor The pointer to a 64-Bit IDT Gate Descriptor.
  * @param Base The Offset value.
  */
-EXTERN_C VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
-    _Out_ PMO_PLATFORM_X64_IDT_GATE_DESCRIPTOR Descriptor,
-    _In_ MO_UINT64 Offset);
+MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
+    _Mo_Out_ PMO_PLATFORM_X64_IDT_GATE_DESCRIPTOR Descriptor,
+    _Mo_In_ MO_UINT64 Offset);
 
 #endif // !MOBILITY_PLATFORM_X64

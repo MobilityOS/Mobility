@@ -10,16 +10,16 @@
 
 #include "Mobility.Runtime.Core.h"
 
-EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
-    _In_ MO_UINTN Size,
-    _In_ MO_UINTN Alignment)
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
+    _Mo_In_ MO_UINTN Size,
+    _Mo_In_ MO_UINTN Alignment)
 {
     return (Size + Alignment - 1) & ~(Alignment - 1);
 }
 
-EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
-    _In_ MO_CONSTANT_POINTER ElementArray,
-    _In_ MO_UINTN ElementSize)
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
+    _Mo_In_ MO_CONSTANT_POINTER ElementArray,
+    _Mo_In_ MO_UINTN ElementSize)
 {
     if (!ElementArray || !ElementSize)
     {
@@ -30,10 +30,10 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
     return (MO_UINTN_MAX - ((MO_UINTN)(ElementArray))) / ElementSize;
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteUnaligned(
-    _Out_ MO_POINTER Buffer,
-    _In_ MO_UINT8 Value,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryFillByteUnaligned(
+    _Mo_Out_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINT8 Value,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -51,10 +51,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteUnaligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteNativeAligned(
-    _Out_ MO_POINTER Buffer,
-    _In_ MO_UINT8 Value,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryFillByteNativeAligned(
+    _Mo_Out_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINT8 Value,
+    _Mo_In_ MO_UINTN Length)
 {
     MO_UINTN NativeValue = 0;
     for (MO_UINTN Index = 0u; Index < sizeof(MO_UINTN); ++Index)
@@ -79,10 +79,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryFillByteNativeAligned(
     }
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
-    _Out_ MO_POINTER Buffer,
-    _In_ MO_UINT8 Value,
-    _In_ MO_UINTN Length)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
+    _Mo_Out_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINT8 Value,
+    _Mo_In_ MO_UINTN Length)
 {
     if (!Buffer)
     {
@@ -152,10 +152,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
     return MO_RESULT_SUCCESS_OK;
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyUnaligned(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryCopyUnaligned(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -174,10 +174,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyUnaligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyNativeAligned(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryCopyNativeAligned(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -197,10 +197,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopyNativeAligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopy(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryCopy(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     MO_UINTN CurrentDestination = (MO_UINTN)(Destination);
     MO_UINTN CurrentSource = (MO_UINTN)(Source);
@@ -279,10 +279,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryCopy(
         UnalignedLength);
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyUnaligned(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryBackwardCopyUnaligned(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -301,10 +301,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyUnaligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyNativeAligned(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryBackwardCopyNativeAligned(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -324,10 +324,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopyNativeAligned(
     }
 }
 
-MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopy(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_FORCEINLINE MO_VOID MoRuntimeInternalMemoryBackwardCopy(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     MO_UINTN RemainingLength = Length;
     MO_UINTN CurrentDestination = ((MO_UINTN)(Destination)) + RemainingLength;
@@ -405,10 +405,10 @@ MO_FORCEINLINE VOID MoRuntimeInternalMemoryBackwardCopy(
         UnalignedLength);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length)
 {
     if (!Destination || !Source)
     {
@@ -458,9 +458,9 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
 }
 
 MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareUnaligned(
-    _In_ MO_POINTER Left,
-    _In_ MO_POINTER Right,
-    _In_ MO_UINTN Length)
+    _Mo_In_ MO_POINTER Left,
+    _Mo_In_ MO_POINTER Right,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -486,9 +486,9 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareUnaligned(
 }
 
 MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareNativeAligned(
-    _In_ MO_POINTER Left,
-    _In_ MO_POINTER Right,
-    _In_ MO_UINTN Length)
+    _Mo_In_ MO_POINTER Left,
+    _Mo_In_ MO_POINTER Right,
+    _Mo_In_ MO_UINTN Length)
 {
     // This library is designed for freestanding environments where C standard
     // library functions (like memcpy) and SIMD intrinsics may not be available.
@@ -517,10 +517,10 @@ MO_FORCEINLINE MO_INTN MoRuntimeInternalMemoryCompareNativeAligned(
     return 0;
 }
 
-EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
-    _In_opt_ MO_POINTER Left,
-    _In_opt_ MO_POINTER Right,
-    _In_ MO_UINTN Length)
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
+    _Mo_In_Opt_ MO_POINTER Left,
+    _Mo_In_Opt_ MO_POINTER Right,
+    _Mo_In_ MO_UINTN Length)
 {
     if (!Length)
     {
@@ -635,12 +635,12 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
     return CurrentResult;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
-    _Inout_ MO_POINTER ElementArray,
-    _In_ MO_UINTN ElementCount,
-    _In_ MO_UINTN ElementSize,
-    _In_ PMO_RUNTIME_SORT_COMPARE_HANDLER CompareHandler,
-    _In_opt_ MO_POINTER Context)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
+    _Mo_InOut_ MO_POINTER ElementArray,
+    _Mo_In_ MO_UINTN ElementCount,
+    _Mo_In_ MO_UINTN ElementSize,
+    _Mo_In_ PMO_RUNTIME_SORT_COMPARE_HANDLER CompareHandler,
+    _Mo_In_Opt_ MO_POINTER Context)
 {
     if (!ElementArray || !ElementCount || !ElementSize || !CompareHandler)
     {
@@ -698,11 +698,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
-    _In_ MO_POINTER Bitmap,
-    _In_ MO_UINTN StartIndex,
-    _In_ MO_UINTN Length,
-    _In_ MO_BOOL ExpectedValue)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
+    _Mo_In_ MO_POINTER Bitmap,
+    _Mo_In_ MO_UINTN StartIndex,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_BOOL ExpectedValue)
 {
     if (!Bitmap || !Length)
     {
@@ -767,11 +767,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
-    _Inout_ MO_POINTER Bitmap,
-    _In_ MO_UINTN StartIndex,
-    _In_ MO_UINTN Length,
-    _In_ MO_BOOL ExpectedValue)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
+    _Mo_InOut_ MO_POINTER Bitmap,
+    _Mo_In_ MO_UINTN StartIndex,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_BOOL ExpectedValue)
 {
     if (!Bitmap || !Length)
     {
@@ -863,12 +863,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
-    _Out_opt_ PMO_UINTN RunLength,
-    _Out_opt_ PMO_BOOL BitValue,
-    _In_ MO_POINTER Bitmap,
-    _In_ MO_UINTN StartIndex,
-    _In_ MO_UINTN MaximumIndex)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
+    _Mo_Out_Opt_ PMO_UINTN RunLength,
+    _Mo_Out_Opt_ PMO_BOOL BitValue,
+    _Mo_In_ MO_POINTER Bitmap,
+    _Mo_In_ MO_UINTN StartIndex,
+    _Mo_In_ MO_UINTN MaximumIndex)
 {
     if (!Bitmap || !(StartIndex < MaximumIndex))
     {
@@ -955,10 +955,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
-    _Out_ PMO_UINT8 SumByte,
-    _In_ MO_POINTER Buffer,
-    _In_ MO_UINTN Size)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
+    _Mo_Out_ PMO_UINT8 SumByte,
+    _Mo_In_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINTN Size)
 {
     if (!SumByte || !Buffer || !Size)
     {
@@ -976,10 +976,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
-    _Out_ PMO_UINT8 ChecksumByte,
-    _In_ MO_POINTER Buffer,
-    _In_ MO_UINTN Size)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
+    _Mo_Out_ PMO_UINT8 ChecksumByte,
+    _Mo_In_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINTN Size)
 {
     MO_RESULT ResultCode = MoRuntimeCalculateSumByte(
         ChecksumByte,
@@ -993,21 +993,21 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
-    _Out_opt_ PMO_CHAR Buffer,
-    _Out_opt_ PMO_UINTN RequiredBufferSize,
-    _In_ MO_UINTN BufferSize,
-    _In_ MO_UINTN Value,
-    _In_ MO_UINTN ValueWidth,
-    _In_ MO_BOOL Uppercase,
-    _In_ MO_BOOL Prefix)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
+    _Mo_Out_Opt_ PMO_CHAR Buffer,
+    _Mo_Out_Opt_ PMO_UINTN RequiredBufferSize,
+    _Mo_In_ MO_UINTN BufferSize,
+    _Mo_In_ MO_UINTN Value,
+    _Mo_In_ MO_UINTN ValueWidth,
+    _Mo_In_ MO_BOOL Uppercase,
+    _Mo_In_ MO_BOOL Prefix)
 {
     if (!Buffer && !RequiredBufferSize)
     {
         // At least one output parameter is required.
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
-    CONST MO_UINTN MaximumValueWidth = sizeof(Value) * 8u;
+    MO_CONST MO_UINTN MaximumValueWidth = sizeof(Value) * 8u;
     if (ValueWidth < 4u || ValueWidth > MaximumValueWidth || ValueWidth & 3u)
     {
         // The value width must be multiple of 4 and between 4 and the number of
@@ -1066,11 +1066,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
-    _Out_opt_ PMO_CHAR Buffer,
-    _Out_opt_ PMO_UINTN RequiredBufferSize,
-    _In_ MO_UINTN BufferSize,
-    _In_ MO_INTN Value)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
+    _Mo_Out_Opt_ PMO_CHAR Buffer,
+    _Mo_Out_Opt_ PMO_UINTN RequiredBufferSize,
+    _Mo_In_ MO_UINTN BufferSize,
+    _Mo_In_ MO_INTN Value)
 {
     if (!Buffer && !RequiredBufferSize)
     {
@@ -1137,11 +1137,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
-    _Out_opt_ PMO_CHAR Buffer,
-    _Out_opt_ PMO_UINTN RequiredBufferSize,
-    _In_ MO_UINTN BufferSize,
-    _In_ MO_UINTN Value)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
+    _Mo_Out_Opt_ PMO_CHAR Buffer,
+    _Mo_Out_Opt_ PMO_UINTN RequiredBufferSize,
+    _Mo_In_ MO_UINTN BufferSize,
+    _Mo_In_ MO_UINTN Value)
 {
     if (!Buffer && !RequiredBufferSize)
     {
@@ -1187,26 +1187,26 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
-    _In_ MO_CONSTANT_STRING String)
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
+    _Mo_In_ MO_CONSTANT_STRING String)
 {
     return MoRuntimeMemoryCalculateMaximumValidLength(
         String,
         sizeof(MO_CHAR));
 }
 
-EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
-    _In_ MO_CONSTANT_WIDE_STRING WideString)
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString)
 {
     return MoRuntimeMemoryCalculateMaximumValidLength(
         WideString,
         sizeof(MO_WIDE_CHAR));
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN MaximumLength)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN MaximumLength)
 {
     if (!String || !MaximumLength)
     {
@@ -1247,10 +1247,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
     return MO_RESULT_ERROR_OUT_OF_BOUNDS;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN MaximumLength)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN MaximumLength)
 {
     if (!WideString || !MaximumLength)
     {
@@ -1292,8 +1292,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDestinationValidate(
-    _In_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength)
+    _Mo_In_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength)
 {
     MO_UINTN MaximumValidLength =
         MoRuntimeStringCalculateMaximumValidLength(Destination);
@@ -1312,8 +1312,8 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDestinationValidate(
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDestinationValidate(
-    _In_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength)
+    _Mo_In_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength)
 {
     MO_UINTN MaximumValidLength =
         MoRuntimeWideStringCalculateMaximumValidLength(Destination);
@@ -1332,10 +1332,10 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDestinationValidate(
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringSourceValidate(
-    _Out_ PMO_UINTN ActualLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ PMO_UINTN ActualLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (MO_UINTN_MAX == ((MO_UINTN)Source))
     {
@@ -1373,10 +1373,10 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringSourceValidate(
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringSourceValidate(
-    _Out_ PMO_UINTN ActualLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ PMO_UINTN ActualLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (MO_UINTN_MAX == ((MO_UINTN)Source))
     {
@@ -1414,10 +1414,10 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringSourceValidate(
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDetectOverlap(
-    _In_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength)
+    _Mo_In_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     MO_UINTN DestinationStart = (MO_UINTN)Destination;
     MO_UINTN DestinationSize = MaximumLength * sizeof(MO_CHAR);
@@ -1436,10 +1436,10 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDetectOverlap(
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDetectOverlap(
-    _In_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength)
+    _Mo_In_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     MO_UINTN DestinationStart = (MO_UINTN)Destination;
     MO_UINTN DestinationSize = MaximumLength * sizeof(MO_WIDE_CHAR);
@@ -1458,11 +1458,11 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDetectOverlap(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringCopy(
-    _Out_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1530,11 +1530,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringCopy(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringCopy(
-    _Out_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1602,11 +1602,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringCopy(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringConcatenate(
-    _Inout_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength,
-    _In_ MO_BOOL Strict)
+    _Mo_InOut_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1684,11 +1684,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringConcatenate(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringConcatenate(
-    _Inout_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength,
-    _In_ MO_BOOL Strict)
+    _Mo_InOut_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Destination || !MaximumLength || !Source)
     {
@@ -1766,11 +1766,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringConcatenate(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringFindFirstCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_CHAR Character,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Index || !String)
     {
@@ -1809,11 +1809,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringFindFirstCharacter(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringFindFirstCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Index || !WideString)
     {
@@ -1852,11 +1852,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringFindFirstCharacter(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringFindLastCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_CHAR Character,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Index || !String)
     {
@@ -1895,11 +1895,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringFindLastCharacter(
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringFindLastCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter,
-    _In_ MO_BOOL Strict)
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter,
+    _Mo_In_ MO_BOOL Strict)
 {
     if (!Index || !WideString)
     {
@@ -1937,11 +1937,11 @@ MO_FORCEINLINE MO_RESULT MoRuntimeInternalWideStringFindLastCharacter(
     return MO_RESULT_SUCCESS_FALSE;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
-    _Out_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
+    _Mo_Out_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     return MoRuntimeInternalStringCopy(
         Destination,
@@ -1951,11 +1951,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
-    _Out_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
+    _Mo_Out_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     return MoRuntimeInternalWideStringCopy(
         Destination,
@@ -1965,11 +1965,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
-    _Inout_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
+    _Mo_InOut_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     return MoRuntimeInternalStringConcatenate(
         Destination,
@@ -1979,11 +1979,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
-    _Inout_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
+    _Mo_InOut_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     return MoRuntimeInternalWideStringConcatenate(
         Destination,
@@ -1993,11 +1993,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_CHAR Character)
 {
     return MoRuntimeInternalStringFindFirstCharacter(
         Index,
@@ -2007,11 +2007,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter)
 {
     return MoRuntimeInternalWideStringFindFirstCharacter(
         Index,
@@ -2021,11 +2021,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_CHAR Character)
 {
     return MoRuntimeInternalStringFindLastCharacter(
         Index,
@@ -2035,11 +2035,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
         MO_TRUE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter)
 {
     return MoRuntimeInternalWideStringFindLastCharacter(
         Index,
@@ -2049,10 +2049,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
         MO_TRUE);
 }
 
-EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
-    _In_opt_ MO_CONSTANT_STRING Left,
-    _In_opt_ MO_CONSTANT_STRING Right,
-    _In_ MO_UINTN Length)
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
+    _Mo_In_Opt_ MO_CONSTANT_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_STRING Right,
+    _Mo_In_ MO_UINTN Length)
 {
     if (!Length)
     {
@@ -2113,10 +2113,10 @@ EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
     return 0;
 }
 
-EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
-    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
-    _In_opt_ MO_CONSTANT_WIDE_STRING Right,
-    _In_ MO_UINTN Length)
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Right,
+    _Mo_In_ MO_UINTN Length)
 {
     if (!Length)
     {
@@ -2177,24 +2177,24 @@ EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
     return 0;
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_STRING String)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_STRING String)
 {
     return MoRuntimeStringValidate(Length, String, MO_UINTN_MAX);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_WIDE_STRING WideString)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString)
 {
     return MoRuntimeWideStringValidate(Length, WideString, MO_UINTN_MAX);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
-    _Out_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
+    _Mo_Out_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source)
 {
     return MoRuntimeInternalStringCopy(
         Destination,
@@ -2204,10 +2204,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
-    _Out_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
+    _Mo_Out_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source)
 {
     return MoRuntimeInternalWideStringCopy(
         Destination,
@@ -2217,10 +2217,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
-    _Inout_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
+    _Mo_InOut_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source)
 {
     return MoRuntimeInternalStringConcatenate(
         Destination,
@@ -2230,10 +2230,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
-    _Inout_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
+    _Mo_InOut_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source)
 {
     return MoRuntimeInternalWideStringConcatenate(
         Destination,
@@ -2243,10 +2243,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character)
 {
     return MoRuntimeInternalStringFindFirstCharacter(
         Index,
@@ -2256,10 +2256,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter)
 {
     return MoRuntimeInternalWideStringFindFirstCharacter(
         Index,
@@ -2269,10 +2269,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character)
 {
     return MoRuntimeInternalStringFindLastCharacter(
         Index,
@@ -2282,10 +2282,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter)
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter)
 {
     return MoRuntimeInternalWideStringFindLastCharacter(
         Index,
@@ -2295,22 +2295,22 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
         MO_FALSE);
 }
 
-EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
-    _In_opt_ MO_CONSTANT_STRING Left,
-    _In_opt_ MO_CONSTANT_STRING Right)
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
+    _Mo_In_Opt_ MO_CONSTANT_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_STRING Right)
 {
     return MoRuntimeStringCompare(Left, Right, MO_UINTN_MAX);
 }
 
-EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
-    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
-    _In_opt_ MO_CONSTANT_WIDE_STRING Right)
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Right)
 {
     return MoRuntimeWideStringCompare(Left, Right, MO_UINTN_MAX);
 }
 
-EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
-    _In_ MO_CONSTANT_STRING String)
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
+    _Mo_In_ MO_CONSTANT_STRING String)
 {
     MO_UINTN Length = 0u;
     if (MO_RESULT_SUCCESS_OK == MoRuntimeStringValidateSimple(
@@ -2322,8 +2322,8 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
     return 0;
 }
 
-EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
-    _In_ MO_CONSTANT_WIDE_STRING WideString)
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString)
 {
     MO_UINTN Length = 0u;
     if (MO_RESULT_SUCCESS_OK == MoRuntimeWideStringValidateSimple(
@@ -2335,9 +2335,9 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
     return 0;
 }
 
-EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character)
+MO_EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character)
 {
     MO_UINTN Index = 0u;
     if (MO_RESULT_SUCCESS_OK == MoRuntimeStringFindFirstCharacterSimple(
@@ -2350,9 +2350,9 @@ EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
     return nullptr;
 }
 
-EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter)
+MO_EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter)
 {
     MO_UINTN Index = 0u;
     if (MO_RESULT_SUCCESS_OK == MoRuntimeWideStringFindFirstCharacterSimple(
@@ -2365,9 +2365,9 @@ EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
     return nullptr;
 }
 
-EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character)
+MO_EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character)
 {
     MO_UINTN Index = 0u;
     if (MO_RESULT_SUCCESS_OK == MoRuntimeStringFindLastCharacterSimple(
@@ -2380,9 +2380,9 @@ EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
     return nullptr;
 }
 
-EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindLastCharacterEasy(
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter)
+MO_EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindLastCharacterEasy(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter)
 {
     MO_UINTN Index = 0u;
     if (MO_RESULT_SUCCESS_OK == MoRuntimeWideStringFindLastCharacterSimple(

@@ -75,8 +75,8 @@ typedef struct _MO_CONSOLE_SCREEN_BUFFER
  *                            background color a.k.a. black.
  * @return The background color from the console screen buffer.
  */
-EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
-    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
+MO_EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
+    _Mo_In_Opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
 
 /**
  * @brief Gets the foreground color from the console screen buffer.
@@ -86,8 +86,8 @@ EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetBackgroundColor(
  *                            foreground color a.k.a. white.
  * @return The foreground color from the console screen buffer.
  */
-EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
-    _In_opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
+MO_EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
+    _Mo_In_Opt_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
 
 /**
  * @brief Updates the color settings for the console screen buffer.
@@ -97,10 +97,10 @@ EXTERN_C MO_UINT32 MOAPI MoConsoleCoreGetForegroundColor(
  * @param BackgroundColor The new background color.
  * @param ForegroundColor The new foreground color.
  */
-EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
-    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_UINT32 BackgroundColor,
-    _In_ MO_UINT32 ForegroundColor);
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreUpdateColorSettings(
+    _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_UINT32 BackgroundColor,
+    _Mo_In_ MO_UINT32 ForegroundColor);
 
 /**
  * @brief Initializes the console screen buffer.
@@ -118,13 +118,13 @@ EXTERN_C VOID MOAPI MoConsoleCoreUpdateColorSettings(
  *                        must ensure the content in the character buffer is
  *                        properly initialized.
  */
-EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
-    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_UINT32 MaximumColumn,
-    _In_ MO_UINT32 MaximumRow,
-    _In_ MO_UINT32 BackgroundColor,
-    _In_ MO_UINT32 ForegroundColor,
-    _In_ PMO_WIDE_CHAR CharacterBuffer);
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
+    _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_UINT32 MaximumColumn,
+    _Mo_In_ MO_UINT32 MaximumRow,
+    _Mo_In_ MO_UINT32 BackgroundColor,
+    _Mo_In_ MO_UINT32 ForegroundColor,
+    _Mo_In_ PMO_WIDE_CHAR CharacterBuffer);
 
 /**
  * @brief Draws a character to the frame buffer.
@@ -137,11 +137,11 @@ EXTERN_C VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
  * @param DestinationCoordinate The destination coordinate you want to draw.
  * @param Character The character to draw.
  */
-EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
-    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
-    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
-    _In_ MO_WIDE_CHAR Character);
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
+    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
+    _Mo_In_ MO_WIDE_CHAR Character);
 
 /**
  * @brief Refreshes the screen with the content in the console screen buffer.
@@ -152,9 +152,9 @@ EXTERN_C VOID MOAPI MoConsoleCoreDrawCharacter(
  *                            This function will do nothing if the memory
  *                            address of the console screen buffer is invalid.
  */
-EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
-    _Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
-    _In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreRefreshScreen(
+    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
 
 /**
  * @brief Writes a UTF-8 string to the console screen buffer.
@@ -174,9 +174,9 @@ EXTERN_C VOID MOAPI MoConsoleCoreRefreshScreen(
  *          of the next line. When the cursor reaches the bottom of the screen,
  *          the screen scrolls up.
  */
-EXTERN_C VOID MOAPI MoConsoleCoreWriteString(
-    _Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINT32 StringLength);
+MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreWriteString(
+    _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINT32 StringLength);
 
 #endif // !MOBILITY_CONSOLE_CORE

@@ -180,9 +180,9 @@ void mu_begin(mu_Context *ctx) {
 
 
 static MO_INTN MOAPI compare_zindex(
-    _In_ MO_POINTER Left,
-    _In_ MO_POINTER Right,
-    _In_ MO_POINTER Context)
+    _Mo_In_ MO_POINTER Left,
+    _Mo_In_ MO_POINTER Right,
+    _Mo_In_ MO_POINTER Context)
 {
     Context; // Not used.
     return (*(mu_Container**)Left)->zindex - (*(mu_Container**)Right)->zindex;

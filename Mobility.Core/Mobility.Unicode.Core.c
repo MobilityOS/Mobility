@@ -10,10 +10,10 @@
 
 #include "Mobility.Unicode.Core.h"
 
-EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUcs2FromUtf8(
-    _Out_opt_ PMO_WIDE_CHAR Destination,
-    _In_ PMO_CHAR Source,
-    _In_ MO_UINTN SourceLength)
+MO_EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUcs2FromUtf8(
+    _Mo_Out_Opt_ PMO_WIDE_CHAR Destination,
+    _Mo_In_ PMO_CHAR Source,
+    _Mo_In_ MO_UINTN SourceLength)
 {
     // Handle zero length source byte sequence.
     if (!Source || !SourceLength)

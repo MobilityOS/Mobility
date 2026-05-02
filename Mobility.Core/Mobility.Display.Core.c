@@ -10,8 +10,8 @@
 
 #include "Mobility.Display.Core.h"
 
-EXTERN_C MO_BOOL MOAPI MoDisplayFrameBufferValidate(
-    _In_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer)
+MO_EXTERN_C MO_BOOL MOAPI MoDisplayFrameBufferValidate(
+    _Mo_In_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer)
 {
     if (!DisplayFrameBuffer || !DisplayFrameBuffer->FrameBufferBase)
     {

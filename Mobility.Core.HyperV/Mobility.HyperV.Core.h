@@ -11,7 +11,6 @@
 #ifndef MOBILITY_HYPERV_CORE
 #define MOBILITY_HYPERV_CORE
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 #include <Mile.HyperV.VMBus.h>
@@ -23,20 +22,20 @@
  * @remarks If the Hyper-V guest interface is not available, the function
  *          returns MO_RESULT_ERROR_NO_INTERFACE.
  */
-EXTERN_C MO_RESULT MOAPI MoHyperVCheckAvailability();
+MO_EXTERN_C MO_RESULT MOAPI MoHyperVCheckAvailability();
 
 /**
  * @brief Retrieves the counter value from Hyper-V Partition Reference Counter.
  * @return The number in 100 nanosecond units.
  */
-EXTERN_C MO_UINT64 MoHyperVGetPartitionReferenceCounter();
+MO_EXTERN_C MO_UINT64 MoHyperVGetPartitionReferenceCounter();
 
 /**
  * @brief Retrieves the number of milliseconds that have elapsed since the
  *        Hyper-V partition was created.
  * @return The number of milliseconds.
  */
-EXTERN_C MO_UINT64 MoHyperVGetTickCount();
+MO_EXTERN_C MO_UINT64 MoHyperVGetTickCount();
 
 /**
  * @brief Sets hypercall page for the current Hyper-V partition.
@@ -45,8 +44,8 @@ EXTERN_C MO_UINT64 MoHyperVGetTickCount();
  * @return If the function succeeds, the return value is MO_TRUE. Otherwise, the
  *         return value is MO_FALSE.
  */
-EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
-    _In_ MO_UINT64 PhysicalAddress);
+MO_EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
+    _Mo_In_ MO_UINT64 PhysicalAddress);
 
 /**
  * @brief Sets synthetic interrupt message page for the current Hyper-V
@@ -56,8 +55,8 @@ EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
  * @return If the function succeeds, the return value is MO_TRUE. Otherwise, the
  *         return value is MO_FALSE.
  */
-EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
-    _In_ MO_UINT64 PhysicalAddress);
+MO_EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
+    _Mo_In_ MO_UINT64 PhysicalAddress);
 
 /**
  * @brief Sets synthetic interrupt event flags page for the current Hyper-V
@@ -68,7 +67,7 @@ EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
  * @return If the function succeeds, the return value is MO_TRUE. Otherwise, the
  *         return value is MO_FALSE.
  */
-EXTERN_C MO_BOOL MoHyperVSetInterruptEventFlagsPage(
-    _In_ MO_UINT64 PhysicalAddress);
+MO_EXTERN_C MO_BOOL MoHyperVSetInterruptEventFlagsPage(
+    _Mo_In_ MO_UINT64 PhysicalAddress);
 
 #endif // !MOBILITY_HYPERV_CORE

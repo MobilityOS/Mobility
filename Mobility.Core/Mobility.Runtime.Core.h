@@ -11,7 +11,6 @@
 #ifndef MOBILITY_RUNTIME_CORE
 #define MOBILITY_RUNTIME_CORE
 
-#define MILE_MOBILITY_ENABLE_MINIMUM_SAL
 #include <Mile.Mobility.Portable.Types.h>
 
 /**
@@ -21,9 +20,9 @@
  *                  be the power of two. This value must not be zero.
  * @return The output size value aligned to the specified alignment.
  */
-EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
-    _In_ MO_UINTN Size,
-    _In_ MO_UINTN Alignment);
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
+    _Mo_In_ MO_UINTN Size,
+    _Mo_In_ MO_UINTN Alignment);
 
 /**
  * @brief Calculate the maximum valid length of an array address that can be
@@ -36,9 +35,9 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
  * @return The maximum length of the array. Returns 0 on invalid parameters or
  *         no valid length.
  */
-EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
-    _In_ MO_CONSTANT_POINTER ElementArray,
-    _In_ MO_UINTN ElementSize);
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
+    _Mo_In_ MO_CONSTANT_POINTER ElementArray,
+    _Mo_In_ MO_UINTN ElementSize);
 
 /**
  * @brief Fills a memory buffer with the specified byte value. This function is
@@ -54,10 +53,10 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeMemoryCalculateMaximumValidLength(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
-    _Out_ MO_POINTER Buffer,
-    _In_ MO_UINT8 Value,
-    _In_ MO_UINTN Length);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
+    _Mo_Out_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINT8 Value,
+    _Mo_In_ MO_UINTN Length);
 
 /**
  * @brief Moves contents from the source memory buffer to the destination memory
@@ -76,10 +75,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryFillByte(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
-    _Out_ MO_POINTER Destination,
-    _In_ MO_POINTER Source,
-    _In_ MO_UINTN Length);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
+    _Mo_Out_ MO_POINTER Destination,
+    _Mo_In_ MO_POINTER Source,
+    _Mo_In_ MO_UINTN Length);
 
 /**
  * @brief Compares two memory buffers byte by byte.
@@ -99,10 +98,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
  *         - Left is greater than Right.
  *         - Right is nullptr and Left is not nullptr.
  */
-EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
-    _In_opt_ MO_POINTER Left,
-    _In_opt_ MO_POINTER Right,
-    _In_ MO_UINTN Length);
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
+    _Mo_In_Opt_ MO_POINTER Left,
+    _Mo_In_Opt_ MO_POINTER Right,
+    _Mo_In_ MO_UINTN Length);
 
 /**
  * @brief Defines the comparison handler used for sorting operations.
@@ -114,9 +113,9 @@ EXTERN_C MO_INTN MOAPI MoRuntimeMemoryCompare(
  *         equal, and a value greater than zero if Left is greater than Right.
  */
 typedef MO_INTN(MOAPI* PMO_RUNTIME_SORT_COMPARE_HANDLER)(
-    _In_ MO_POINTER Left,
-    _In_ MO_POINTER Right,
-    _In_ MO_POINTER Context);
+    _Mo_In_ MO_POINTER Left,
+    _Mo_In_ MO_POINTER Right,
+    _Mo_In_ MO_POINTER Context);
 
 /**
  * @brief Sorts an array of elements in ascending order using the specified
@@ -142,12 +141,12 @@ typedef MO_INTN(MOAPI* PMO_RUNTIME_SORT_COMPARE_HANDLER)(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
-    _Inout_ MO_POINTER ElementArray,
-    _In_ MO_UINTN ElementCount,
-    _In_ MO_UINTN ElementSize,
-    _In_ PMO_RUNTIME_SORT_COMPARE_HANDLER CompareHandler,
-    _In_opt_ MO_POINTER Context);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
+    _Mo_InOut_ MO_POINTER ElementArray,
+    _Mo_In_ MO_UINTN ElementCount,
+    _Mo_In_ MO_UINTN ElementSize,
+    _Mo_In_ PMO_RUNTIME_SORT_COMPARE_HANDLER CompareHandler,
+    _Mo_In_Opt_ MO_POINTER Context);
 
 /**
  * @brief Test a range of bits in a bitmap for an expected value.
@@ -160,11 +159,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeElementSort(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
-    _In_ MO_POINTER Bitmap,
-    _In_ MO_UINTN StartIndex,
-    _In_ MO_UINTN Length,
-    _In_ MO_BOOL ExpectedValue);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
+    _Mo_In_ MO_POINTER Bitmap,
+    _Mo_In_ MO_UINTN StartIndex,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_BOOL ExpectedValue);
 
 /**
  * @brief Fill a range of bits in a bitmap with a specified value.
@@ -177,11 +176,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapTestRange(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
-    _Inout_ MO_POINTER Bitmap,
-    _In_ MO_UINTN StartIndex,
-    _In_ MO_UINTN Length,
-    _In_ MO_BOOL ExpectedValue);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
+    _Mo_InOut_ MO_POINTER Bitmap,
+    _Mo_In_ MO_UINTN StartIndex,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_BOOL ExpectedValue);
 
 /**
  * @brief Query the length of the continuous run of the same bit value starting
@@ -196,12 +195,12 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapFillRange(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
-    _Out_opt_ PMO_UINTN RunLength,
-    _Out_opt_ PMO_BOOL BitValue,
-    _In_ MO_POINTER Bitmap,
-    _In_ MO_UINTN StartIndex,
-    _In_ MO_UINTN MaximumIndex);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
+    _Mo_Out_Opt_ PMO_UINTN RunLength,
+    _Mo_Out_Opt_ PMO_BOOL BitValue,
+    _Mo_In_ MO_POINTER Bitmap,
+    _Mo_In_ MO_UINTN StartIndex,
+    _Mo_In_ MO_UINTN MaximumIndex);
 
 /**
  * @brief Calculates the 8-bit sum for the requested region.
@@ -217,10 +216,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeBitmapQueryContinuousRunLength(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
-    _Out_ PMO_UINT8 SumByte,
-    _In_ MO_POINTER Buffer,
-    _In_ MO_UINTN Size);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
+    _Mo_Out_ PMO_UINT8 SumByte,
+    _Mo_In_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINTN Size);
 
 /**
  * @brief Calculates the 8-bit checksum for the requested region.
@@ -236,10 +235,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateSumByte(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
-    _Out_ PMO_UINT8 ChecksumByte,
-    _In_ MO_POINTER Buffer,
-    _In_ MO_UINTN Size);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
+    _Mo_Out_ PMO_UINT8 ChecksumByte,
+    _Mo_In_ MO_POINTER Buffer,
+    _Mo_In_ MO_UINTN Size);
 
 /**
  * @brief Convert an unsigned integer to a hexadecimal string.
@@ -262,14 +261,14 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeCalculateChecksumByte(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
-    _Out_opt_ PMO_CHAR Buffer,
-    _Out_opt_ PMO_UINTN RequiredBufferSize,
-    _In_ MO_UINTN BufferSize,
-    _In_ MO_UINTN Value,
-    _In_ MO_UINTN ValueWidth,
-    _In_ MO_BOOL Uppercase,
-    _In_ MO_BOOL Prefix);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
+    _Mo_Out_Opt_ PMO_CHAR Buffer,
+    _Mo_Out_Opt_ PMO_UINTN RequiredBufferSize,
+    _Mo_In_ MO_UINTN BufferSize,
+    _Mo_In_ MO_UINTN Value,
+    _Mo_In_ MO_UINTN ValueWidth,
+    _Mo_In_ MO_BOOL Uppercase,
+    _Mo_In_ MO_BOOL Prefix);
 
 /**
  * @brief Convert a signed integer to a decimal string.
@@ -286,11 +285,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToHexString(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
-    _Out_opt_ PMO_CHAR Buffer,
-    _Out_opt_ PMO_UINTN RequiredBufferSize,
-    _In_ MO_UINTN BufferSize,
-    _In_ MO_INTN Value);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
+    _Mo_Out_Opt_ PMO_CHAR Buffer,
+    _Mo_Out_Opt_ PMO_UINTN RequiredBufferSize,
+    _Mo_In_ MO_UINTN BufferSize,
+    _Mo_In_ MO_INTN Value);
 
 /**
  * @brief Convert an unsigned integer to a decimal string.
@@ -307,11 +306,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertIntegerToDecimalString(
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
-    _Out_opt_ PMO_CHAR Buffer,
-    _Out_opt_ PMO_UINTN RequiredBufferSize,
-    _In_ MO_UINTN BufferSize,
-    _In_ MO_UINTN Value);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
+    _Mo_Out_Opt_ PMO_CHAR Buffer,
+    _Mo_Out_Opt_ PMO_UINTN RequiredBufferSize,
+    _Mo_In_ MO_UINTN BufferSize,
+    _Mo_In_ MO_UINTN Value);
 
 /**
  * @brief Calculate the maximum valid length of a string that can be used for
@@ -322,8 +321,8 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeConvertUnsignedIntegerToDecimalString(
  * @return The maximum length of the string including the null terminator.
  *         Returns 0 on invalid parameters or no valid length.
  */
-EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
-    _In_ MO_CONSTANT_STRING String);
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
+    _Mo_In_ MO_CONSTANT_STRING String);
 
 /**
  * @brief Calculate the maximum valid length of a wide string that can be used
@@ -334,8 +333,8 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeStringCalculateMaximumValidLength(
  * @return The maximum length of the wide string including the null terminator.
  *         Returns 0 on invalid parameters or no valid length.
  */
-EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
-    _In_ MO_CONSTANT_WIDE_STRING WideString);
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString);
 
 /**
  * @brief Validate a null-terminated string within a maximum length, and
@@ -353,10 +352,10 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringCalculateMaximumValidLength(
  * @remarks If the string is invalid which is not null-terminated within the
  *          maximum length, the function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN MaximumLength);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN MaximumLength);
 
 /**
  * @brief Validate a null-terminated wide string within a maximum length, and
@@ -375,10 +374,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidate(
  *          the maximum length, the function returns
  *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN MaximumLength);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN MaximumLength);
 
 /**
  * @brief Copies a string from source to destination with specified lengths.
@@ -398,11 +397,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidate(
  *          If the address ranges of source or destination overflow, the
  *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
-    _Out_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
+    _Mo_Out_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength);
 
 /**
  * @brief Copies a wide string from source to destination with specified
@@ -423,11 +422,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopy(
  *          If the address ranges of source or destination overflow, the
  *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
-    _Out_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
+    _Mo_Out_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength);
 
 /**
  * @brief Concatenate source string to the end of destination string.
@@ -454,11 +453,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopy(
  *          or destination overflow, the function returns
  *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
-    _Inout_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source,
-    _In_ MO_UINTN SourceLength);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
+    _Mo_InOut_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength);
 
 /**
  * @brief Concatenate source wide string to the end of destination wide string.
@@ -485,11 +484,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenate(
  *          address ranges of source or destination overflow, the function
  *          returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
-    _Inout_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source,
-    _In_ MO_UINTN SourceLength);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
+    _Mo_InOut_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
+    _Mo_In_ MO_UINTN SourceLength);
 
 /**
  * @brief Find the first occurrence of a character in a string.
@@ -506,11 +505,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenate(
  *          string is not valid with the specified length, the function returns
  *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_CHAR Character);
 
 /**
  * @brief Find the first occurrence of a wide character in a wide string.
@@ -527,11 +526,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacter(
  *          If the wide string is not valid with the specified length, the
  *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter);
 
 /**
  * @brief Find the last occurrence of a character in a string.
@@ -548,11 +547,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacter(
  *          string is not valid with the specified length, the function returns
  *          MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_UINTN Length,
-    _In_ MO_CHAR Character);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_CHAR Character);
 
 /**
  * @brief Find the last occurrence of a wide character in a wide string.
@@ -569,11 +568,11 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacter(
  *          If the wide string is not valid with the specified length, the
  *          function returns MO_RESULT_ERROR_OUT_OF_BOUNDS.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_UINTN Length,
-    _In_ MO_WIDE_CHAR WideCharacter);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_UINTN Length,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter);
 
 /**
  * @brief Compares two strings up to a specified length.
@@ -593,10 +592,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacter(
  *         - Left is greater than Right.
  *         - Right is nullptr and Left is not nullptr.
  */
-EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
-    _In_opt_ MO_CONSTANT_STRING Left,
-    _In_opt_ MO_CONSTANT_STRING Right,
-    _In_ MO_UINTN Length);
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
+    _Mo_In_Opt_ MO_CONSTANT_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_STRING Right,
+    _Mo_In_ MO_UINTN Length);
 
 /**
  * @brief Compares two wide strings up to a specified length.
@@ -616,10 +615,10 @@ EXTERN_C MO_INTN MOAPI MoRuntimeStringCompare(
  *         - Left is greater than Right.
  *         - Right is nullptr and Left is not nullptr.
  */
-EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
-    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
-    _In_opt_ MO_CONSTANT_WIDE_STRING Right,
-    _In_ MO_UINTN Length);
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Right,
+    _Mo_In_ MO_UINTN Length);
 
 /**
  * @brief Validate a null-terminated string within a maximum length, and
@@ -633,9 +632,9 @@ EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompare(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeStringValidate.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_STRING String);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_STRING String);
 
 /**
  * @brief Validate a null-terminated wide string within a maximum length, and
@@ -649,9 +648,9 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringValidateSimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeWideStringValidate.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
-    _Out_opt_ PMO_UINTN Length,
-    _In_ MO_CONSTANT_WIDE_STRING WideString);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
+    _Mo_Out_Opt_ PMO_UINTN Length,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString);
 
 /**
  * @brief Copies a string from source to destination.
@@ -663,10 +662,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringValidateSimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeStringCopy.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
-    _Out_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
+    _Mo_Out_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source);
 
 /**
  * @brief Copies a wide string from source to destination.
@@ -678,10 +677,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringCopySimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeWideStringCopy.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
-    _Out_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
+    _Mo_Out_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source);
 
 /**
  * @brief Concatenate source string to the end of destination string.
@@ -693,10 +692,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringCopySimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeStringConcatenate.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
-    _Inout_ MO_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_STRING Source);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
+    _Mo_InOut_ MO_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_STRING Source);
 
 /**
  * @brief Concatenate source wide string to the end of destination wide string.
@@ -708,10 +707,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringConcatenateSimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeWideStringConcatenate.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
-    _Inout_ MO_WIDE_STRING Destination,
-    _In_ MO_UINTN MaximumLength,
-    _In_ MO_CONSTANT_WIDE_STRING Source);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
+    _Mo_InOut_ MO_WIDE_STRING Destination,
+    _Mo_In_ MO_UINTN MaximumLength,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING Source);
 
 /**
  * @brief Find the first occurrence of a character in a string.
@@ -723,10 +722,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringConcatenateSimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeStringFindFirstCharacter.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character);
 
 /**
  * @brief Find the first occurrence of a wide character in a wide string.
@@ -739,10 +738,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindFirstCharacterSimple(
  * @remarks This is the simplified version of
  *          MoRuntimeWideStringFindFirstCharacter.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter);
 
 /**
  * @brief Find the last occurrence of a character in a string.
@@ -754,10 +753,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindFirstCharacterSimple(
  *         it returns an MO_RESULT error code.
  * @remarks This is the simplified version of MoRuntimeStringFindLastCharacter.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character);
 
 /**
  * @brief Find the last occurrence of a wide character in a wide string.
@@ -770,10 +769,10 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeStringFindLastCharacterSimple(
  * @remarks This is the simplified version of
  *          MoRuntimeWideStringFindLastCharacter.
  */
-EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
-    _Out_ PMO_UINTN Index,
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter);
+MO_EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
+    _Mo_Out_ PMO_UINTN Index,
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter);
 
 /**
  * @brief Compares two strings up to their maximum valid lengths.
@@ -793,9 +792,9 @@ EXTERN_C MO_RESULT MOAPI MoRuntimeWideStringFindLastCharacterSimple(
  *         - Right is nullptr and Left is not nullptr.
  * @remarks This is the simplified version of MoRuntimeStringCompare.
  */
-EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
-    _In_opt_ MO_CONSTANT_STRING Left,
-    _In_opt_ MO_CONSTANT_STRING Right);
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
+    _Mo_In_Opt_ MO_CONSTANT_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_STRING Right);
 
 /**
  * @brief Compares two wide strings up to their maximum valid lengths.
@@ -815,9 +814,9 @@ EXTERN_C MO_INTN MOAPI MoRuntimeStringCompareSimple(
  *         - Right is nullptr and Left is not nullptr.
  * @remarks This is the simplified version of MoRuntimeWideStringCompare.
  */
-EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
-    _In_opt_ MO_CONSTANT_WIDE_STRING Left,
-    _In_opt_ MO_CONSTANT_WIDE_STRING Right);
+MO_EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Left,
+    _Mo_In_Opt_ MO_CONSTANT_WIDE_STRING Right);
 
 /**
  * @brief Get the length of a null-terminated string.
@@ -826,8 +825,8 @@ EXTERN_C MO_INTN MOAPI MoRuntimeWideStringCompareSimple(
  *         string is empty or invalid.
  * @remarks This is the easy version of MoRuntimeStringValidateSimple.
  */
-EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
-    _In_ MO_CONSTANT_STRING String);
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
+    _Mo_In_ MO_CONSTANT_STRING String);
 
 /**
  * @brief Get the length of a null-terminated wide string.
@@ -836,8 +835,8 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeStringLength(
  *         the string is empty or invalid.
  * @remarks This is the easy version of MoRuntimeWideStringValidateSimple.
  */
-EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
-    _In_ MO_CONSTANT_WIDE_STRING WideString);
+MO_EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString);
 
 /**
  * @brief Find the first occurrence of a character in a string.
@@ -847,9 +846,9 @@ EXTERN_C MO_UINTN MOAPI MoRuntimeWideStringLength(
  *         nullptr if the character is not found or an error occurs.
  * @remarks This is the easy version of MoRuntimeStringFindFirstCharacterSimple.
  */
-EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character);
+MO_EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character);
 
 /**
  * @brief Find the first occurrence of a wide character in a wide string.
@@ -861,9 +860,9 @@ EXTERN_C MO_STRING MOAPI MoRuntimeStringFindFirstCharacterEasy(
  * @remarks This is the easy version of
  *          MoRuntimeWideStringFindFirstCharacterSimple.
  */
-EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter);
+MO_EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter);
 
 /**
  * @brief Find the last occurrence of a character in a string.
@@ -873,9 +872,9 @@ EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindFirstCharacterEasy(
  *         nullptr if the character is not found or an error occurs.
  * @remarks This is the easy version of MoRuntimeStringFindLastCharacterSimple.
  */
-EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
-    _In_ MO_CONSTANT_STRING String,
-    _In_ MO_CHAR Character);
+MO_EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
+    _Mo_In_ MO_CONSTANT_STRING String,
+    _Mo_In_ MO_CHAR Character);
 
 /**
  * @brief Find the last occurrence of a wide character in a wide string.
@@ -887,8 +886,8 @@ EXTERN_C MO_STRING MOAPI MoRuntimeStringFindLastCharacterEasy(
  * @remarks This is the easy version of
  *          MoRuntimeWideStringFindLastCharacterSimple.
  */
-EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindLastCharacterEasy(
-    _In_ MO_CONSTANT_WIDE_STRING WideString,
-    _In_ MO_WIDE_CHAR WideCharacter);
+MO_EXTERN_C MO_WIDE_STRING MOAPI MoRuntimeWideStringFindLastCharacterEasy(
+    _Mo_In_ MO_CONSTANT_WIDE_STRING WideString,
+    _Mo_In_ MO_WIDE_CHAR WideCharacter);
 
 #endif // !MOBILITY_RUNTIME_CORE

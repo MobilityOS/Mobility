@@ -1029,18 +1029,18 @@ static MO_UINT8 LaffStdGlyphs[] =
 
 #define LAFFSTD_GLYPH_END 0x25C4
 
-EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetWidth()
+MO_EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetWidth()
 {
     return LAFFSTD_WIDTH;
 }
 
-EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight()
+MO_EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight()
 {
     return LAFFSTD_HEIGHT;
 }
 
-EXTERN_C CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
-    _In_ MO_WIDE_CHAR Character)
+MO_EXTERN_C MO_CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
+    _Mo_In_ MO_WIDE_CHAR Character)
 {
     if (Character > LAFFSTD_GLYPH_END)
     {

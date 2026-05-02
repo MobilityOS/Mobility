@@ -13,7 +13,7 @@
 #include <Mobility.Runtime.Core.h>
 #include <Mobility.Platform.x64.h>
 
-EXTERN_C MO_RESULT MOAPI MoHyperVCheckAvailability()
+MO_EXTERN_C MO_RESULT MOAPI MoHyperVCheckAvailability()
 {
     // Reference: Requirements for Implementing the Microsoft Hypervisor
     //            Interface
@@ -82,18 +82,18 @@ EXTERN_C MO_RESULT MOAPI MoHyperVCheckAvailability()
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_UINT64 MoHyperVGetPartitionReferenceCounter()
+MO_EXTERN_C MO_UINT64 MoHyperVGetPartitionReferenceCounter()
 {
     return ::MoPlatformReadMsr(HvSyntheticMsrTimeRefCount);
 }
 
-EXTERN_C MO_UINT64 MoHyperVGetTickCount()
+MO_EXTERN_C MO_UINT64 MoHyperVGetTickCount()
 {
     return ::MoHyperVGetPartitionReferenceCounter() / 10 / 1000;
 }
 
-EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
-    _In_ MO_UINT64 PhysicalAddress)
+MO_EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
+    _Mo_In_ MO_UINT64 PhysicalAddress)
 {
     HV_X64_MSR_HYPERCALL_CONTENTS Config;
     Config.AsUINT64 = 0;
@@ -108,8 +108,8 @@ EXTERN_C MO_BOOL MoHyperVSetHypercallPage(
     return ((0 != PhysicalAddress) == Config.Enable) ? MO_TRUE : MO_FALSE;
 }
 
-EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
-    _In_ MO_UINT64 PhysicalAddress)
+MO_EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
+    _Mo_In_ MO_UINT64 PhysicalAddress)
 {
     HV_SYNIC_SIMP Config;
     Config.AsUINT64 = 0;
@@ -124,8 +124,8 @@ EXTERN_C MO_BOOL MoHyperVSetInterruptMessagePage(
     return ((0 != PhysicalAddress) == Config.SimpEnabled) ? MO_TRUE : MO_FALSE;
 }
 
-EXTERN_C MO_BOOL MoHyperVSetInterruptEventFlagsPage(
-    _In_ MO_UINT64 PhysicalAddress)
+MO_EXTERN_C MO_BOOL MoHyperVSetInterruptEventFlagsPage(
+    _Mo_In_ MO_UINT64 PhysicalAddress)
 {
     HV_SYNIC_SIEFP Config;
     Config.AsUINT64 = 0;
