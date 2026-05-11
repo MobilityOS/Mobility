@@ -41,6 +41,10 @@ Work In Progress
     - AMD Ryzen 9 9950X with Windows 11, version 25H2 host: CPU reports 48
       physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
       because 32 MiB virtual machines will crash silently.
+    - AMD Ryzen 9 9950X with Windows 11, version 26H1 host: CPU reports 48
+      physical address bits, and 2 MiB free memory for 38 MiB virtual machines,
+      because 36 MiB virtual machines will crash with hanging at firmware
+      initialization.
 
 ## The simple specification for Mobility Retrovisor (Retro-V)
 
