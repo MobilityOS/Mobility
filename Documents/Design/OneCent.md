@@ -14,7 +14,7 @@ called Otokonoko.
 > This design document will be kept for historic purpose.
 
 Originally, the whole Mobility project was the rebirth of the original MobOS
-created by Kenji Mouri around  2012. MobOS is an abandoned toy operating system
+created by Kenji Mouri around 2012. MobOS is an abandoned toy operating system
 project because he doesn't want to make a duplicate POSIX-based toy OS
 implementation.
 
