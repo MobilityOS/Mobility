@@ -10,6 +10,8 @@
 
 #include "Mobility.Runtime.Core.h"
 
+#include "Mile.Mobility.Utilities.Memory.Unstaged.h"
+
 MO_EXTERN_C MO_UINTN MOAPI MoRuntimeGetAlignedSize(
     _Mo_In_ MO_UINTN Size,
     _Mo_In_ MO_UINTN Alignment)
@@ -426,18 +428,15 @@ MO_EXTERN_C MO_RESULT MOAPI MoRuntimeMemoryMove(
         return MO_RESULT_SUCCESS_OK;
     }
 
-    MO_UINTN DestinationStart = (MO_UINTN)(Destination);
-    MO_UINTN SourceStart = (MO_UINTN)(Source);
-
-    if (Length > (MO_UINTN_MAX - DestinationStart) ||
-        Length > (MO_UINTN_MAX - SourceStart))
+    if (!MoMileMemoryRangeValidate(nullptr, Destination, Length) ||
+        !MoMileMemoryRangeValidate(nullptr, Source, Length))
     {
-        // Overflow detected.
+        // Invalid memory range.
         return MO_RESULT_ERROR_OUT_OF_BOUNDS;
     }
 
-    if (DestinationStart < SourceStart ||
-        DestinationStart >= (SourceStart + Length))
+    if (((MO_UINTN)(Destination)) < ((MO_UINTN)(Source)) ||
+        !MoMileMemoryRangeOverlaps(Destination, Length, Source, Length))
     {
         // No overlap or safe to copy forward.
         MoRuntimeInternalMemoryCopy(
@@ -1419,20 +1418,42 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalStringDetectOverlap(
     _Mo_In_ MO_CONSTANT_STRING Source,
     _Mo_In_ MO_UINTN SourceLength)
 {
-    MO_UINTN DestinationStart = (MO_UINTN)Destination;
-    MO_UINTN DestinationSize = MaximumLength * sizeof(MO_CHAR);
+    MO_UINTN DestinationSize = 0u;
+    MO_UINTN SourceCharacterCount = 0u;
+    MO_UINTN SourceSize = 0u;
 
-    MO_UINTN SourceStart = (MO_UINTN)Source;
-    MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_CHAR);
-
-    if ((DestinationStart < (SourceStart + SourceSize)) &&
-        (SourceStart < (DestinationStart + DestinationSize)))
+    if (!MoMileFixedIntegerCheckedMultiplication(
+        &DestinationSize,
+        MO_FALSE,
+        MaximumLength,
+        sizeof(MO_CHAR)))
     {
-        // Overlap detected.
-        return MO_TRUE;
+        return MO_FALSE;
     }
 
-    return MO_FALSE;
+    if (!MoMileFixedIntegerCheckedAddition(
+        &SourceCharacterCount,
+        MO_FALSE,
+        SourceLength,
+        1u))
+    {
+        return MO_FALSE;
+    }
+
+    if (!MoMileFixedIntegerCheckedMultiplication(
+        &SourceSize,
+        MO_FALSE,
+        SourceCharacterCount,
+        sizeof(MO_CHAR)))
+    {
+        return MO_FALSE;
+    }
+
+    return MoMileMemoryRangeOverlaps(
+        Destination,
+        DestinationSize,
+        Source,
+        SourceSize);
 }
 
 MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDetectOverlap(
@@ -1441,20 +1462,42 @@ MO_FORCEINLINE MO_BOOL MoRuntimeInternalWideStringDetectOverlap(
     _Mo_In_ MO_CONSTANT_WIDE_STRING Source,
     _Mo_In_ MO_UINTN SourceLength)
 {
-    MO_UINTN DestinationStart = (MO_UINTN)Destination;
-    MO_UINTN DestinationSize = MaximumLength * sizeof(MO_WIDE_CHAR);
+    MO_UINTN DestinationSize = 0u;
+    MO_UINTN SourceCharacterCount = 0u;
+    MO_UINTN SourceSize = 0u;
 
-    MO_UINTN SourceStart = (MO_UINTN)Source;
-    MO_UINTN SourceSize = (SourceLength + 1u) * sizeof(MO_WIDE_CHAR);
-
-    if ((DestinationStart < (SourceStart + SourceSize)) &&
-        (SourceStart < (DestinationStart + DestinationSize)))
+    if (!MoMileFixedIntegerCheckedMultiplication(
+        &DestinationSize,
+        MO_FALSE,
+        MaximumLength,
+        sizeof(MO_WIDE_CHAR)))
     {
-        // Overlap detected.
-        return MO_TRUE;
+        return MO_FALSE;
     }
 
-    return MO_FALSE;
+    if (!MoMileFixedIntegerCheckedAddition(
+        &SourceCharacterCount,
+        MO_FALSE,
+        SourceLength,
+        1u))
+    {
+        return MO_FALSE;
+    }
+
+    if (!MoMileFixedIntegerCheckedMultiplication(
+        &SourceSize,
+        MO_FALSE,
+        SourceCharacterCount,
+        sizeof(MO_WIDE_CHAR)))
+    {
+        return MO_FALSE;
+    }
+
+    return MoMileMemoryRangeOverlaps(
+        Destination,
+        DestinationSize,
+        Source,
+        SourceSize);
 }
 
 MO_FORCEINLINE MO_RESULT MoRuntimeInternalStringCopy(
