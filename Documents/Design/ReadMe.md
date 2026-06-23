@@ -59,21 +59,22 @@ Work In Progress
 - Style: Type-1 Emulator, a term coined in homage to the Type-1 Hypervisor
 - Memory layout
   - 1:1 identity page table for running the emulator
+  - Use the largest page table entry which is available without any extra
+    settings, for example, x64 is 2 MiB page, not the 1 GiB page
   - Maximum page table defined address is 4 GiB
-  - Retro-V will use 8 MiB memory for itself and video memory
 - Emulated Hardware
   - CPU: Intel Pentium Overdrive
     - Interpreter with limited just in time binary translation
     - No translation cache, which is good for self modified code and reduce
       attack surface and errors
     - ISA Level: 586 without MMX
-  - Motherboard: 486 and pure ISA
+  - Motherboard: 486 and pure ISA as the baseline (a.k.a. Without PCI and ACPI)
     - Intel Pentium Overdrive is designed for that
     - Much simplified but enough for most old software
     - Also good for passthrough PCI and ACPI if users want to use bare-metal
     - Some emulated devices can be disabled if bare-metal has alternatives
   - Input: PS/2 Keyboard & Mouse
-  - Graphics: Cirrus Logic Compatible 54xx Compatible
+  - Graphics: Cirrus Logic 54xx Compatible
     - Because Windows XP also supports that
     - Cirrus Logic 5434 4 MiB, for 1024x768 support
       - Windows 2000 and Windows XP can identify 4 MiB video memory, but only
@@ -81,11 +82,14 @@ Work In Progress
       - Windows 98 can use 1024x768 24bpp with 4 MiB video memory.
   - Sound: Sound Blaster 16 Compatible
   - Network: Novell NE2000 Compatible
-  - Firmware: High Level Emulation BIOS, 
+  - Firmware: High Level Emulation BIOS
     - Only with necessary stubs in guest
     - Reduce the maintenance cost
     - Improve the performance
     - Optional MO-DOS mode (Mobility DOS, High Level Emulation DOS)
+  - Not mentioned devices:
+    - Follow the mainstream legacy PC conventions
+    - For example, storage will use IDE
 - Guest OS Support
   - DOS
   - DOS Applications if MO-DOS mode enabled
@@ -93,10 +97,20 @@ Work In Progress
     - Windows 98 and Windows 2000 should have out-of-the-box experience.
     - You need to use upgrade installation from Windows 2000 if you want to use
       Windows XP with proper configured graphics and network drivers.
-- Host Support
-  - Hyper-V Generation 2 Virtual Machines (maintained by Kenji Mouri)
-  - UEFI without calling ExitBootServices (maintained by Kenji Mouri)
-  - VirtIO compatible platform like KVM and Xen (maintained by community)
+- Possible Independent Backends
+  - Hyper-V Generation 2 Virtual Machines
+    - Maintained by Kenji Mouri
+    - The reference and prototype platform
+    - Retro-V will use 8 MiB memory for itself, including:
+      - Unikernel a.k.a. runtime part including the page table
+      - Emulator contexts including the video memory
+      - Not including the guest memory and memory from MMIO
+  - UEFI without calling ExitBootServices
+    - Maintained by Kenji Mouri
+    - Not the goal if the reference and prototype platform is not ready
+  - VirtIO compatible platform like KVM and Xen
+    - Maintained by community
+    - Not the goal if the reference and prototype platform is not ready
 - User Experience
   - Ctrl+Alt+Del for runtime menu
     - Send Ctrl+Alt+Del to guest
