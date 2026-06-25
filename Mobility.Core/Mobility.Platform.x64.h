@@ -899,18 +899,6 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformHalt();
 MO_EXTERN_C MO_VOID MOAPI MoPlatformDebugBreak();
 
 /**
- * @brief Disables interrupts on the current processor.
- * @remarks Implemented in the assembly parts.
- */
-MO_EXTERN_C MO_VOID MOAPI MoPlatformDisableInterrupts();
-
-/**
- * @brief Enables interrupts on the current processor.
- * @remarks Implemented in the assembly parts.
- */
-MO_EXTERN_C MO_VOID MOAPI MoPlatformEnableInterrupts();
-
-/**
  * @brief The result of the CPUID instruction for x64 architecture.
  */
 typedef struct _MO_PLATFORM_X64_CPUID_RESULT
@@ -962,20 +950,96 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteCr3(
     _Mo_In_ MO_UINT64 Value);
 
 /**
- * @brief Loads the Global Descriptor Table (GDT) with the specified descriptor.
- * @param Descriptor A pointer to the pseudo-descriptor that contains the base
- *                   address and limit of the GDT.
- */
-MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
-    _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
-
-/**
  * @brief Loads the Interrupt Descriptor Table (IDT) with the specified
  *        descriptor.
  * @param Descriptor A pointer to the pseudo-descriptor that contains the base
  *                   address and limit of the IDT.
  */
 MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
+    _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
+
+/**
+ * @brief Guarantees that every previous memory reference, including both load
+ *        and store memory references, is globally visible before any subsequent
+ *        memory reference.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier();
+
+/**
+ * @brief Limits the compiler optimizations that can reorder memory accesses
+ *        across the point of the call.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformReadWriteBarrier();
+
+/**
+ * @brief Reads an 8-bit value from the specified I/O port.
+ * @param Port The I/O port to read from.
+ * @return The 8-bit value read from the specified I/O port.
+ */
+MO_EXTERN_C MO_UINT8 MOAPI MoPlatformReadIoPort8(
+    _Mo_In_ MO_UINT16 Port);
+
+/**
+ * @brief Reads a 16-bit value from the specified I/O port.
+ * @param Port The I/O port to read from.
+ * @return The 16-bit value read from the specified I/O port.
+ */
+MO_EXTERN_C MO_UINT16 MOAPI MoPlatformReadIoPort16(
+    _Mo_In_ MO_UINT16 Port);
+
+/**
+ * @brief Reads a 32-bit value from the specified I/O port.
+ * @param Port The I/O port to read from.
+ * @return The 32-bit value read from the specified I/O port.
+ */
+MO_EXTERN_C MO_UINT32 MOAPI MoPlatformReadIoPort32(
+    _Mo_In_ MO_UINT16 Port);
+
+/**
+ * @brief Writes an 8-bit value to the specified I/O port.
+ * @param Port The I/O port to write to.
+ * @param Value The 8-bit value to write to the specified I/O port.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort8(
+    _Mo_In_ MO_UINT16 Port,
+    _Mo_In_ MO_UINT8 Value);
+
+/**
+ * @brief Writes a 16-bit value to the specified I/O port.
+ * @param Port The I/O port to write to.
+ * @param Value The 16-bit value to write to the specified I/O port.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort16(
+    _Mo_In_ MO_UINT16 Port,
+    _Mo_In_ MO_UINT16 Value);
+
+/**
+ * @brief Writes a 32-bit value to the specified I/O port.
+ * @param Port The I/O port to write to.
+ * @param Value The 32-bit value to write to the specified I/O port.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort32(
+    _Mo_In_ MO_UINT16 Port,
+    _Mo_In_ MO_UINT32 Value);
+
+/**
+ * @brief Disables interrupts on the current processor.
+ * @remarks Implemented in the assembly parts.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformDisableInterrupts();
+
+/**
+ * @brief Enables interrupts on the current processor.
+ * @remarks Implemented in the assembly parts.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformEnableInterrupts();
+
+/**
+ * @brief Loads the Global Descriptor Table (GDT) with the specified descriptor.
+ * @param Descriptor A pointer to the pseudo-descriptor that contains the base
+ *                   address and limit of the GDT.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadGlobalDescriptorTable(
     _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**

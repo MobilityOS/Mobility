@@ -70,6 +70,18 @@ void __writecr3(unsigned __int64);
 
 void __lidt(void*);
 
+void __faststorefence();
+
+void _ReadWriteBarrier();
+
+unsigned char __inbyte(unsigned short);
+unsigned short __inword(unsigned short);
+unsigned long __indword(unsigned short);
+
+void __outbyte(unsigned short, unsigned char);
+void __outword(unsigned short, unsigned short);
+void __outdword(unsigned short, unsigned long);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
@@ -217,6 +229,55 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
     _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor)
 {
     __lidt(Descriptor);
+}
+
+MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier()
+{
+    __faststorefence();
+}
+
+MO_EXTERN_C MO_VOID MOAPI MoPlatformReadWriteBarrier()
+{
+    _ReadWriteBarrier();
+}
+
+MO_EXTERN_C MO_UINT8 MOAPI MoPlatformReadIoPort8(
+    _Mo_In_ MO_UINT16 Port)
+{
+    return __inbyte(Port);
+}
+
+MO_EXTERN_C MO_UINT16 MOAPI MoPlatformReadIoPort16(
+    _Mo_In_ MO_UINT16 Port)
+{
+    return __inword(Port);
+}
+
+MO_EXTERN_C MO_UINT32 MOAPI MoPlatformReadIoPort32(
+    _Mo_In_ MO_UINT16 Port)
+{
+    return __indword(Port);
+}
+
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort8(
+    _Mo_In_ MO_UINT16 Port,
+    _Mo_In_ MO_UINT8 Value)
+{
+    __outbyte(Port, Value);
+}
+
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort16(
+    _Mo_In_ MO_UINT16 Port,
+    _Mo_In_ MO_UINT16 Value)
+{
+    __outword(Port, Value);
+}
+
+MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort32(
+    _Mo_In_ MO_UINT16 Port,
+    _Mo_In_ MO_UINT32 Value)
+{
+    __outdword(Port, Value);
 }
 
 #endif // _MSC_VER
