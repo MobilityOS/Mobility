@@ -1199,76 +1199,90 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
     _Mo_In_ MO_UINT64 Offset);
 
 /**
- * @brief The COM1 serial port I/O port base address for x64 architecture.
+ * @brief The COM1 serial port I/O port base address for x64 PC platform.
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_COM1 0x03F8
 /**
- * @brief The COM2 serial port I/O port base address for x64 architecture.
+ * @brief The COM2 serial port I/O port base address for x64 PC platform.
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_COM2 0x02F8
 /**
- * @brief The COM3 serial port I/O port base address for x64 architecture.
+ * @brief The COM3 serial port I/O port base address for x64 PC platform.
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_COM3 0x03E8
 /**
- * @brief The COM4 serial port I/O port base address for x64 architecture.
+ * @brief The COM4 serial port I/O port base address for x64 PC platform.
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_COM4 0x02E8
 
 /**
  * @brief The data register (Receive Buffer Register (RBR) or Transmit Holding
- *        Register (THR)) offset for the serial port for x64 architecture when
+ *        Register (THR)) offset for the serial port for x64 PC platform when
  *        Divisor Latch Access Bit (DLAB) in Line Control Register (LCR) is
  *        cleared.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_DATA 0x00
+#define MO_PLATFORM_X64_SERIAL_PORT_DATA_REGISTER_OFFSET 0x00
 /**
- * @brief The Divisor Latch Least Significant Byte (DLL) offset for the serial
- *        port for x64 architecture when Divisor Latch Access Bit (DLAB) in Line
- *        Control Register (LCR) is set.
+ * @brief The Divisor Latch Least (DLL) register offset for the serial port for
+ *        x64 PC platform when Divisor Latch Access Bit (DLAB) in Line Control
+ *        Register (LCR) is set.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_DIVISOR_LATCH_LEAST 0x00
+#define MO_PLATFORM_X64_SERIAL_PORT_DIVISOR_LATCH_LEAST_REGISTER_OFFSET 0x00
 /**
  * @brief The Interrupt Enable Register (IER) offset for the serial port for x64
- *        architecture when Divisor Latch Access Bit (DLAB) in Line Control
+ *        PC platform when Divisor Latch Access Bit (DLAB) in Line Control
  *        Register (LCR) is cleared.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_INTERRUPT_ENABLE 0x01
+#define MO_PLATFORM_X64_SERIAL_PORT_INTERRUPT_ENABLE_REGISTER_OFFSET 0x01
 /**
- * @brief The Divisor Latch Most Significant Byte (DLM) offset for the serial
- *        port for x64 architecture when Divisor Latch Access Bit (DLAB) in Line
- *        Control Register (LCR) is set.
+ * @brief The Divisor Latch Most (DLM) register offset for the serial port for
+ *        x64 PC platform when Divisor Latch Access Bit (DLAB) in Line Control
+ *        Register (LCR) is set.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_DIVISOR_LATCH_MOST 0x01
+#define MO_PLATFORM_X64_SERIAL_PORT_DIVISOR_LATCH_MOST_REGISTER_OFFSET 0x01
 /**
  * @brief The FIFO Control Register (FCR) offset for the serial port for x64
- *        architecture.
+ *        PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_FIFO_CONTROL 0x02
+#define MO_PLATFORM_X64_SERIAL_PORT_FIFO_CONTROL_REGISTER_OFFSET 0x02
 /**
  * @brief The Line Control Register (LCR) offset for the serial port for x64
- *        architecture.
+ *        PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_LINE_CONTROL 0x03
+#define MO_PLATFORM_X64_SERIAL_PORT_LINE_CONTROL_REGISTER_OFFSET 0x03
 /**
  * @brief The Modem Control Register (MCR) offset for the serial port for x64
- *        architecture.
+ *        PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_MODEM_CONTROL 0x04
+#define MO_PLATFORM_X64_SERIAL_PORT_MODEM_CONTROL_REGISTER_OFFSET 0x04
 /**
  * @brief The Line Status Register (LSR) offset for the serial port for x64
- *        architecture.
+ *        PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_LINE_STATUS 0x05
+#define MO_PLATFORM_X64_SERIAL_PORT_LINE_STATUS_REGISTER_OFFSET 0x05
 /**
  * @brief The Modem Status Register (MSR) offset for the serial port for x64
- *        architecture.
+ *        PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_MODEM_STATUS 0x06
+#define MO_PLATFORM_X64_SERIAL_PORT_MODEM_STATUS_REGISTER_OFFSET 0x06
 /**
  * @brief The Scratch Register (SCR) offset for the serial port for x64
- *        architecture.
+ *        PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_REGISTER_SCRATCH 0x07
+#define MO_PLATFORM_X64_SERIAL_PORT_SCRATCH_REGISTER_OFFSET 0x07
+
+/**
+ * @brief The standard baud base for the serial port for x64 PC platform.
+ * @remark The divisor value that is set in the Divisor Latch registers
+ *         (Divisor Latch Least (DLL) and Divisor Latch Most (DLM)) for the
+ *         desired baud can be calculated by the following formula:
+ *         Divisor = Frequency / (16 * Baud) = (Frequency / 16) / Baud
+ *         The standard frequency for the serial port is 1.8432 MHz a.k.a.
+ *         1843200 Hz. So, the standard baud base is 1843200 / 16 = 115200,
+ *         which can be used to simply calculate the divisor value. For example,
+ *         if the desired baud is 9600, the divisor value should be
+ *         MO_PLATFORM_X64_SERIAL_PORT_BAUD_BASE / 9600 = 115200 / 9600 = 12.
+ */
+#define MO_PLATFORM_X64_SERIAL_PORT_BAUD_BASE 115200
 
 #endif // !MOBILITY_PLATFORM_X64
