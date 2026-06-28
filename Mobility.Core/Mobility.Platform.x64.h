@@ -959,17 +959,17 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
     _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor);
 
 /**
+ * @brief Limits the compiler optimizations that can reorder memory accesses
+ *        across the point of the call.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoPlatformReadWriteBarrier();
+
+/**
  * @brief Guarantees that every previous memory reference, including both load
  *        and store memory references, is globally visible before any subsequent
  *        memory reference.
  */
 MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier();
-
-/**
- * @brief Limits the compiler optimizations that can reorder memory accesses
- *        across the point of the call.
- */
-MO_EXTERN_C MO_VOID MOAPI MoPlatformReadWriteBarrier();
 
 /**
  * @brief Reads an 8-bit value from the specified I/O port.

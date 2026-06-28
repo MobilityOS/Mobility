@@ -231,53 +231,68 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
     __lidt(Descriptor);
 }
 
-MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier()
-{
-    __faststorefence();
-}
-
 MO_EXTERN_C MO_VOID MOAPI MoPlatformReadWriteBarrier()
 {
     _ReadWriteBarrier();
 }
 
+MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier()
+{
+    __faststorefence();
+}
+
 MO_EXTERN_C MO_UINT8 MOAPI MoPlatformReadIoPort8(
     _Mo_In_ MO_UINT16 Port)
 {
-    return __inbyte(Port);
+    MoPlatformReadWriteBarrier();
+    MO_UINT8 Result = __inbyte(Port);
+    MoPlatformReadWriteBarrier();
+    return Result;
 }
 
 MO_EXTERN_C MO_UINT16 MOAPI MoPlatformReadIoPort16(
     _Mo_In_ MO_UINT16 Port)
 {
-    return __inword(Port);
+    MoPlatformReadWriteBarrier();
+    MO_UINT16 Result = __inword(Port);
+    MoPlatformReadWriteBarrier();
+    return Result;
 }
 
 MO_EXTERN_C MO_UINT32 MOAPI MoPlatformReadIoPort32(
     _Mo_In_ MO_UINT16 Port)
 {
-    return __indword(Port);
+    MoPlatformReadWriteBarrier();
+    MO_UINT32 Result = __indword(Port);
+    MoPlatformReadWriteBarrier();
+    return Result;
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort8(
     _Mo_In_ MO_UINT16 Port,
     _Mo_In_ MO_UINT8 Value)
 {
+    MoPlatformReadWriteBarrier();
     __outbyte(Port, Value);
+    MoPlatformReadWriteBarrier();
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort16(
     _Mo_In_ MO_UINT16 Port,
     _Mo_In_ MO_UINT16 Value)
 {
+    MoPlatformReadWriteBarrier();
     __outword(Port, Value);
+    MoPlatformReadWriteBarrier();
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort32(
     _Mo_In_ MO_UINT16 Port,
     _Mo_In_ MO_UINT32 Value)
 {
+    MoPlatformReadWriteBarrier();
     __outdword(Port, Value);
+    MoPlatformReadWriteBarrier();
 }
 
 #endif // _MSC_VER
