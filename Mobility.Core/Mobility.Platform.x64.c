@@ -10,6 +10,8 @@
 
 #include "Mobility.Platform.x64.h"
 
+#include "Mile.Mobility.Utilities.MemoryAccess.Unstaged.h"
+
 #ifdef _MSC_VER
 
 #ifndef MOBILITY_PLATFORM_X64_PRIVATE
@@ -71,8 +73,6 @@ void __writecr3(unsigned __int64);
 void __lidt(void*);
 
 void __faststorefence();
-
-void _ReadWriteBarrier();
 
 unsigned char __inbyte(unsigned short);
 unsigned short __inword(unsigned short);
@@ -231,11 +231,6 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
     __lidt(Descriptor);
 }
 
-MO_EXTERN_C MO_VOID MOAPI MoPlatformReadWriteBarrier()
-{
-    _ReadWriteBarrier();
-}
-
 MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier()
 {
     __faststorefence();
@@ -244,27 +239,27 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier()
 MO_EXTERN_C MO_UINT8 MOAPI MoPlatformReadIoPort8(
     _Mo_In_ MO_UINT16 Port)
 {
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     MO_UINT8 Result = __inbyte(Port);
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     return Result;
 }
 
 MO_EXTERN_C MO_UINT16 MOAPI MoPlatformReadIoPort16(
     _Mo_In_ MO_UINT16 Port)
 {
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     MO_UINT16 Result = __inword(Port);
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     return Result;
 }
 
 MO_EXTERN_C MO_UINT32 MOAPI MoPlatformReadIoPort32(
     _Mo_In_ MO_UINT16 Port)
 {
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     MO_UINT32 Result = __indword(Port);
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     return Result;
 }
 
@@ -272,27 +267,27 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort8(
     _Mo_In_ MO_UINT16 Port,
     _Mo_In_ MO_UINT8 Value)
 {
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     __outbyte(Port, Value);
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort16(
     _Mo_In_ MO_UINT16 Port,
     _Mo_In_ MO_UINT16 Value)
 {
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     __outword(Port, Value);
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteIoPort32(
     _Mo_In_ MO_UINT16 Port,
     _Mo_In_ MO_UINT32 Value)
 {
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
     __outdword(Port, Value);
-    MoPlatformReadWriteBarrier();
+    MoMileCompilerBarrier();
 }
 
 #endif // _MSC_VER
