@@ -72,8 +72,6 @@ void __writecr3(unsigned __int64);
 
 void __lidt(void*);
 
-void __faststorefence();
-
 unsigned char __inbyte(unsigned short);
 unsigned short __inword(unsigned short);
 unsigned long __indword(unsigned short);
@@ -229,11 +227,6 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformLoadInterruptDescriptorTable(
     _Mo_In_ PMO_PLATFORM_X64_PSEUDO_DESCRIPTOR Descriptor)
 {
     __lidt(Descriptor);
-}
-
-MO_EXTERN_C MO_VOID MOAPI MoPlatformMemoryBarrier()
-{
-    __faststorefence();
 }
 
 MO_EXTERN_C MO_UINT8 MOAPI MoPlatformReadIoPort8(
