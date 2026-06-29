@@ -24,7 +24,6 @@
   <ItemGroup>
     <ClCompile Include="microui.c" />
     <ClCompile Include="Mile.Mobility.Utilities.Memory.Unstaged.c" />
-    <ClCompile Include="Mile.Mobility.Utilities.MemoryAccess.Unstaged.c" />
     <ClCompile Include="Mobility.BitmapFont.LaffStd.c" />
     <ClCompile Include="Mobility.Console.Core.c" />
     <ClCompile Include="Mobility.Display.Core.c" />
@@ -35,7 +34,6 @@
   <ItemGroup>
     <ClInclude Include="microui.h" />
     <ClInclude Include="Mile.Mobility.Utilities.Memory.Unstaged.h" />
-    <ClInclude Include="Mile.Mobility.Utilities.MemoryAccess.Unstaged.h" />
     <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
     <ClInclude Include="Mobility.Console.Core.h" />
     <ClInclude Include="Mobility.Display.Core.h" />
