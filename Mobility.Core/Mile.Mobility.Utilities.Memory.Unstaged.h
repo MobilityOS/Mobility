@@ -19,26 +19,26 @@
  * - Only depends on Mile.Mobility.Utilities.FixedInteger.h.
  */
 
- /**
-   * @brief Determines whether a memory range representation is valid.
-   * @param EndAddress The optional pointer to the variable that receives the end
-   *                   boundary address of the memory range. EndAddress may be
-   *                   null. If the return value is MO_FALSE, the value pointed
-   *                   to by EndAddress is not modified. The received address is
-   *                   the end boundary of the half-open range and is not
-   *                   guaranteed to be readable or writable.
-   * @param BaseAddress The base address of the memory range. If Length is zero,
-   *                    BaseAddress may be null. If Length is nonzero,
-   *                    BaseAddress must not be null.
-   * @param Length The length, in bytes, of the memory range.
-   * @return MO_TRUE if the memory range is a valid half-open range
-   *         [BaseAddress, the computed end boundary address), and the address
-   *         computation does not wrap around. MO_FALSE otherwise. The boundary
-   *         computation is performed by using native-width unsigned address
-   *         representations. This function only validates the range
-   *         representation; it does not prove that the memory range is actually
-   *         readable or writable.
-   */
+/**
+  * @brief Determines whether a memory range representation is valid.
+  * @param EndAddress The optional pointer to the variable that receives the end
+  *                   boundary address of the memory range. EndAddress may be
+  *                   null. If the return value is MO_FALSE, the value pointed
+  *                   to by EndAddress is not modified. The received address is
+  *                   the end boundary of the half-open range and is not
+  *                   guaranteed to be readable or writable.
+  * @param BaseAddress The base address of the memory range. If Length is zero,
+  *                    BaseAddress may be null. If Length is nonzero,
+  *                    BaseAddress must not be null.
+  * @param Length The length, in bytes, of the memory range.
+  * @return MO_TRUE if the memory range is a valid half-open range
+  *         [BaseAddress, the computed end boundary address), and the address
+  *         computation does not wrap around. MO_FALSE otherwise. The boundary
+  *         computation is performed by using native-width unsigned address
+  *         representations. This function only validates the range
+  *         representation; it does not prove that the memory range is actually
+  *         readable or writable.
+  */
 MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeValidate(
     _Mo_Out_Opt_ PMO_CONSTANT_POINTER EndAddress,
     _Mo_In_Opt_ MO_CONSTANT_POINTER BaseAddress,
