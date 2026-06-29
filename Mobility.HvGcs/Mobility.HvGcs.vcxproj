@@ -30,7 +30,7 @@
       <Version>1.2.997</Version>
     </PackageReference>
     <PackageReference Include="Mile.Mobility">
-      <Version>1.1.564</Version>
+      <Version>1.1.602</Version>
     </PackageReference>
   </ItemGroup>
   <Import Sdk="Mile.Uefi" Version="1.0.1898" Project="Mile.Uefi.targets" />
