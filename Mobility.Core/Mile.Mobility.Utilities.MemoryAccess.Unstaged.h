@@ -43,4 +43,11 @@ static MO_FORCEINLINE MO_VOID MoMileCompilerBarrier(MO_VOID)
 #endif
 }
 
+/**
+ * @brief Creates a hardware memory barrier (fence) that prevents the CPU from
+ *        re-ordering read and write operations. It may also prevent the
+ *        compiler from re-ordering read and write operations.
+ */
+MO_EXTERN_C MO_VOID MOAPI MoMileMemoryBarrier(MO_VOID);
+
 #endif // !MILE_MOBILITY_UTILITIES_MEMORYACCESS_UNSTAGED
