@@ -1144,4 +1144,78 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_BAUD_BASE 115200
 
+typedef union _MO_PLATFORM_X64_SERIAL_PORT_REGISTER
+{
+    MO_UINT8 RawData;
+    struct
+    {
+        MO_UINT8 ReceivedDataAvailable : 1;
+        MO_UINT8 TransmitterHoldingRegisterEmpty : 1;
+        MO_UINT8 ReceiverLineStatus : 1;
+        MO_UINT8 ModemStatus : 1;
+        MO_UINT8 Reserved : 4;
+    } InterruptEnable;
+    struct
+    {
+        MO_UINT8 EnableFifo : 1;
+        MO_UINT8 ClearReceiveFifo : 1;
+        MO_UINT8 ClearTransmitFifo : 1;
+        MO_UINT8 DmaModeSelect : 1;
+        MO_UINT8 Reserved : 2;
+        MO_UINT8 InterruptTriggerLevel : 2;
+    } FifoControl;
+    struct
+    {
+        MO_UINT8 InterruptPending : 1;
+        MO_UINT8 InterruptState : 2;
+        /* On the 8250/16450 UART, this bit is zero. */
+        MO_UINT8 TimeoutInterruptPending : 1;
+        MO_UINT8 Reserved : 2;
+        /* On the 8250/16450 UART, this bit is zero. */
+        MO_UINT8 FifoBufferState : 2;
+    } InterruptIdentification;
+    struct
+    {
+        MO_UINT8 WordLength : 2;
+        MO_UINT8 StopBits : 1;
+        MO_UINT8 ParityEnable : 1;
+        MO_UINT8 EvenParitySelect : 1;
+        MO_UINT8 StickParity : 1;
+        MO_UINT8 SetBreak : 1;
+        MO_UINT8 DivisorLatchAccessBit : 1;
+    } LineControl;
+    struct
+    {
+        MO_UINT8 DataTerminalReady : 1;
+        MO_UINT8 RequestToSend : 1;
+        MO_UINT8 AuxiliaryOutput1 : 1;
+        MO_UINT8 AuxiliaryOutput2 : 1;
+        MO_UINT8 LoopbackMode : 1;
+        MO_UINT8 Reserved : 3;
+    } ModemControl;
+    struct
+    {
+        MO_UINT8 DataReady : 1;
+        MO_UINT8 OverrunError : 1;
+        MO_UINT8 ParityError : 1;
+        MO_UINT8 FramingError : 1;
+        MO_UINT8 BreakInterrupt : 1;
+        MO_UINT8 TransmitterHoldingRegisterEmpty : 1;
+        MO_UINT8 TransmitterEmpty : 1;
+        /* On the 8250/16450 UART, this bit is zero. */
+        MO_UINT8 ErrorInReceivedFifo : 1;
+    } LineStatus;
+    struct
+    {
+        MO_UINT8 DeltaClearToSend : 1;
+        MO_UINT8 DeltaDataSetReady : 1;
+        MO_UINT8 TrailingEdgeRingIndicator : 1;
+        MO_UINT8 DeltaDataCarrierDetect : 1;
+        MO_UINT8 ClearToSend : 1;
+        MO_UINT8 DataSetReady : 1;
+        MO_UINT8 RingIndicator : 1;
+        MO_UINT8 DataCarrierDetect : 1;
+    } ModemStatus;
+} MO_PLATFORM_X64_SERIAL_PORT_REGISTER, *PMO_PLATFORM_X64_SERIAL_PORT_REGISTER;
+
 #endif // !MOBILITY_PLATFORM_X64
