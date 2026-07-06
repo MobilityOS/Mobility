@@ -122,3 +122,88 @@ Work In Progress
   - Support Hyper-V Basic Session and Enhanced Session
   - If the legacy OS partition is FAT series, we can add /EFI/Boot/bootx64.efi
     a.k.a. Retro-V itself to make the legacy OS great again
+
+## Emulated Hardware Specification for Mobility Retrovisor (Retro-V)
+
+### Hardware List
+
+- Processor: Emulates an Intel Pentium OverDrive processor.
+- Platform: Implements a pure 486 ISA platform with the following components:
+  - MC146818-compatible CMOS and Real-Time Clock (RTC)
+  - Two 8237A-compatible DMA controllers
+  - Two cascaded 8259A-compatible Programmable Interrupt Controllers (PICs)
+  - 8253/8254-compatible Programmable Interval Timer (PIT)
+  - Two 16550A-compatible UART controllers that support up to two serial ports
+  - 8042-compatible Keyboard Controller Device and A20 Gate
+  - ISA Bus
+  - Floppy disk controller
+  - PC Speaker
+- Floppy Disk Drive: Supports a single 3.5-inch 1.44 MB floppy disk drive and
+  mapping raw floppy drive images.
+- Serial (COM) Port: Emulates up to two serial ports: COM1 and COM2.
+- Mouse: Emulates a standard PS/2 mouse.
+- Keyboard: Emulates a standard PS/2 keyboard.
+- Network Adapter: Emulates a Novell NE2000 Compatible network adapter.
+- Memory: Supports nearly 4 GiB of guest RAM.
+- Sound Card: Emulates a Sound Blaster 16 Compatible sound card.
+- Video Card: Emulates a Cirrus Logic 54xx compatible graphics adapter with 4
+  MiB of Video RAM (VRAM), VGA, and SVGA support.
+- IDE/ATAPI Storage: Emulates up to four IDE/ATAPI devices on the Primary and
+  Secondary IDE Channels, including hard drives and CD-ROM drives or ISO images.
+
+### IRQ
+
+- IRQ0: Programmable Interval Timer (PIT)
+- IRQ1: Keyboard Controller
+- IRQ2: Programmable Interrupt Controllers (PIC) cascade
+- IRQ3: COM2
+- IRQ4: COM1
+- IRQ5: Sound Card
+- IRQ6: Floppy Disk Controller
+- IRQ7: Unused
+- IRQ8: Real-Time Clock (RTC)
+- IRQ9: Unused
+- IRQ10: Network Adapter
+- IRQ11: Unused
+- IRQ12: PS/2 Mouse
+- IRQ13: x87 FPU
+- IRQ14: Primary IDE Channel
+- IRQ15: Secondary IDE Channel
+
+### DMA
+
+- DMA0: Unused
+- DMA1: Sound Card (8-bit DMA)
+- DMA2: Floppy Disk Controller
+- DMA3: Unused
+- DMA4: DMA controller cascade
+- DMA5: Sound Card (16-bit DMA)
+- DMA6: Unused
+- DMA7: Unused
+
+### I/O Port
+
+- 0x0000 - 0x000F: DMA Controller
+- 0x0020 - 0x0021: Programmable Interrupt Controllers (PIC)
+- 0x0040 - 0x0043: Programmable Interval Timer (PIT)
+- 0x0060 - 0x0064: Keyboard Controller, PC Speaker
+- 0x0070 - 0x0071: CMOS and Real-Time Clock (RTC)
+- 0x0080 - 0x008F: DMA Page Registers
+- 0x0092: System Control Port A
+- 0x0094: POS / Video Card
+- 0x00A0 - 0x00A1: Programmable Interrupt Controllers (PIC)
+- 0x00C0 - 0x00DF: DMA Controller
+- 0x0102: POS / Video Card
+- 0x0170 - 0x0177: Secondary IDE Channel
+- 0x01F0 - 0x01F7: Primary IDE Channel
+- 0x0220 - 0x022F: Sound Card
+- 0x02F8 - 0x02FF: COM2
+- 0x0300 - 0x031F: Network Adapter
+- 0x0376: Secondary IDE Channel
+- 0x0388 - 0x038B: Sound Card
+- 0x03B0 - 0x03DF: Video Card
+- 0x03F0 - 0x03F5: Floppy Disk Controller
+- 0x03F6: Primary IDE Channel
+- 0x03F7: Floppy Disk Controller
+- 0x03F8 - 0x03FF: COM1
+- 0x46E8: Video Card
