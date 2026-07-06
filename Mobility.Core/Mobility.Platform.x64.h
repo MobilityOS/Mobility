@@ -1075,60 +1075,70 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
 #define MO_PLATFORM_X64_SERIAL_PORT_COM4 0x02E8
 
 /**
- * @brief The data register (Receive Buffer Register (RBR) or Transmit Holding
- *        Register (THR)) offset for the serial port for x64 PC platform when
- *        Divisor Latch Access Bit (DLAB) in Line Control Register (LCR) is
- *        cleared.
+ * @brief The Receive Buffer Register (RBR) (Read Only) offset for the serial
+ *        port for x64 PC platform when Divisor Latch Access Bit (DLAB) in Line
+ *        Control Register (LCR) is cleared.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_DATA_REGISTER_OFFSET 0x00
+#define MO_PLATFORM_X64_SERIAL_PORT_RBR_OFFSET 0x00
 /**
- * @brief The Divisor Latch Least (DLL) register offset for the serial port for
- *        x64 PC platform when Divisor Latch Access Bit (DLAB) in Line Control
- *        Register (LCR) is set.
+ * @brief The Transmit Holding Register (THR) (Write Only) offset for the serial
+ *        port for x64 PC platform when Divisor Latch Access Bit (DLAB) in Line
+ *        Control Register (LCR) is cleared.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_DIVISOR_LATCH_LEAST_REGISTER_OFFSET 0x00
+#define MO_PLATFORM_X64_SERIAL_PORT_THR_OFFSET 0x00
+/**
+ * @brief The Divisor Latch (Least Significant Byte (LS)) (DLL) register offset
+ *        for the serial port for x64 PC platform when Divisor Latch Access Bit
+ *        (DLAB) in Line Control Register (LCR) is set.
+ */
+#define MO_PLATFORM_X64_SERIAL_PORT_DLL_OFFSET 0x00
 /**
  * @brief The Interrupt Enable Register (IER) offset for the serial port for x64
  *        PC platform when Divisor Latch Access Bit (DLAB) in Line Control
  *        Register (LCR) is cleared.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_INTERRUPT_ENABLE_REGISTER_OFFSET 0x01
+#define MO_PLATFORM_X64_SERIAL_PORT_IER_OFFSET 0x01
 /**
- * @brief The Divisor Latch Most (DLM) register offset for the serial port for
- *        x64 PC platform when Divisor Latch Access Bit (DLAB) in Line Control
- *        Register (LCR) is set.
+ * @brief The Divisor Latch (Most Significant Byte (MS)) (DLM) register offset
+ *        for the serial port for x64 PC platform when Divisor Latch Access Bit
+ *        (DLAB) in Line Control Register (LCR) is set.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_DIVISOR_LATCH_MOST_REGISTER_OFFSET 0x01
+#define MO_PLATFORM_X64_SERIAL_PORT_DLM_OFFSET 0x01
 /**
- * @brief The FIFO Control Register (FCR) offset for the serial port for x64
- *        PC platform.
+ * @brief The Interrupt Identification Register (IIR) (Read Only) offset for the
+ *        serial port for x64 PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_FIFO_CONTROL_REGISTER_OFFSET 0x02
+#define MO_PLATFORM_X64_SERIAL_PORT_IIR_OFFSET 0x02
 /**
- * @brief The Line Control Register (LCR) offset for the serial port for x64
- *        PC platform.
+ * @brief The FIFO Control Register (FCR) (Write Only) offset for the serial port
+ *        for x64 PC platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_LINE_CONTROL_REGISTER_OFFSET 0x03
+#define MO_PLATFORM_X64_SERIAL_PORT_FCR_OFFSET 0x02
 /**
- * @brief The Modem Control Register (MCR) offset for the serial port for x64
- *        PC platform.
+ * @brief The Line Control Register (LCR) offset for the serial port for x64 PC
+ *        platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_MODEM_CONTROL_REGISTER_OFFSET 0x04
+#define MO_PLATFORM_X64_SERIAL_PORT_LCR_OFFSET 0x03
 /**
- * @brief The Line Status Register (LSR) offset for the serial port for x64
- *        PC platform.
+ * @brief The MODEM Control Register (MCR) offset for the serial port for x64 PC
+ *        platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_LINE_STATUS_REGISTER_OFFSET 0x05
+#define MO_PLATFORM_X64_SERIAL_PORT_MCR_OFFSET 0x04
 /**
- * @brief The Modem Status Register (MSR) offset for the serial port for x64
- *        PC platform.
+ * @brief The Line Status Register (LSR) offset for the serial port for x64 PC
+ *        platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_MODEM_STATUS_REGISTER_OFFSET 0x06
+#define MO_PLATFORM_X64_SERIAL_PORT_LSR_OFFSET 0x05
 /**
- * @brief The Scratch Register (SCR) offset for the serial port for x64
- *        PC platform.
+ * @brief The MODEM Status Register (MSR) offset for the serial port for x64 PC
+ *        platform.
  */
-#define MO_PLATFORM_X64_SERIAL_PORT_SCRATCH_REGISTER_OFFSET 0x07
+#define MO_PLATFORM_X64_SERIAL_PORT_MSR_OFFSET 0x06
+/**
+ * @brief The Scratch Register (SCR) offset for the serial port for x64 PC
+ *        platform.
+ */
+#define MO_PLATFORM_X64_SERIAL_PORT_SCR_OFFSET 0x07
 
 /**
  * @brief The standard baud base for the serial port for x64 PC platform.
@@ -1144,78 +1154,300 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_BAUD_BASE 115200
 
+/**
+ * @brief The definition of the serial port registers for x64 PC platform.
+ */
 typedef union _MO_PLATFORM_X64_SERIAL_PORT_REGISTER
 {
+    /**
+     * @brief The raw data of the serial port register.
+     */
     MO_UINT8 RawData;
+    /**
+     * @brief Receive Buffer Register (RBR) (Read Only)
+     */
     struct
     {
-        MO_UINT8 ReceivedDataAvailable : 1;
-        MO_UINT8 TransmitterHoldingRegisterEmpty : 1;
-        MO_UINT8 ReceiverLineStatus : 1;
-        MO_UINT8 ModemStatus : 1;
+        /**
+         * @brief The data received from the serial port.
+         */
+        MO_UINT8 Data;
+    } RBR;
+    /**
+     * @brief Transmit Holding Register (THR) (Write Only)
+     */
+    struct
+    {
+        /**
+         * @brief The data to be transmitted to the serial port.
+         */
+        MO_UINT8 Data;
+    } THR;
+    /**
+     * @brief Divisor Latch (Least Significant Byte (LS)) (DLL) register
+     */
+    struct
+    {
+        /**
+         * @brief The least significant byte of the divisor value for the
+         *        desired baud.
+         */
+        MO_UINT8 Data;
+    } DLL;
+    /**
+     * @brief Interrupt Enable Register (IER)
+     */
+    struct
+    {
+        /**
+         * @brief Enable Received Data Available Interrupt (ERBFI)
+         */
+        MO_UINT8 ERBFI : 1;
+        /**
+         * @brief Enable Transmitter Holding Register Empty Interrupt (ETBEI)
+         */
+        MO_UINT8 ETBEI : 1;
+        /**
+         * @brief Enable Receiver Line Status Interrupt (ELSI)
+         */
+        MO_UINT8 ELSI : 1;
+        /**
+         * @brief Enable MODEM Status Interrupt (EDSSI)
+         */
+        MO_UINT8 EDSSI : 1;
+        /**
+         * @brief Reserved
+         */
         MO_UINT8 Reserved : 4;
-    } InterruptEnable;
+    } IER;
+    /**
+     * @brief Divisor Latch (Most Significant Byte (MS)) (DLM) register
+     */
     struct
     {
-        MO_UINT8 EnableFifo : 1;
-        MO_UINT8 ClearReceiveFifo : 1;
-        MO_UINT8 ClearTransmitFifo : 1;
+        /**
+         * @brief The most significant byte of the divisor value for the desired
+         *        baud.
+         */
+        MO_UINT8 Data;
+    } DLM;
+    /**
+     * @brief Interrupt Identification Register (IIR) (Read Only)
+     */
+    struct
+    {
+        /**
+         * @brief Interrupt Pending
+         * @remark 0 = At least one interrupt is pending
+         *         1 = No interrupts are pending
+         */
+        MO_UINT8 Pending : 1;
+        /**
+         * @brief Interrupt ID Bits
+         * @remark 0 = MODEM Status (-CTS, -DSR, -RI, -DCD)
+         *         1 = Transmitter Holding Register Empty (THRE)
+         *         2 = Received Data Available
+         *         3 = Receiver Line Status (OE, PE, FE, BI)
+         *         6 = Character Timeout Indication (N/A on 8250/16450 UART)
+         */
+        MO_UINT8 ID : 3;
+        /**
+         * @brief Reserved
+         */
+        MO_UINT8 Reserved : 2;
+        /**
+         * @brief FIFOs Enabled
+         * @remark 0 = FIFO disabled, 3 = FIFO enabled
+         *         On the 8250/16450 UART, this bit is zero.
+         */
+        MO_UINT8 FifosEnabled : 2;
+    } IIR;
+    /**
+     * @brief FIFO Control Register (FCR) (Write Only)
+     */
+    struct
+    {
+        /**
+         * @brief FIFO Enable
+         */
+        MO_UINT8 Enable : 1;
+        /**
+         * @brief Receiver FIFO Reset
+         */
+        MO_UINT8 ReceiverReset : 1;
+        /**
+         * @brief Transmit FIFO Reset
+         */
+        MO_UINT8 TransmitReset : 1;
+        /**
+         * @brief DMA Mode Select
+         */
         MO_UINT8 DmaModeSelect : 1;
+        /**
+         * @brief Reserved
+         */
         MO_UINT8 Reserved : 2;
-        MO_UINT8 InterruptTriggerLevel : 2;
-    } FifoControl;
+        /**
+         * @brief Receiver Trigger Level
+         * @remark 0 = 1 byte, 1 = 4 bytes, 2 = 8 bytes, 3 = 14 bytes
+         */
+        MO_UINT8 ReceiveTrigger : 2;
+    } FCR;
+    /**
+     * @brief Line Control Register (LCR)
+     */
     struct
     {
-        MO_UINT8 InterruptPending : 1;
-        MO_UINT8 InterruptState : 2;
-        /* On the 8250/16450 UART, this bit is zero. */
-        MO_UINT8 TimeoutInterruptPending : 1;
-        MO_UINT8 Reserved : 2;
-        /* On the 8250/16450 UART, this bit is zero. */
-        MO_UINT8 FifoBufferState : 2;
-    } InterruptIdentification;
-    struct
-    {
-        MO_UINT8 WordLength : 2;
-        MO_UINT8 StopBits : 1;
-        MO_UINT8 ParityEnable : 1;
-        MO_UINT8 EvenParitySelect : 1;
+        /**
+         * @brief Word Length Select Bits (WLS)
+         * @remark 0 = 5 bits, 1 = 6 bits, 2 = 7 bits, 3 = 8 bits
+         */
+        MO_UINT8 WLS : 2;
+        /**
+         * @brief Number of Stop Bits (STB)
+         */
+        MO_UINT8 STB : 1;
+        /**
+         * @brief Parity Enable (PEN)
+         */
+        MO_UINT8 PEN : 1;
+        /**
+         * @brief Even Parity Select (EPS)
+         */
+        MO_UINT8 EPS : 1;
+        /**
+         * @brief Stick Parity
+         */
         MO_UINT8 StickParity : 1;
+        /**
+         * @brief Set Break
+         */
         MO_UINT8 SetBreak : 1;
-        MO_UINT8 DivisorLatchAccessBit : 1;
-    } LineControl;
+        /**
+         * @brief Divisor Latch Access Bit (DLAB)
+         */
+        MO_UINT8 DLAB : 1;
+    } LCR;
+    /**
+     * @brief MODEM Control Register (MCR)
+     */
     struct
     {
-        MO_UINT8 DataTerminalReady : 1;
-        MO_UINT8 RequestToSend : 1;
-        MO_UINT8 AuxiliaryOutput1 : 1;
-        MO_UINT8 AuxiliaryOutput2 : 1;
-        MO_UINT8 LoopbackMode : 1;
+        /**
+         * @brief Data Terminal Ready (DTR)
+         */
+        MO_UINT8 DTR : 1;
+        /**
+         * @brief Request To Send (RTS)
+         */
+        MO_UINT8 RTS : 1;
+        /**
+         * @brief Output 1 (OUT1)
+         */
+        MO_UINT8 OUT1 : 1;
+        /**
+         * @brief Output 2 (OUT2)
+         */
+        MO_UINT8 OUT2 : 1;
+        /**
+         * @brief Loopback Mode
+         */
+        MO_UINT8 Loop : 1;
+        /**
+         * @brief Reserved
+         */
         MO_UINT8 Reserved : 3;
-    } ModemControl;
+    } MCR;
+    /**
+     * @brief Line Status Register (LSR)
+     */
     struct
     {
-        MO_UINT8 DataReady : 1;
-        MO_UINT8 OverrunError : 1;
-        MO_UINT8 ParityError : 1;
-        MO_UINT8 FramingError : 1;
-        MO_UINT8 BreakInterrupt : 1;
-        MO_UINT8 TransmitterHoldingRegisterEmpty : 1;
-        MO_UINT8 TransmitterEmpty : 1;
-        /* On the 8250/16450 UART, this bit is zero. */
+        /**
+         * @brief Data Ready (DR)
+         */
+        MO_UINT8 DR : 1;
+        /**
+         * @brief Overrun Error (OE)
+         */
+        MO_UINT8 OE : 1;
+        /**
+         * @brief Parity Error (PE)
+         */
+        MO_UINT8 PE : 1;
+        /**
+         * @brief Framing Error (FE)
+         */
+        MO_UINT8 FE : 1;
+        /**
+         * @brief Break Interrupt (BI)
+         */
+        MO_UINT8 BI : 1;
+        /**
+         * @brief Transmitter Holding Register Empty (THRE)
+         */
+        MO_UINT8 THRE : 1;
+        /**
+         * @brief Transmitter Empty (TEMT)
+         */
+        MO_UINT8 TEMT : 1;
+        /**
+         * @brief Error in Received FIFO
+         * @remark On the 8250/16450 UART, this bit is zero.
+         */
         MO_UINT8 ErrorInReceivedFifo : 1;
-    } LineStatus;
+    } LSR;
+    /**
+     * @brief MODEM Status Register (MSR)
+     */
     struct
     {
-        MO_UINT8 DeltaClearToSend : 1;
-        MO_UINT8 DeltaDataSetReady : 1;
-        MO_UINT8 TrailingEdgeRingIndicator : 1;
-        MO_UINT8 DeltaDataCarrierDetect : 1;
-        MO_UINT8 ClearToSend : 1;
-        MO_UINT8 DataSetReady : 1;
-        MO_UINT8 RingIndicator : 1;
-        MO_UINT8 DataCarrierDetect : 1;
-    } ModemStatus;
+        /**
+         * @brief Delta Clear To Send (DCTS)
+         */
+        MO_UINT8 DCTS : 1;
+        /**
+         * @brief Delta Data Set Ready (DDSR)
+         */
+        MO_UINT8 DDSR : 1;
+        /**
+         * @brief Trailing Edge of Ring Indicator (TERI)
+         */
+        MO_UINT8 TERI : 1;
+        /**
+         * @brief Delta Data Carrier Detect (DDCD)
+         */
+        MO_UINT8 DDCD : 1;
+        /**
+         * @brief Clear To Send (CTS)
+         */
+        MO_UINT8 CTS : 1;
+        /**
+         * @brief Data Set Ready (DSR)
+         */
+        MO_UINT8 DSR : 1;
+        /**
+         * @brief Ring Indicator (RI)
+         */
+        MO_UINT8 RI : 1;
+        /**
+         * @brief Data Carrier Detect (DCD)
+         */
+        MO_UINT8 DCD : 1;
+    } MSR;
+    /**
+     * @brief Scratch Register (SCR)
+     */
+    struct
+    {
+        /**
+         * @brief The data stored in the scratch register.
+         * @remark This register performs no function in the UART. Any value can
+         *         be written by the host to this location and read by the host
+         *         later on.
+         */
+        MO_UINT8 Data;
+    } SCR;
 } MO_PLATFORM_X64_SERIAL_PORT_REGISTER, *PMO_PLATFORM_X64_SERIAL_PORT_REGISTER;
 
 #endif // !MOBILITY_PLATFORM_X64
