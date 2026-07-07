@@ -2,7 +2,30 @@
 
 Work In Progress
 
-## Why choose Hyper-V Generation 2 Virtual Machines as the reference platform?
+## Architecture Overview of Mobility
+
+Mobility is a unikernel-style operating system project created by Kenji Mouri to
+realize his childhood operating system dream:
+
+- He does not want to build yet another POSIX-based toy OS.
+- He wants to see an ecosystem with binary-level portability.
+- He wants to push the industry forward by solving real problems.
+
+Therefore, Mobility generally consists of both a Platform part and a Unikernel
+part, also known as Mobility itself. The Platform part is the environment in
+which Mobility runs, including local or cloud virtual machines and bare-metal
+platforms such as SoCs and even MCUs.
+
+The Platform part of Mobility can target the following possible platforms:
+
+- Hyper-V Generation 2 Virtual Machines, including Windows, Azure, OpenVMM, etc.
+- VirtIO-compatible virtualization platforms, such as KVM and Xen.
+- UEFI without calling ExitBootServices(), as a fallback, especially for
+  bare-metal platforms with UEFI support.
+- Windows desktop application, for development use only.
+
+The Reference Platform is Hyper-V Generation 2 Virtual Machines for the
+following reasons:
 
 - Hyper-V Generation 2 Virtual Machines represent one of the most widely adopted
   para-virtualization platforms, and arguably the most aggressively
@@ -23,105 +46,132 @@ Work In Progress
   community contributions to support his continued participation in the program
   in the years ahead.
 
-## Why require minimum 48 MiB memory for Hyper-V Generation 2 Virtual Machines?
+The Windows desktop application platform target is intended for development use
+only for the following reasons:
+
+- Users already have much better choices for conventional application scenarios
+  if they can accept running software on top of existing operating systems.
+- Mobility is a complex long-term project, so having a Windows desktop
+  application platform target can be very helpful for developing parts that are
+  not platform-specific.
+
+Kenji Mouri is currently working only on the following possible platform
+targets:
+
+- Hyper-V Generation 2 Virtual Machines
+- Windows desktop application
+
+Other platform targets are not Kenji Mouri's responsibility until the platform
+targets mentioned above are finished and the first stable release is released.
+Those platform targets also require help from the community.
+
+## Reference Platform Specification for Mobility
+
+The Reference Platform is Hyper-V Generation 2 Virtual Machines. The following
+requirements apply to this platform target:
+
+- Require x86 (64-Bit) guests with a minimum of 48 MiB of memory.
+- Use a 1:1 identity page table, with the largest page-table entry available
+  without any extra settings. For example, on x86 (64-Bit), use 2 MiB pages
+  instead of 1 GiB pages.
+
+The current page table layout is chosen to reduce memory usage, and it is also
+natural for unikernel-style operating system projects.
+
+Although Hyper-V Generation 2 Virtual Machines support ARM (64-Bit) guests, and
+Kenji Mouri has created the https://github.com/ProjectMile/Mile.HyperV project
+and collected a rich set of Hyper-V guest interface definitions for both x86
+(64-Bit) and ARM (64-Bit), given the practical limits of Kenji Mouri's time,
+resources, and technical capacity, Kenji Mouri is currently working only on x86
+(64-Bit) guests on Hyper-V Generation 2 Virtual Machines until this target is
+finished and the first stable release is released.
+
+The following are the reasons for requiring a minimum of 48 MiB of memory for
+Hyper-V Generation 2 Virtual Machines:
 
 - Although 32 MiB is the minimum memory size supported by Hyper-V Generation 2
   Virtual Machines, it may not be sufficient in some scenarios:
   - On Windows 11 or later hosts, the Hyper-V UEFI firmware requires more than
     32 MiB of memory to load UEFI binaries larger than 1 MiB.
-  - On x86-64 CPUs that report more than 39 physical address bits, the UEFI
-    firmware consumes more memory due to its use of a 1:1 identity page table.
+  - On x86 (64-Bit) CPUs that report more than 39 physical address bits, the
+    UEFI firmware consumes more memory due to its use of a 1:1 identity page
+    table.
 - However, requiring 64 MiB would be excessive for the project design, and
-  40 MiB may not be enough for future Windows versions. Here are some notes 
-  based on running a customized 900 KiB size UEFI shell.
-    - Intel Core i7-7700K with Windows 10, version 2004 host: CPU reports 39
-      physical address bits, and 8 MiB free memory for 32 MiB virtual machines.
-    - Intel Core i7-11800H with Windows 11, version 25H2 host: CPU reports 39
-      physical address bits, and 2 MiB free memory for 32 MiB virtual machines.
-    - AMD Ryzen 9 9950X with Windows 11, version 25H2 host: CPU reports 48
-      physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
-      because 32 MiB virtual machines will crash silently.
-    - AMD Ryzen 9 9950X with Windows 11, version 26H1 host: CPU reports 48
-      physical address bits, and 2 MiB free memory for 38 MiB virtual machines,
-      because 36 MiB virtual machines will crash with hanging at firmware
-      initialization.
+  40 MiB may not be enough for future Windows versions. Here are some notes
+  based on running a customized 900 KiB UEFI shell:
+  - Intel Core i7-7700K with Windows 10, version 2004 host: CPU reports 39
+    physical address bits, and 8 MiB free memory for 32 MiB virtual machines.
+  - Intel Core i7-11800H with Windows 11, version 25H2 host: CPU reports 39
+    physical address bits, and 2 MiB free memory for 32 MiB virtual machines.
+  - AMD Ryzen 9 9950X with Windows 11, version 25H2 host: CPU reports 48
+    physical address bits, and 2 MiB free memory for 34 MiB virtual machines,
+    because 32 MiB virtual machines will crash silently.
+  - AMD Ryzen 9 9950X with Windows 11, version 26H1 host: CPU reports 48
+    physical address bits, and 2 MiB free memory for 38 MiB virtual machines,
+    because 36 MiB virtual machines will hang during firmware initialization.
+- The 48 MiB baseline also provides a good low-memory starting point for
+  developing Mobility parts that are not platform-specific, which may help
+  future ports to bare-metal platforms such as SoCs and even MCUs.
 
-## The simple specification for Mobility Retrovisor (Retro-V)
+## Architecture Overview of Mobility Retrovisor (Retro-V)
 
-- Goals
-  - Kenji Mouri hopes to have an immersive experience for legacy x86-32 
-    operating systems on modern hardware with the UEFI Class 3 firmware.
-  - Kenji Mouri hopes to push the limits for ultra-lightweight system emulators.
-  - Kenji Mouri hopes to provide a fallback solution that can make hardware
-    vendors reduce legacy things easier and more reasonably, which he thinks can
-    help the industry.
-  - Kenji Mouri hopes to have a portable DOS platform.
-- Style: Type-1 Emulator, a term coined in homage to the Type-1 Hypervisor
-- Memory layout
-  - 1:1 identity page table for running the emulator
-  - Use the largest page table entry which is available without any extra
-    settings, for example, x64 is 2 MiB page, not the 1 GiB page
-  - Maximum page table defined address is 4 GiB
-- Emulated Hardware
-  - CPU: Intel Pentium Overdrive
-    - Interpreter with limited just in time binary translation
-    - No translation cache, which is good for self modified code and reduce
-      attack surface and errors
-    - ISA Level: 586 without MMX
-  - Motherboard: 486 and pure ISA as the baseline (a.k.a. Without PCI and ACPI)
-    - Intel Pentium Overdrive is designed for that
-    - Much simplified but enough for most old software
-    - Also good for passthrough PCI and ACPI if users want to use bare-metal
-    - Some emulated devices can be disabled if bare-metal has alternatives
-  - Input: PS/2 Keyboard & Mouse
-  - Graphics: Cirrus Logic 54xx Compatible
-    - Because Windows XP also supports that
-    - Cirrus Logic 5434 4 MiB, for 1024x768 support
-      - Windows 2000 and Windows XP can identify 4 MiB video memory, but only
-        supports 1024x768 16bpp like the 2 MiB video memory.
-      - Windows 98 can use 1024x768 24bpp with 4 MiB video memory.
-  - Sound: Sound Blaster 16 Compatible
-  - Network: Novell NE2000 Compatible
-  - Firmware: High Level Emulation BIOS
-    - Only with necessary stubs in guest
-    - Reduce the maintenance cost
-    - Improve the performance
-    - Optional MO-DOS mode (Mobility DOS, High Level Emulation DOS)
-  - Not mentioned devices:
-    - Follow the mainstream legacy PC conventions
-    - For example, storage will use IDE
-- Guest OS Support
-  - DOS
-  - DOS Applications if MO-DOS mode enabled
-  - Windows XP or earlier
-    - Windows 98 and Windows 2000 should have out-of-the-box experience.
-    - You need to use upgrade installation from Windows 2000 if you want to use
-      Windows XP with proper configured graphics and network drivers.
-- Possible Independent Backends
-  - Hyper-V Generation 2 Virtual Machines
-    - Maintained by Kenji Mouri
-    - The reference and prototype platform
-    - Retro-V will use 8 MiB memory for itself, including:
-      - Unikernel a.k.a. runtime part including the page table
-      - Emulator contexts including the video memory
-      - Not including the guest memory and memory from MMIO
-  - UEFI without calling ExitBootServices
-    - Maintained by Kenji Mouri
-    - Not the goal if the reference and prototype platform is not ready
-  - VirtIO compatible platform like KVM and Xen
-    - Maintained by community
-    - Not the goal if the reference and prototype platform is not ready
-- User Experience
-  - Ctrl+Alt+Del for runtime menu
-    - Send Ctrl+Alt+Del to guest
-    - Cancel
-    - Change guest resource settings like floppy and cdrom
-    - Force Poweroff
-    - Force Restart
-  - Version notice and Ctrl+Alt+Del notice at initialization
-  - Support Hyper-V Basic Session and Enhanced Session
-  - If the legacy OS partition is FAT series, we can add /EFI/Boot/bootx64.efi
-    a.k.a. Retro-V itself to make the legacy OS great again
+Currently, Mobility Retrovisor (Retro-V) is the main practical form of Mobility.
+It is intended to provide an immersive experience for legacy x86 (32-bit)
+operating systems on modern hardware with UEFI Class 3 firmware, to provide a
+portable DOS platform, and to push the limits of ultra-lightweight system
+emulators. Mobility Retrovisor (Retro-V) is also intended to provide a fallback
+solution that can make it easier and more reasonable for hardware vendors to
+reduce legacy components, which Kenji Mouri believes can help the industry.
+
+Given the practical limits of Kenji Mouri's time, resources, and technical
+capacity, he concluded that the most feasible way to realize this vision is
+through a specialized Type-1 Emulator, a term coined in homage to the Type-1
+Hypervisor.
+
+Mobility Retrovisor (Retro-V) is an emulator that runs directly on the platform
+layer while emulating a pure legacy x86 ISA-bus platform, effectively a
+486-class ISA machine paired with a 586-class Pentium OverDrive CPU. This pure
+ISA baseline is intentional: rather than making newer standards such as PCI,
+AGP, or PCIe part of the canonical emulated platform, Retro-V leaves open the
+possibility of direct passthrough for users who want to experiment with modern,
+real hardware.
+
+In the Unikernel part, Mobility Retrovisor (Retro-V) consists of the Retrovisor
+part, namely Mobility Retrovisor (Retro-V) itself, and the Guest part, which is
+the emulated environment provided by Mobility Retrovisor (Retro-V).
+
+Mobility Retrovisor (Retro-V) is designed to support the following scenarios:
+
+- DOS
+- DOS applications, if Mobility DOS (MO-DOS) mode is enabled
+- Windows XP or earlier
+  - Windows 98 and Windows 2000 should have an out-of-the-box experience.
+  - Windows XP requires an upgrade installation from Windows 2000 if users want
+    properly configured graphics and network drivers.
+- Other legacy x86 (32-bit) operating systems that support a pure legacy x86
+  ISA-bus platform.
+
+Windows XP and operating systems outside the primary Mobility Retrovisor
+(Retro-V) scenarios may be better served by other solutions when users need a
+full general-purpose virtual machine experience.
+
+## Reference Platform Specification for Mobility Retrovisor (Retro-V)
+
+The following extra requirements apply to Mobility Retrovisor (Retro-V) on this
+platform target:
+
+- The maximum page-table-defined address is 4 GiB.
+- Mobility Retrovisor (Retro-V) will keep its own memory usage within 8 MiB,
+  including:
+  - Reserved memory for UEFI Runtime Services, ACPI, etc.
+  - The Mobility Retrovisor (Retro-V) executable image.
+  - Platform contexts, including:
+    - Memory-management overhead, including the page table.
+    - Contexts for using Hyper-V Guest Interfaces.
+  - Emulator contexts, including backing memory for guest MMIO, such as video
+    memory.
+- The 8 MiB budget does not include guest RAM.
+- The 8 MiB budget does not include platform MMIO.
 
 ## Emulated Hardware Specification for Mobility Retrovisor (Retro-V)
 
@@ -207,3 +257,64 @@ Work In Progress
 - 0x03F7: Floppy Disk Controller
 - 0x03F8 - 0x03FF: COM1
 - 0x46E8: Video Card
+
+### Reasons
+
+Here are the real minimum hardware requirements for Windows XP x86 (32-bit):
+
+- An x86 processor compatible with the original Pentium, also known as i586 or
+  P5, because CPUID and CMPXCHG8B are required.
+- Legacy BIOS firmware, which is supported by all x86 (32-bit) Windows versions.
+- ACPI-compliant firmware is not required for Windows XP. Beginning with Windows
+  Vista and Windows Server 2008, ACPI-compliant firmware dated January 1, 1999
+  or later is required.
+- The memory and storage requirements can be much more flexible.
+
+Therefore, the actual oldest practical platform for running Windows XP x86
+(32-bit) can be:
+
+- Intel Pentium OverDrive, a processor with the original Pentium, also known as
+  i586 or P5, ISA level without MMX.
+- A pure 486 ISA platform, because Intel Pentium OverDrive was designed as an
+  upgrade processor for 486 platform users, and 486 platforms can have pure ISA
+  boards.
+
+This combination is much simpler than later PC platforms, but is still enough
+for most old software. For example, the baseline is pure ISA without PCI and
+ACPI. This also keeps future bare-metal scenarios simpler if users want to use
+passthrough PCI and ACPI in future releases. In that scenario, some emulated
+devices can be disabled if bare-metal alternatives are available.
+
+Mobility Retrovisor (Retro-V) also chooses a Cirrus Logic 54xx compatible
+graphics adapter with 4 MiB of Video RAM (VRAM) because:
+
+- Windows 9x and Windows 2000 have built-in drivers for this device.
+- Windows XP also has the built-in driver binaries, but they are only usable
+  through an upgrade installation from Windows 2000. Upgrade installation from
+  Windows 9x has not been tested.
+- Windows 2000 and Windows XP can identify 4 MiB of video memory, but only
+  support 1024x768 16bpp, the same as with 2 MiB of video memory.
+- Windows 98 can use 1024x768 24bpp with 4 MiB of video memory.
+
+## Open Design Items for Mobility Retrovisor (Retro-V)
+
+- Emulation Implementation
+  - Interpreter with limited just in time binary translation
+  - No translation cache, which is good for self modified code and reduce attack
+    surface and errors
+- Firmware: High Level Emulation BIOS
+  - Only with necessary stubs in guest
+  - Reduce the maintenance cost
+  - Improve the performance
+  - Optional MO-DOS mode (Mobility DOS, High Level Emulation DOS)
+- User Experience
+  - Ctrl+Alt+Del for runtime menu
+    - Send Ctrl+Alt+Del to guest
+    - Cancel
+    - Change guest resource settings like floppy and cdrom
+    - Force Poweroff
+    - Force Restart
+  - Version notice and Ctrl+Alt+Del notice at initialization
+  - Support Hyper-V Basic Session and Enhanced Session
+  - If the legacy OS partition is FAT series, we can add /EFI/Boot/bootx64.efi
+    a.k.a. Retro-V itself to make the legacy OS great again

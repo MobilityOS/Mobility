@@ -48,7 +48,7 @@ to create this project as the middle stage of the whole Mobility project.
 ## Supported Platforms
 
 - Hyper-V Generation 2 Virtual Machines as the reference platform
-  - x86-64 guests with minimum 48 MiB of memory
+  - x86 (64-Bit) guests with a minimum of 48 MiB of memory
 
 > [!NOTE]
 > Read [Mobility Design Documents] for more
