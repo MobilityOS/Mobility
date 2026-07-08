@@ -15,10 +15,10 @@
     <MileProjectVersion>1.0.$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse('2024-11-04'))).TotalDays).0</MileProjectVersion>
     <MileProjectVersionTag Condition="false">Alpha 1</MileProjectVersionTag>
   </PropertyGroup>
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Platform.x64.props" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Cpp.Default.props" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Cpp.props" />
-  <Import Sdk="Mile.Uefi" Version="1.0.1898" Project="Mile.Uefi.props" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.props" />
+  <Import Sdk="Mile.Uefi" Project="Mile.Uefi.props" />
   <Import Project="..\Mobility.Core\Mobility.Core.props" />
   <Import Project="..\Mobility.Core.Uefi\Mobility.Core.Uefi.props" />
   <Import Project="..\Mobility.Core.HyperV\Mobility.Core.HyperV.props" />
@@ -33,6 +33,6 @@
       <Version>1.1.602</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Sdk="Mile.Uefi" Version="1.0.1898" Project="Mile.Uefi.targets" />
-  <Import Sdk="Mile.Project.Configurations" Version="1.0.1917" Project="Mile.Project.Cpp.targets" />
+  <Import Sdk="Mile.Uefi" Project="Mile.Uefi.targets" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.targets" />
 </Project>
