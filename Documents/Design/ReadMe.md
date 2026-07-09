@@ -296,6 +296,78 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
   support 1024x768 16bpp, the same as with 2 MiB of video memory.
 - Windows 98 can use 1024x768 24bpp with 4 MiB of video memory.
 
+## User Experience Specification for Mobility Retrovisor (Retro-V)
+
+- Runtime Menu
+  - Entry Points
+    - Hyper-V Generation 2 Virtual Machines: Ctrl + Alt + Del
+    - Windows desktop application: top-bar button in the emulator window
+    - Other Platform: T.B.D.
+  - Menu Items
+    - Send Ctrl + Alt + Del to the Guest.
+    - Change Guest runtime settings.
+      - Change the Floppy images.
+      - Change the CD-ROM images.
+    - Force Power Off the Guest.
+    - Force Restart the Guest.
+    - Return to the Guest, a.k.a. Cancel.
+- Floppy Support
+  - Hyper-V Generation 2 Virtual Machines
+    - Only read-only mode is supported.
+    - Runtime Floppy image changes are supported only among the Floppy images
+      preloaded during Mobility Retrovisor (Retro-V) initialization.
+    - The first preloaded Floppy image will be selected at Power On.
+  - Windows desktop application
+    - Read and write are supported.
+    - Changing to any suitable Floppy image is supported.
+  - Other Platform: T.B.D.
+- CD-ROM Support
+  - Hyper-V Generation 2 Virtual Machines
+    - Only raw block devices exposed by Virtual Machines are supported.
+    - CD-ROM images are not supported.
+    - Runtime changes are not supported.
+  - Windows desktop application
+    - Only CD-ROM images are supported.
+    - Changing to any suitable CD-ROM image is supported.
+  - Other Platform: T.B.D.
+- Hard Drive Support
+  - Hyper-V Generation 2 Virtual Machines
+    - Only raw block devices exposed by Virtual Machines are supported.
+    - Hard Drive images are not supported.
+  - Windows desktop application
+    - Only Hard Drive images are supported.
+  - Other Platform: T.B.D.
+- Interaction
+  - Hyper-V Generation 2 Virtual Machines
+    - Hyper-V Basic Session
+    - Hyper-V Enhanced Session over VMBus
+      - Based on Mobility Alice
+  - Windows desktop application
+    - Standard Emulator Window Mode
+    - Microsoft Remote Desktop Protocol (RDP) over TCP
+      - Based on Mobility Alice
+  - Other Platform: T.B.D.
+- Initialization
+  - Parse and load the configuration file.
+  - Display version information.
+  - Display Runtime Menu entry information.
+  - If the legacy OS partition uses a FAT-family file system, Retro-V can add
+    `/EFI/Boot/bootx64.efi`, a.k.a. Retro-V itself, to make the legacy OS great
+    again.
+
+## Stage 1 of the First Stable Release for Mobility Retrovisor (Retro-V)
+
+For easier implementation, the First Stable Release should include a Stage 1.
+This stage is intended to help implement and test emulated devices.
+
+- Emulated Hardware
+  - Change the Processor to Intel 8088.
+  - Change the Video Card to Standard VGA.
+  - No Sound Card.
+- Interaction
+  - No Hyper-V Enhanced Session over VMBus.
+  - No Microsoft Remote Desktop Protocol (RDP) over TCP.
+
 ## Open Design Items for Mobility Retrovisor (Retro-V)
 
 - Emulation Implementation
@@ -307,14 +379,3 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
   - Reduce the maintenance cost
   - Improve the performance
   - Optional MO-DOS mode (Mobility DOS, High Level Emulation DOS)
-- User Experience
-  - Ctrl+Alt+Del for runtime menu
-    - Send Ctrl+Alt+Del to guest
-    - Cancel
-    - Change guest resource settings like floppy and cdrom
-    - Force Poweroff
-    - Force Restart
-  - Version notice and Ctrl+Alt+Del notice at initialization
-  - Support Hyper-V Basic Session and Enhanced Session
-  - If the legacy OS partition is FAT series, we can add /EFI/Boot/bootx64.efi
-    a.k.a. Retro-V itself to make the legacy OS great again
