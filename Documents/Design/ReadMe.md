@@ -168,9 +168,9 @@ platform target:
   - Platform contexts, including:
     - Memory-management overhead, including the page table.
     - Contexts for using Hyper-V Guest Interfaces.
-  - Emulator contexts, including backing memory for guest MMIO, such as video
-    memory.
-- The 8 MiB budget does not include guest RAM.
+  - Emulator contexts, including virtual CPU register contexts.
+- The 8 MiB budget does not include guest RAM, guest MMIO like video memory and
+  user payloads.
 - The 8 MiB budget does not include platform MMIO.
 
 ## Emulated Hardware Specification for Mobility Retrovisor (Retro-V)
