@@ -228,8 +228,8 @@ MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryRanges(
         // No Memory Affinity Structure found.
         return MO_RESULT_ERROR_NO_INTERFACE;
     }
-    MO_UINT16 Size = static_cast<MO_UINT16>(
-        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count);
+    MO_UINTN Size =
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count;
 
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM Ranges = nullptr;
     if (MO_RESULT_SUCCESS_OK != ::MoPlatformHeapAllocate(
@@ -370,8 +370,8 @@ MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMergedMemoryRanges(
         ::MoPlatformHeapFree(MemoryRanges);
         return MO_RESULT_ERROR_UNEXPECTED;
     }
-    MO_UINT16 Size = static_cast<MO_UINT16>(
-        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count);
+    MO_UINTN Size =
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * Count;
 
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM MergedRanges = nullptr;
     if (MO_RESULT_SUCCESS_OK != ::MoPlatformHeapAllocate(
@@ -433,8 +433,8 @@ MO_EXTERN_C MO_RESULT MOAPI MoUefiAcpiQueryMemoryHoles(
     }
 
     MO_UINTN HoleCount = MergedMemoryRangesCount - 1;
-    MO_UINT16 Size = static_cast<MO_UINT16>(
-        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * HoleCount);
+    MO_UINTN Size =
+        sizeof(MO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM) * HoleCount;
     PMO_UEFI_ACPI_SIMPLE_MEMORY_RANGE_ITEM Holes = nullptr;
     if (MO_RESULT_SUCCESS_OK != ::MoPlatformHeapAllocate(
         reinterpret_cast<PMO_POINTER>(&Holes),
