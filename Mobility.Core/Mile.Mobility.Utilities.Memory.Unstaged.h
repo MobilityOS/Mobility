@@ -129,4 +129,31 @@ MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeOverlaps(
     _Mo_In_Opt_ MO_CONSTANT_POINTER RightBaseAddress,
     _Mo_In_ MO_UINTN RightLength);
 
+/**
+  * @brief Determines whether a range within a memory block is valid.
+  * @param StartAddress The optional pointer to the variable that receives the
+  *                     start address of the range within the memory block.
+  *                     StartAddress may be null. If the return value is
+  *                     MO_FALSE, the value pointed to by StartAddress is not
+  *                     modified. If Length is zero, the received address may
+  *                     be an end boundary address and is not guaranteed to be
+  *                     readable or writable.
+  * @param MemoryBlock The pointer to the memory block structure. MemoryBlock
+  *                    must not be null.
+  * @param Index The starting index, in bytes, of the range within the memory
+  *              block.
+  * @param Length The length, in bytes, of the range.
+  * @return MO_TRUE if the memory block is a valid memory range representation,
+  *         the index computation does not wrap around, and the half-open index
+  *         range [Index, Index + Length) is fully contained in
+  *         [0, MemoryBlock->Size). MO_FALSE otherwise. This function only
+  *         validates the range representation; it does not prove that the
+  *         memory range is actually readable or writable.
+  */
+MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryBlockValidate(
+    _Mo_Out_Opt_ PMO_POINTER StartAddress,
+    _Mo_In_ PMO_MEMORY_BLOCK MemoryBlock,
+    _Mo_In_ MO_UINTN Index,
+    _Mo_In_ MO_UINTN Length);
+
 #endif // !MILE_MOBILITY_UTILITIES_MEMORY_UNSTAGED

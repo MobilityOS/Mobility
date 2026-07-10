@@ -128,3 +128,50 @@ MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeOverlaps(
 
     return MO_FALSE;
 }
+
+MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryBlockValidate(
+    _Mo_Out_Opt_ PMO_POINTER StartAddress,
+    _Mo_In_ PMO_MEMORY_BLOCK MemoryBlock,
+    _Mo_In_ MO_UINTN Index,
+    _Mo_In_ MO_UINTN Length)
+{
+    if (!MemoryBlock)
+    {
+        return MO_FALSE;
+    }
+
+    {
+        MO_POINTER BaseAddress = MemoryBlock->BaseAddress;
+        MO_UINTN Size = MemoryBlock->Size;
+        MO_UINTN EndIndex = 0;
+
+        if (!MoMileMemoryRangeValidate(
+            nullptr,
+            BaseAddress,
+            Size))
+        {
+            return MO_FALSE;
+        }
+
+        if (!MoMileFixedIntegerCheckedAddition(
+            &EndIndex,
+            MO_FALSE,
+            Index,
+            Length))
+        {
+            return MO_FALSE;
+        }
+
+        if (EndIndex > Size)
+        {
+            return MO_FALSE;
+        }
+
+        if (StartAddress)
+        {
+            *StartAddress = ((MO_POINTER)(((MO_UINTN)(BaseAddress)) + Index));
+        }
+    }
+
+    return MO_TRUE;
+}
