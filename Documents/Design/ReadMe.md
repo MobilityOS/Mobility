@@ -22,7 +22,7 @@ The Platform part of Mobility can target the following possible platforms:
 - VirtIO-compatible virtualization platforms, such as KVM and Xen.
 - UEFI without calling ExitBootServices(), as a fallback, especially for
   bare-metal platforms with UEFI support.
-- Windows desktop application, for development use only.
+- Windows Desktop Application, for development use only.
 
 The Reference Platform is Hyper-V Generation 2 Virtual Machines for the
 following reasons:
@@ -46,7 +46,7 @@ following reasons:
   community contributions to support his continued participation in the program
   in the years ahead.
 
-The Windows desktop application platform target is intended for development use
+The Windows Desktop Application platform target is intended for development use
 only for the following reasons:
 
 - Users already have much better choices for conventional application scenarios
@@ -59,7 +59,7 @@ Kenji Mouri is currently working only on the following possible platform
 targets:
 
 - Hyper-V Generation 2 Virtual Machines
-- Windows desktop application
+- Windows Desktop Application
 
 Other platform targets are not Kenji Mouri's responsibility until the platform
 targets mentioned above are finished and the first stable release is released.
@@ -301,7 +301,7 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
 - Runtime Menu
   - Entry Points
     - Hyper-V Generation 2 Virtual Machines: Ctrl + Alt + Del
-    - Windows desktop application: top-bar button in the emulator window
+    - Windows Desktop Application: top-bar button in the emulator window
     - Other Platform: T.B.D.
   - Menu Items
     - Send Ctrl + Alt + Del to the Guest.
@@ -317,7 +317,7 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
     - Runtime Floppy image changes are supported only among the Floppy images
       preloaded during Mobility Retrovisor (Retro-V) initialization.
     - The first preloaded Floppy image will be selected at Power On.
-  - Windows desktop application
+  - Windows Desktop Application
     - Read and write are supported.
     - Changing to any suitable Floppy image is supported.
   - Other Platform: T.B.D.
@@ -326,7 +326,7 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
     - Only raw block devices exposed by Virtual Machines are supported.
     - CD-ROM images are not supported.
     - Runtime changes are not supported.
-  - Windows desktop application
+  - Windows Desktop Application
     - Only CD-ROM images are supported.
     - Changing to any suitable CD-ROM image is supported.
   - Other Platform: T.B.D.
@@ -334,7 +334,7 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
   - Hyper-V Generation 2 Virtual Machines
     - Only raw block devices exposed by Virtual Machines are supported.
     - Hard Drive images are not supported.
-  - Windows desktop application
+  - Windows Desktop Application
     - Only Hard Drive images are supported.
   - Other Platform: T.B.D.
 - Interaction
@@ -342,7 +342,7 @@ graphics adapter with 4 MiB of Video RAM (VRAM) because:
     - Hyper-V Basic Session
     - Hyper-V Enhanced Session over VMBus
       - Based on Mobility Alice
-  - Windows desktop application
+  - Windows Desktop Application
     - Standard Emulator Window Mode
     - Microsoft Remote Desktop Protocol (RDP) over TCP
       - Based on Mobility Alice
