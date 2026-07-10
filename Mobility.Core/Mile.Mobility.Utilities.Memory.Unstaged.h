@@ -20,6 +20,42 @@
  */
 
 /**
+ * @brief The structure for describing a contiguous memory block.
+ */
+typedef struct _MO_MEMORY_BLOCK
+{
+    /**
+     * @brief The base address of the memory block.
+     */
+    MO_POINTER BaseAddress;
+    /**
+     * @brief The size, in bytes, of the memory block.
+     */
+    MO_UINTN Size;
+} MO_MEMORY_BLOCK, *PMO_MEMORY_BLOCK;
+
+#ifndef MO_MEMORY_BLOCK_INITIALIZER
+/**
+ * @brief Expands to an initializer for a memory block structure.
+ * @param BaseAddress The base address of the memory block.
+ * @param Size The size, in bytes, of the memory block.
+ */
+#define MO_MEMORY_BLOCK_INITIALIZER(BaseAddress, Size) \
+    { (BaseAddress), (Size) }
+#endif // !MO_MEMORY_BLOCK_INITIALIZER
+
+#ifndef MO_MEMORY_BLOCK_EXPAND_ARGUMENTS
+/**
+ * @brief Expands a memory block structure into its base address and size
+ *        arguments.
+ * @param MemoryBlock The pointer to the memory block structure.
+ */
+#define MO_MEMORY_BLOCK_EXPAND_ARGUMENTS(MemoryBlock) \
+    (MemoryBlock)->BaseAddress, \
+    (MemoryBlock)->Size
+#endif // !MO_MEMORY_BLOCK_EXPAND_ARGUMENTS
+
+/**
   * @brief Determines whether a memory range representation is valid.
   * @param EndAddress The optional pointer to the variable that receives the end
   *                   boundary address of the memory range. EndAddress may be
