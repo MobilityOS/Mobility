@@ -6,7 +6,11 @@
 
 All multi-byte integer fields are stored in little-endian byte order.
 
+Each block must be written in ascending byte-offset order.
+
 ### Superblock (Block 0)
+
+The superblock is immutable.
 
 | Offset           | Size              | Field                      |
 |------------------|-------------------|----------------------------|
@@ -54,6 +58,8 @@ Every block after Block 0 uses the following layout:
 |1| Block Index                                                 |
 ```
 
+For a Stop block, the payload area after the Remaining Size is used as padding.
+
 #### Generation / Padding
 
 Content objects are immutable, so this field is used as padding.
@@ -80,3 +86,25 @@ Content objects use the following payload layout:
 | Offset | Size     | Field        |
 |--------|----------|--------------|
 | `0`    | Variable | Content Data |
+
+## Size Limitations
+
+The block size must be a power of 2.
+
+- Theoretical Limits
+  - Block Size
+    - Minimum: 4 KiB
+    - Maximum: 2 GiB
+  - Storage Size
+    - Minimum: 24 KiB
+      - 1 Superblock
+      - 1 Session List object with 1 Metadata Content
+      - 1 Session object with 1 Metadata Content and 1 Content object
+    - Maximum: 8 EiB - 2 GiB
+- Practical Limits
+  - Block Size
+    - Minimum: 4 KiB
+    - Maximum: 16 MiB
+  - Storage Size
+    - Minimum: 256 KiB
+    - Maximum: 64 GiB
