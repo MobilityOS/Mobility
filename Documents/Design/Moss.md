@@ -61,8 +61,8 @@ Every block after Block 0 uses the following layout:
 |1| Block Index                                                 |
 ```
 
-A Content object consists of zero or more Block Index blocks followed by exactly
-one Stop block. If any Block Index blocks are present, they are indexed
+Every object consists of zero or more Block Index blocks followed by exactly one
+Stop block. If any Block Index blocks are present, they are indexed
 consecutively in object order, starting at `0`. Each Block Index block contains
 a full Payload and uses the Block Index form of the Length field.
 

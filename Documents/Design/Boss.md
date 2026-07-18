@@ -13,12 +13,12 @@
     - Interrupts and Events
     - Timers
     - Memory
-  - Devices
-    - Display (optional; required for the framebuffer console)
-    - Keyboard (optional; required for local keyboard interaction)
-    - Network (optional; may be provided through a separate UART)
-    - Storage
-    - UART
+  - Devices (all devices are optional)
+    - Display: required for the framebuffer console
+    - Keyboard: required for local keyboard interaction
+    - Network: required unless a separate UART is available as an alternative
+    - Storage: required unless a remote instance is available
+    - UART: required unless other input and/or output devices are available
   - Infrastructure
     - Scheduler
     - Task Pool
@@ -34,3 +34,12 @@
 - Minimum Prototype Configuration
   - Memory: 48 MiB
   - Storage: 256 MiB
+
+## Philosophies (boss-like)
+
+> A session may be presented as a chat.
+
+- Everything is a Session
+- Sessions as Applications
+- Sessions as Tasks
+- Tool Calling as System Services
