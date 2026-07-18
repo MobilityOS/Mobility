@@ -43,3 +43,5 @@
 - Sessions as Applications
 - Sessions as Tasks
 - Tool Calling as System Services
+- Software as a Session (SaaS)
+- Session-defined Hardware (SDH)
