@@ -61,7 +61,18 @@ Every block after Block 0 uses the following layout:
 |1| Block Index                                                 |
 ```
 
-For a Stop block, the payload area after the Remaining Size is used as padding.
+A Content object consists of zero or more Block Index blocks followed by exactly
+one Stop block. If any Block Index blocks are present, they are indexed
+consecutively in object order, starting at `0`. Each Block Index block contains
+a full Payload and uses the Block Index form of the Length field.
+
+The Stop block uses the Remaining Size form of the Length field and stores the
+remaining Content Data in the first `Remaining Size` bytes of its Payload. The
+rest of the Payload must be filled with zero-valued padding bytes.
+
+The Remaining Size must be less than `Block Size - 16`. If the Content Data is
+empty or its size is an exact multiple of `Block Size - 16`, the Stop block has
+a Remaining Size of `0` and its entire Payload is padding.
 
 #### Generation / Padding
 
