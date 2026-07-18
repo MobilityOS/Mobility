@@ -6,7 +6,10 @@
 
 All multi-byte integer fields are stored in little-endian byte order.
 
-Each block must be written in ascending byte-offset order.
+All padding bytes must be set to zero.
+
+The byte range `[0, Block Size)` of each block must be written one byte at a
+time in strictly ascending byte-offset order.
 
 ### Superblock (Block 0)
 
@@ -18,7 +21,7 @@ The superblock is immutable.
 | `1`              | 1 byte            | Signature (`'o'`)          |
 | `2`              | 1 byte            | Signature (`'S'`)          |
 | `3`              | 1 byte            | Signature (`'S'`)          |
-| `4`              | 4 bytes           | Format Version             |
+| `4`              | 4 bytes           | Format Version (`1`)       |
 | `8`              | 4 bytes           | Block Size                 |
 | `12`             | 4 bytes           | Total Block Count          |
 | `16`             | `Block Size - 24` | Padding                    |
@@ -86,6 +89,23 @@ Content objects use the following payload layout:
 | Offset | Size     | Field        |
 |--------|----------|--------------|
 | `0`    | Variable | Content Data |
+
+#### CRC-32
+
+The CRC-32 field uses the standard CRC-32 algorithm (CRC-32/ISO-HDLC).
+
+This is the conventional CRC-32 algorithm used by Ethernet, ZIP, gzip, zlib,
+and PNG. CRC-32C and other CRC-32 variants are not used.
+
+For the Superblock, the CRC-32 is calculated over the byte range
+`[4, Block Size - 6)`. This includes all bytes after the Signature and before
+the CRC-32 field.
+
+For every block after Block 0, the CRC-32 is calculated over the byte range
+`[0, Block Size - 6)`. This includes all bytes before the CRC-32 field.
+
+The CRC-32 field and the Completion Marker bytes are not included in the
+CRC-32 calculation.
 
 ## Size Limitations
 
