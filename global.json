@@ -1,6 +1,6 @@
 ﻿{
   "msbuild-sdks": {
-    "Mile.Project.Configurations": "1.0.2069",
+    "Mile.Project.Configurations": "1.0.2075",
     "Mile.Uefi": "1.0.1908"
   }
 }
