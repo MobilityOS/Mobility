@@ -2,14 +2,51 @@
 
 **Work In Progress**
 
+## Design Context
+
+This section is non-normative.
+
+Mobility Session Storage (MoSS) is a specialized filesystem for storing chat
+sessions. It primarily targets MCU-class devices and virtual-machine guests
+without a general-purpose operating system. A POSIX filesystem can be emulated
+on top of Mobility Session Storage (MoSS), but doing so is strongly discouraged
+because general-purpose filesystem workloads are not its intended use.
+
+The design favors reliability and minimal erase/program activity over
+throughput and initialization latency. Existing valid data is modified as
+little as possible: the Superblock and Content objects are immutable, while
+Session and Session List objects are replaced by newer generations.
+
+When an FTL is present, physical wear leveling and bad-block management are
+storage firmware responsibilities. On directly managed erase-before-write
+media, the immutable and generational layout helps the backend minimize
+erase/program operations. Medium-specific mechanisms such as ECC and bad-block
+handling remain backend responsibilities.
+
+Directly managed MCU storage is expected to be small enough for initialization
+scanning. Larger virtual storage configurations are expected to provide memory
+appropriate to their capacity for reconstructed indexes and caching. This
+trade-off avoids mutable on-disk allocation maps, journals, indexes, and
+checkpoints.
+
+Zero-valued padding is intentional. It produces canonical block images and,
+when the erased state is nonzero, helps offline binary analysis distinguish
+serialized blocks from untouched storage.
+
 ## On-disk Structures
 
 All multi-byte integer fields are stored in little-endian byte order.
 
 All padding bytes must be set to zero.
 
-The byte range `[0, Block Size)` of each block must be written one byte at a
-time in strictly ascending byte-offset order.
+Each block must be fully serialized into an in-memory image of exactly
+`Block Size` bytes before being submitted to the underlying storage.
+Serialization must write exactly one byte at each offset in
+`[0, Block Size)`, proceeding in strictly ascending byte-offset order.
+
+This requirement defines only the logical construction order of the block image.
+It does not prescribe the write granularity or persistence order of the
+underlying storage medium.
 
 ### Superblock (Block 0)
 
@@ -80,6 +117,11 @@ Content objects are immutable, so this field is used as padding.
 
 Session and Session List objects use this field as their generation number.
 
+Generation numbers are compared using 16-bit serial number arithmetic. Given
+generation numbers `A` and `B`, `A` is newer than `B` if and only if
+`0 < ((A - B) mod (2 ^ 16)) < (2 ^ 15)`. A difference of exactly `2 ^ 15` is
+ambiguous and must not occur between generations that may be compared.
+
 #### Payload
 
 Session and Session List objects use the following payload layout:
@@ -117,6 +159,42 @@ For every block after Block 0, the CRC-32 is calculated over the byte range
 
 The CRC-32 field and the Completion Marker bytes are not included in the
 CRC-32 calculation.
+
+## Operational Semantics
+
+### Generation Selection
+
+For each Session or Session List Identifier, the current generation is the
+newest generation that forms a complete and valid object according to the
+on-disk structure rules. Incomplete or invalid generations are ignored.
+
+### Write Order
+
+Objects written as part of an update must be completed in the following order:
+
+1. Content objects referenced by Session generations, including their Metadata
+   Content objects.
+2. The Session generations that reference those Content objects, together with
+   the Metadata Content objects referenced by Session List generations.
+3. The Session List generations that reference those Sessions and Metadata
+   Content objects.
+
+Each stage must be completed before the next stage begins. Each object must be
+written completely before any object that references it is written.
+
+### Lazy Reclamation
+
+Blocks are reclaimed only as part of a write operation.
+
+The following blocks may be overwritten:
+
+- Blocks belonging to superseded or invalid generations of Session or Session
+  List objects.
+- Blocks carrying a Content Identifier that is not referenced by any current
+  Session or Session List generation.
+
+Blocks reserved by an in-progress write must not be reclaimed. All other blocks
+must be preserved.
 
 ## Size Limitations
 
