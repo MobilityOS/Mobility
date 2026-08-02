@@ -4,8 +4,6 @@
 
 ## Design Context
 
-This section is non-normative.
-
 Mobility Session Storage (MoSS) is a specialized filesystem for storing chat
 sessions. It primarily targets MCU-class devices and virtual-machine guests
 without a general-purpose operating system. A POSIX filesystem can be emulated
@@ -17,11 +15,12 @@ throughput and initialization latency. Existing valid data is modified as
 little as possible: the Superblock and Content objects are immutable, while
 Session and Session List objects are replaced by newer generations.
 
-When an FTL is present, physical wear leveling and bad-block management are
-storage firmware responsibilities. On directly managed erase-before-write
-media, the immutable and generational layout helps the backend minimize
-erase/program operations. Medium-specific mechanisms such as ECC and bad-block
-handling remain backend responsibilities.
+Managed block storage exposes logical blocks while hiding medium-specific
+management; examples include controller-managed flash, hard disk drives, and
+virtual disks. On directly managed erase-before-write media, the immutable and
+generational layout helps the backend minimize erase/program operations.
+Medium-specific mechanisms such as wear leveling, ECC, and bad-block handling
+remain backend responsibilities.
 
 Directly managed MCU storage is expected to be small enough for initialization
 scanning. Larger virtual storage configurations are expected to provide memory
@@ -44,9 +43,9 @@ Each block must be fully serialized into an in-memory image of exactly
 Serialization must write exactly one byte at each offset in
 `[0, Block Size)`, proceeding in strictly ascending byte-offset order.
 
-This requirement defines only the logical construction order of the block image.
-It does not prescribe the write granularity or persistence order of the
-underlying storage medium.
+For managed block storage, this ordering requirement also applies to writes
+submitted to the underlying storage. Directly managed storage should preserve
+equivalent ordering and completion semantics as closely as the medium permits.
 
 ### Superblock (Block 0)
 
@@ -122,6 +121,10 @@ generation numbers `A` and `B`, `A` is newer than `B` if and only if
 `0 < ((A - B) mod (2 ^ 16)) < (2 ^ 15)`. A difference of exactly `2 ^ 15` is
 ambiguous and must not occur between generations that may be compared.
 
+In practice, 16 bits are sufficient. Directly managed storage is expected to be
+small, while managed block storage may use reclamation operations such as TRIM,
+shrinking, or compaction.
+
 #### Payload
 
 Session and Session List objects use the following payload layout:
@@ -186,15 +189,25 @@ written completely before any object that references it is written.
 
 Blocks are reclaimed only as part of a write operation.
 
-The following blocks may be overwritten:
+The live object graph has one root for each Session List Identifier that has a
+current generation. Multiple Session List objects may therefore be live at the
+same time.
 
-- Blocks belonging to superseded or invalid generations of Session or Session
-  List objects.
-- Blocks carrying a Content Identifier that is not referenced by any current
-  Session or Session List generation.
+- A Session List generation is live if and only if it is the current generation
+  of its Session List Identifier.
+- A Session generation is live if and only if it is the current generation of
+  its Session Identifier and that identifier is referenced by at least one live
+  Session List generation.
+- A Content object is live if and only if its Content Identifier is referenced
+  by at least one live Session generation, including as Metadata Content, or as
+  Metadata Content by at least one live Session List generation.
 
-Blocks reserved by an in-progress write must not be reclaimed. All other blocks
-must be preserved.
+Thus, each Session or Session List Identifier has at most one live generation.
+Blocks belonging to superseded, invalid, or non-live objects may be
+overwritten.
+
+Blocks reserved by an in-progress write must not be reclaimed. All blocks
+belonging to live objects must be preserved.
 
 ## Size Limitations
 
