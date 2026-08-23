@@ -1087,7 +1087,7 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_THR_OFFSET 0x00
 /**
- * @brief The Divisor Latch (Least Significant Byte (LS)) (DLL) register offset
+ * @brief The Divisor Latch (Least Significant Byte (LS)) (DLL) Register offset
  *        for the serial port for x64 PC platform when Divisor Latch Access Bit
  *        (DLAB) in Line Control Register (LCR) is set.
  */
@@ -1099,7 +1099,7 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
  */
 #define MO_PLATFORM_X64_SERIAL_PORT_IER_OFFSET 0x01
 /**
- * @brief The Divisor Latch (Most Significant Byte (MS)) (DLM) register offset
+ * @brief The Divisor Latch (Most Significant Byte (MS)) (DLM) Register offset
  *        for the serial port for x64 PC platform when Divisor Latch Access Bit
  *        (DLAB) in Line Control Register (LCR) is set.
  */
@@ -1160,40 +1160,27 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformSetIdtGateDescriptorOffset(
 typedef union _MO_PLATFORM_X64_SERIAL_PORT_REGISTER
 {
     /**
-     * @brief The raw data of the serial port register.
+     * @brief The raw 8-bit value of the serial port register.
+     * @remarks This member can be used to:
+     *          - Initialize the entire union by setting it to zero.
+     *          - Transfer register values through the 8-bit I/O port functions.
+     *          - Represent the complete 8-bit values of the following registers
+     *            without bit-field interpretation:
+     *            - Receive Buffer Register (RBR) (Read Only): The data received
+     *              from the serial port.
+     *            - Transmit Holding Register (THR) (Write Only): The data to be
+     *              transmitted to the serial port.
+     *            - Divisor Latch (Least Significant Byte (LS)) (DLL) Register:
+     *              The least significant byte of the divisor value for the
+     *              desired baud.
+     *            - Divisor Latch (Most Significant Byte (MS)) (DLM) Register:
+     *              The most significant byte of the divisor value for the
+     *              desired baud.
+     *            - Scratch Register (SCR): This register performs no function
+     *              in the UART. Any value can be written by the host to this
+     *              location and read by the host later on.
      */
     MO_UINT8 RawData;
-    /**
-     * @brief Receive Buffer Register (RBR) (Read Only)
-     */
-    struct
-    {
-        /**
-         * @brief The data received from the serial port.
-         */
-        MO_UINT8 Data;
-    } RBR;
-    /**
-     * @brief Transmit Holding Register (THR) (Write Only)
-     */
-    struct
-    {
-        /**
-         * @brief The data to be transmitted to the serial port.
-         */
-        MO_UINT8 Data;
-    } THR;
-    /**
-     * @brief Divisor Latch (Least Significant Byte (LS)) (DLL) register
-     */
-    struct
-    {
-        /**
-         * @brief The least significant byte of the divisor value for the
-         *        desired baud.
-         */
-        MO_UINT8 Data;
-    } DLL;
     /**
      * @brief Interrupt Enable Register (IER)
      */
@@ -1220,17 +1207,6 @@ typedef union _MO_PLATFORM_X64_SERIAL_PORT_REGISTER
          */
         MO_UINT8 Reserved : 4;
     } IER;
-    /**
-     * @brief Divisor Latch (Most Significant Byte (MS)) (DLM) register
-     */
-    struct
-    {
-        /**
-         * @brief The most significant byte of the divisor value for the desired
-         *        baud.
-         */
-        MO_UINT8 Data;
-    } DLM;
     /**
      * @brief Interrupt Identification Register (IIR) (Read Only)
      */
@@ -1435,19 +1411,8 @@ typedef union _MO_PLATFORM_X64_SERIAL_PORT_REGISTER
          */
         MO_UINT8 DCD : 1;
     } MSR;
-    /**
-     * @brief Scratch Register (SCR)
-     */
-    struct
-    {
-        /**
-         * @brief The data stored in the scratch register.
-         * @remark This register performs no function in the UART. Any value can
-         *         be written by the host to this location and read by the host
-         *         later on.
-         */
-        MO_UINT8 Data;
-    } SCR;
 } MO_PLATFORM_X64_SERIAL_PORT_REGISTER, *PMO_PLATFORM_X64_SERIAL_PORT_REGISTER;
+MO_C_STATIC_ASSERT(
+    sizeof(MO_PLATFORM_X64_SERIAL_PORT_REGISTER) == sizeof(MO_UINT8));
 
 #endif // !MOBILITY_PLATFORM_X64
