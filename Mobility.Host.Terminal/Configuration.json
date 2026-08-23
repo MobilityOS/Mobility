@@ -1,0 +1,23 @@
+﻿{
+  "Profiles": [
+    {
+      "Enabled": true,
+      "Name": "Mobility.TestVM (COM1)",
+      "Type": "NamedPipe",
+      "Resource": "Mobility.TestVM.ComPortPipe.1"
+    },
+    {
+      "Enabled": true,
+      "Name": "Mobility.TestVM (COM2)",
+      "Type": "NamedPipe",
+      "Resource": "Mobility.TestVM.ComPortPipe.2"
+    },
+    {
+      "Enabled": false,
+      "Name": "Serial Port Sample (COM1)",
+      "Type": "SerialPort",
+      "Resource": "COM1",
+      "Baud": 115200
+    }
+  ]
+}
