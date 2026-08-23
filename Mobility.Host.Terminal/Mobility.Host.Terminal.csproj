@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
+    <GenerateRuntimeConfigurationFiles Condition="'$(TargetFramework)' == 'netstandard2.0'">true</GenerateRuntimeConfigurationFiles>
+    <LangVersion>default</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
