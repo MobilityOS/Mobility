@@ -1415,4 +1415,65 @@ typedef union _MO_PLATFORM_X64_SERIAL_PORT_REGISTER
 MO_C_STATIC_ASSERT(
     sizeof(MO_PLATFORM_X64_SERIAL_PORT_REGISTER) == sizeof(MO_UINT8));
 
+/**
+ * @brief Initializes the specified serial port for polling-mode communication.
+ * @param Base The I/O port base address of the serial port. This parameter must
+ *             be one of the supported COM port base address constants.
+ * @param Baud The desired baud. This parameter must be non-zero and must not
+ *             exceed MO_PLATFORM_X64_SERIAL_PORT_BAUD_BASE.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks The serial port is configured for 8 data bits, one stop bit, no
+ *          parity, enabled FIFO, and disabled interrupts. Data Terminal Ready
+ *          (DTR) and Request To Send (RTS) are enabled. The baud divisor is
+ *          rounded to the nearest representable integer value.
+ */
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformSerialPortInitialize(
+    _Mo_In_ MO_UINT16 Base,
+    _Mo_In_ MO_UINT32 Baud);
+
+/**
+ * @brief Attempts to read one byte from the specified serial port without
+ *        blocking.
+ * @param Base The I/O port base address of the serial port. This parameter must
+ *             be one of the supported COM port base address constants.
+ * @param Data The non-null pointer that receives the byte read from the serial
+ *             port.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks If no data is available, the function returns
+ *          MO_RESULT_ERROR_PENDING and does not modify Data.
+ */
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformSerialPortTryRead(
+    _Mo_In_ MO_UINT16 Base,
+    _Mo_Out_ PMO_UINT8 Data);
+
+/**
+ * @brief Reads one byte from the specified serial port.
+ * @param Base The I/O port base address of the serial port. This parameter must
+ *             be one of the supported COM port base address constants.
+ * @param Data The non-null pointer that receives the byte read from the serial
+ *             port.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This function uses polling and blocks until data becomes available.
+ */
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformSerialPortRead(
+    _Mo_In_ MO_UINT16 Base,
+    _Mo_Out_ PMO_UINT8 Data);
+
+/**
+ * @brief Writes one byte to the specified serial port.
+ * @param Base The I/O port base address of the serial port. This parameter must
+ *             be one of the supported COM port base address constants.
+ * @param Data The byte to be written to the serial port.
+ * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
+ *         it returns an MO_RESULT error code.
+ * @remarks This function uses polling and blocks until the transmitter is ready
+ *          to accept the byte.
+ */
+MO_EXTERN_C MO_RESULT MOAPI MoPlatformSerialPortWrite(
+    _Mo_In_ MO_UINT16 Base,
+    _Mo_In_ MO_UINT8 Data);
+
 #endif // !MOBILITY_PLATFORM_X64
