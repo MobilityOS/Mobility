@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.IO.Pipes;
+﻿using System.IO.Pipes;
 using System.IO.Ports;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 
@@ -39,46 +37,9 @@ namespace Mobility.Host.Terminal
             }
         }
 
-        public static string GetGitRepositoryRootPath()
-        {
-            try
-            {
-                Process process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        CreateNoWindow = true,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        FileName = "git.exe",
-                        Arguments = "rev-parse --show-toplevel",
-                        WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
-                    }
-                };
-                if (process.Start())
-                {
-                    string result = process.StandardOutput.ReadToEnd().Trim();
-                    process.WaitForExit();
-                    if (process.ExitCode == 0)
-                    {
-                        if (!string.IsNullOrEmpty(result))
-                        {
-                            return Path.GetFullPath(result);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                // Git discovery is allowed to fail.
-            }
-
-            return string.Empty;
-        }
-
         private static ConfigurationDefinition LoadConfiguration()
         {
-            string repositoryRoot = GetGitRepositoryRootPath();
+            string repositoryRoot = Helpers.GetGitRepositoryRootPath();
 
             if (string.IsNullOrEmpty(repositoryRoot))
             {
@@ -438,85 +399,12 @@ namespace Mobility.Host.Terminal
             }
         }
 
-        [DllImport(
-            "kernel32.dll",
-            SetLastError = true)]
-        private static extern IntPtr GetStdHandle(
-            int standardHandle);
-
-        [DllImport(
-            "kernel32.dll",
-            SetLastError = true)]
-        private static extern bool GetConsoleMode(
-            IntPtr consoleHandle,
-            out uint consoleMode);
-
-        [DllImport(
-            "kernel32.dll",
-            SetLastError = true)]
-        private static extern bool SetConsoleMode(
-            IntPtr consoleHandle,
-            uint consoleMode);
-
-        private static bool IsWindows()
-        {
-#if NET462
-            return true;
-#elif NETSTANDARD2_0
-    return RuntimeInformation.IsOSPlatform(
-        OSPlatform.Windows);
-#else
-    return false;
-#endif
-        }
-
-        private static void EnableVirtualTerminalOutput()
-        {
-            const int standardOutputHandle = -11;
-            const uint enableVirtualTerminalProcessing = 0x0004;
-
-            if (!IsWindows())
-            {
-                return;
-            }
-
-            try
-            {
-                IntPtr outputHandle =
-                    GetStdHandle(standardOutputHandle);
-
-                if (outputHandle == IntPtr.Zero ||
-                    outputHandle == new IntPtr(-1))
-                {
-                    return;
-                }
-
-                if (!GetConsoleMode(
-                    outputHandle,
-                    out uint consoleMode))
-                {
-                    return;
-                }
-
-                SetConsoleMode(
-                    outputHandle,
-                    consoleMode |
-                    enableVirtualTerminalProcessing);
-            }
-            catch (DllNotFoundException)
-            {
-            }
-            catch (EntryPointNotFoundException)
-            {
-            }
-        }
-
         private static async Task<int> RunAsync()
         {
             Console.InputEncoding = TerminalEncoding;
             Console.OutputEncoding = TerminalEncoding;
 
-            EnableVirtualTerminalOutput();
+            Helpers.EnableVirtualTerminalOutput();
 
             bool originalTreatControlCAsInput =
                 Console.TreatControlCAsInput;
@@ -620,19 +508,22 @@ namespace Mobility.Host.Terminal
 
         static void Main(string[] args)
         {
+            int ExitCode = 0;
+
             try
             {
-                Environment.ExitCode = RunAsync().GetAwaiter().GetResult();
+                ExitCode = RunAsync().GetAwaiter().GetResult();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
+                ExitCode = 1;
                 Console.Error.WriteLine(
                     "Fatal error ({0}): {1}",
-                    exception.GetType().Name,
-                    exception.Message);
-
-                Environment.ExitCode = 1;
+                    ex.GetType().Name,
+                    ex.Message);
             }
+
+            Environment.ExitCode = ExitCode;
         }
     }
 }
