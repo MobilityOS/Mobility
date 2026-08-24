@@ -221,9 +221,7 @@ namespace Mobility.Host.Terminal
                 // Fail immediately if no pipe server is available.
                 pipe.Connect(0);
 
-                return new TerminalConnection(
-                    pipe,
-                    pipe);
+                return new TerminalConnection(pipe, pipe);
             }
             catch
             {
@@ -477,7 +475,7 @@ namespace Mobility.Host.Terminal
                         Console.WriteLine(
                             "Connection closed. Select another profile.");
                     }
-                    catch (Exception exception)
+                    catch (Exception ex)
                     {
                         Console.TreatControlCAsInput = false;
 
@@ -485,17 +483,17 @@ namespace Mobility.Host.Terminal
 
                         Console.Error.WriteLine(
                             "Connection failed ({0}): {1}",
-                            exception.GetType().Name,
-                            exception.Message);
+                            ex.GetType().Name,
+                            ex.Message);
                     }
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
                 Console.Error.WriteLine(
                     "Startup failed ({0}): {1}",
-                    exception.GetType().Name,
-                    exception.Message);
+                    ex.GetType().Name,
+                    ex.Message);
 
                 return 1;
             }
