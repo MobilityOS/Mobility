@@ -61,4 +61,5 @@ to create this project as the middle stage of the whole Mobility project.
 - [Documents](Documents/ReadMe.md)
 - [License](License.md)
 - [Release Notes](ReleaseNotes.md)
+- [Upstream Synchronization Status](Documents/UpstreamSynchronization.md)
 - [Versioning](Versioning.md)
