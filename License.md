@@ -11,8 +11,12 @@ The Mobility project logo (located in the `Assets` folder) was designed by
 Kenji Mouri and authorized for use by the Mobility project. It is distributed 
 under the CC BY-ND 4.0 License.
 
-The source code from the third-party libraries is distributed under the original
-license used in the third-party libraries.
+The source code from third-party libraries is distributed under their respective
+original licenses.
+
+Mobility uses only selected MAME source files under the 3-Clause BSD License,
+retaining their original notices. The files and revisions are documented in
+`Documents/UpstreamSynchronization.md`.
 
 This permission notice shall be included in all copies or substantial portions
 of the Software.
@@ -462,6 +466,7 @@ Creative Commons may be contacted at creativecommons.org.
 
 ### The third-party libraries used in Mobility
 
+- MAME (selected BSD-3-Clause-licensed source files only), https://github.com/mamedev/mame
 - Mile.HyperV, https://github.com/ProjectMile/Mile.HyperV
 - Mile.Mobility, https://github.com/ProjectMile/Mile.Mobility
 - Mile.Project.Configurations, https://github.com/ProjectMile/Mile.Project.Configurations
