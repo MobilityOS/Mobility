@@ -4,6 +4,6 @@
 
 ### Referenced Version
 
-https://github.com/mamedev/mame/tree/d19c5fcd4b2b067d50ddd1c308d87e7ecd785a0c
+https://github.com/mamedev/mame/tree/mame0289
 
 ### Referenced by Mobility
