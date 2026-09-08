@@ -1147,7 +1147,6 @@ void i386_device::i386_repeat(int invert_flag)
 		if(!m_operand_prefix)
 		{
 			m_operand_size ^= 1;
-			m_xmm_operand_size ^= 1;
 			m_operand_prefix = 1;
 		}
 		break;
@@ -2307,7 +2306,6 @@ void i386_device::i386_operand_size()      // Opcode prefix 0x66
 	if(m_operand_prefix == 0)
 	{
 		m_operand_size ^= 1;
-		m_xmm_operand_size ^= 1;
 		m_operand_prefix = 1;
 	}
 	m_opcode = FETCH();

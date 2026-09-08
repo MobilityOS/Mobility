@@ -120,31 +120,6 @@ protected:
 		uint32_t limit;
 	};
 
-	union XMM_REG {
-		uint8_t  b[16];
-		uint16_t w[8];
-		uint32_t d[4];
-		uint64_t q[2];
-		int8_t   c[16];
-		int16_t  s[8];
-		int32_t  i[4];
-		int64_t  l[2];
-		float  f[4];
-		double  f64[2];
-	};
-
-	union MMX_REG {
-		uint32_t d[2];
-		int32_t  i[2];
-		uint16_t w[4];
-		int16_t  s[4];
-		uint8_t  b[8];
-		int8_t   c[8];
-		float  f[2];
-		uint64_t q;
-		int64_t  l;
-	};
-
 	struct I386_CALL_GATE
 	{
 		uint16_t segment;
@@ -325,7 +300,6 @@ protected:
 	int m_halted;
 
 	int m_operand_size;
-	int m_xmm_operand_size;
 	int m_address_size;
 	int m_operand_prefix;
 	int m_address_prefix;
@@ -372,10 +346,6 @@ protected:
 	i386_modrm_func m_opcode_table_x87_dd[256];
 	i386_modrm_func m_opcode_table_x87_de[256];
 	i386_modrm_func m_opcode_table_x87_df[256];
-
-	// SSE
-	XMM_REG m_sse_reg[8];
-	uint32_t m_mxcsr;
 
 	i386_op_func m_opcode_table1_16[256];
 	i386_op_func m_opcode_table1_32[256];
@@ -428,7 +398,6 @@ protected:
 
 	void register_state_i386();
 	void register_state_i386_x87();
-	void register_state_i386_x87_xmm();
 	uint32_t i386_translate(int segment, uint32_t ip, int rwn, int size = 1);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
@@ -1056,16 +1025,6 @@ protected:
 	void i486_bswap_esi();
 	void i486_bswap_edi();
 	void i486_mov_cr_r32();
-	inline bool MMXPROLOG();
-	inline bool SSEPROLOG();
-	inline void READMMX(uint32_t ea,MMX_REG &r);
-	inline void WRITEMMX(uint32_t ea,MMX_REG &r);
-	inline void READXMM(uint32_t ea,XMM_REG &r);
-	inline void WRITEXMM(uint32_t ea,XMM_REG &r);
-	inline void READXMM_LO64(uint32_t ea,XMM_REG &r);
-	inline void WRITEXMM_LO64(uint32_t ea,XMM_REG &r);
-	inline void READXMM_HI64(uint32_t ea,XMM_REG &r);
-	inline void WRITEXMM_HI64(uint32_t ea,XMM_REG &r);
 	void pentium_rdmsr();
 	void pentium_wrmsr();
 	void pentium_rdtsc();
@@ -1106,285 +1065,11 @@ protected:
 	void pentium_cmovg_r32_rm32();
 	void pentium_movnti_m16_r16();
 	void pentium_movnti_m32_r32();
-	void i386_cyrix_special();
-	void i386_cyrix_unknown();
 	void pentium_cmpxchg8b_m64();
-	void pentium_movntq_m64_r64();
-	void pentium_maskmovq_r64_r64();
 	void pentium_popcnt_r16_rm16();
 	void pentium_popcnt_r32_rm32();
 	void pentium_tzcnt_r16_rm16();
 	void pentium_tzcnt_r32_rm32();
-	void mmx_group_0f71();
-	void mmx_group_0f72();
-	void mmx_group_0f73();
-	void mmx_psrlw_r64_rm64();
-	void mmx_psrld_r64_rm64();
-	void mmx_psrlq_r64_rm64();
-	void mmx_paddq_r64_rm64();
-	void mmx_pmullw_r64_rm64();
-	void mmx_psubusb_r64_rm64();
-	void mmx_psubusw_r64_rm64();
-	void mmx_pand_r64_rm64();
-	void mmx_paddusb_r64_rm64();
-	void mmx_paddusw_r64_rm64();
-	void mmx_pandn_r64_rm64();
-	void mmx_psraw_r64_rm64();
-	void mmx_psrad_r64_rm64();
-	void mmx_pmulhw_r64_rm64();
-	void mmx_psubsb_r64_rm64();
-	void mmx_psubsw_r64_rm64();
-	void mmx_por_r64_rm64();
-	void mmx_paddsb_r64_rm64();
-	void mmx_paddsw_r64_rm64();
-	void mmx_pxor_r64_rm64();
-	void mmx_psllw_r64_rm64();
-	void mmx_pslld_r64_rm64();
-	void mmx_psllq_r64_rm64();
-	void mmx_pmaddwd_r64_rm64();
-	void mmx_psubb_r64_rm64();
-	void mmx_psubw_r64_rm64();
-	void mmx_psubd_r64_rm64();
-	void mmx_paddb_r64_rm64();
-	void mmx_paddw_r64_rm64();
-	void mmx_paddd_r64_rm64();
-	void mmx_emms();
-	void i386_cyrix_svdc();
-	void i386_cyrix_rsdc();
-	void i386_cyrix_svldt();
-	void i386_cyrix_rsldt();
-	void i386_cyrix_svts();
-	void i386_cyrix_rsts();
-	void mmx_movd_r64_rm32();
-	void mmx_movq_r64_rm64();
-	void mmx_movd_rm32_r64();
-	void mmx_movq_rm64_r64();
-	void mmx_pcmpeqb_r64_rm64();
-	void mmx_pcmpeqw_r64_rm64();
-	void mmx_pcmpeqd_r64_rm64();
-	void mmx_pshufw_r64_rm64_i8();
-	void mmx_punpcklbw_r64_r64m32();
-	void mmx_punpcklwd_r64_r64m32();
-	void mmx_punpckldq_r64_r64m32();
-	void mmx_packsswb_r64_rm64();
-	void mmx_pcmpgtb_r64_rm64();
-	void mmx_pcmpgtw_r64_rm64();
-	void mmx_pcmpgtd_r64_rm64();
-	void mmx_packuswb_r64_rm64();
-	void mmx_punpckhbw_r64_rm64();
-	void mmx_punpckhwd_r64_rm64();
-	void mmx_punpckhdq_r64_rm64();
-	void mmx_packssdw_r64_rm64();
-	void sse_group_0fae();
-	void sse_group_660f71();
-	void sse_group_660f72();
-	void sse_group_660f73();
-	void sse_cvttps2dq_r128_rm128();
-	void sse_cvtss2sd_r128_r128m32();
-	void sse_cvttss2si_r32_r128m32();
-	void sse_cvtss2si_r32_r128m32();
-	void sse_cvtsi2ss_r128_rm32();
-	void sse_cvtpi2ps_r128_rm64();
-	void sse_cvttps2pi_r64_r128m64();
-	void sse_cvtps2pi_r64_r128m64();
-	void sse_cvtps2pd_r128_r128m64();
-	void sse_cvtdq2ps_r128_rm128();
-	void sse_cvtdq2pd_r128_r128m64();
-	void sse_movss_r128_rm128();
-	void sse_movss_rm128_r128();
-	void sse_movsldup_r128_rm128();
-	void sse_movshdup_r128_rm128();
-	void sse_movaps_r128_rm128();
-	void sse_movaps_rm128_r128();
-	void sse_movups_r128_rm128();
-	void sse_movups_rm128_r128();
-	void sse_movlps_r128_m64();
-	void sse_movlps_m64_r128();
-	void sse_movhps_r128_m64();
-	void sse_movhps_m64_r128();
-	void sse_movntps_m128_r128();
-	void sse_movmskps_r16_r128();
-	void sse_movmskps_r32_r128();
-	void sse_movq2dq_r128_r64();
-	void sse_movdqu_r128_rm128();
-	void sse_movdqu_rm128_r128();
-	void sse_movd_m128_rm32();
-	void sse_movdqa_m128_rm128();
-	void sse_movq_r128_r128m64();
-	void sse_movd_rm32_r128();
-	void sse_movdqa_rm128_r128();
-	void sse_pmovmskb_r16_r64();
-	void sse_pmovmskb_r32_r64();
-	void sse_xorps();
-	void sse_addps();
-	void sse_sqrtps_r128_rm128();
-	void sse_rsqrtps_r128_rm128();
-	void sse_rcpps_r128_rm128();
-	void sse_andps_r128_rm128();
-	void sse_andnps_r128_rm128();
-	void sse_orps_r128_rm128();
-	void sse_mulps();
-	void sse_subps();
-	void sse_minps();
-	void sse_divps();
-	void sse_maxps();
-	void sse_maxss_r128_r128m32();
-	void sse_addss();
-	void sse_subss();
-	void sse_mulss();
-	void sse_divss();
-	void sse_rcpss_r128_r128m32();
-	void sse_sqrtss_r128_r128m32();
-	void sse_rsqrtss_r128_r128m32();
-	void sse_minss_r128_r128m32();
-	void sse_comiss_r128_r128m32();
-	void sse_ucomiss_r128_r128m32();
-	void sse_shufps();
-	void sse_punpcklbw_r128_rm128();
-	void sse_punpcklwd_r128_rm128();
-	void sse_punpckldq_r128_rm128();
-	void sse_punpcklqdq_r128_rm128();
-	void sse_unpcklps_r128_rm128();
-	void sse_unpckhps_r128_rm128();
-	void sse_cmpps_r128_rm128_i8();
-	void sse_cmpss_r128_r128m32_i8();
-	void sse_pinsrw_r64_r16m16_i8();
-	void sse_pinsrw_r64_r32m16_i8();
-	void sse_pinsrw_r128_r32m16_i8();
-	void sse_pextrw_r16_r64_i8();
-	void sse_pextrw_r32_r64_i8();
-	void sse_pextrw_reg_r128_i8();
-	void sse_pminub_r64_rm64();
-	void sse_pmaxub_r64_rm64();
-	void sse_pavgb_r64_rm64();
-	void sse_pavgw_r64_rm64();
-	void sse_pmulhuw_r64_rm64();
-	void sse_pminsw_r64_rm64();
-	void sse_pmaxsw_r64_rm64();
-	void sse_pmuludq_r64_rm64();
-	void sse_psadbw_r64_rm64();
-	void sse_psubq_r64_rm64();
-	void sse_pshufhw_r128_rm128_i8();
-	void sse_packsswb_r128_rm128();
-	void sse_packssdw_r128_rm128();
-	void sse_pcmpgtb_r128_rm128();
-	void sse_pcmpgtw_r128_rm128();
-	void sse_pcmpgtd_r128_rm128();
-	void sse_packuswb_r128_rm128();
-	void sse_punpckhbw_r128_rm128();
-	void sse_punpckhwd_r128_rm128();
-	void sse_unpckhdq_r128_rm128();
-	void sse_punpckhqdq_r128_rm128();
-	void sse_pcmpeqb_r128_rm128();
-	void sse_pcmpeqw_r128_rm128();
-	void sse_pcmpeqd_r128_rm128();
-	void sse_paddq_r128_rm128();
-	void sse_pmullw_r128_rm128();
-	void sse_pmuludq_r128_rm128();
-	void sse_psubq_r128_rm128();
-	void sse_paddb_r128_rm128();
-	void sse_paddw_r128_rm128();
-	void sse_paddd_r128_rm128();
-	void sse_psubusb_r128_rm128();
-	void sse_psubusw_r128_rm128();
-	void sse_pminub_r128_rm128();
-	void sse_pand_r128_rm128();
-	void sse_pandn_r128_rm128();
-	void sse_paddusb_r128_rm128();
-	void sse_paddusw_r128_rm128();
-	void sse_pmaxub_r128_rm128();
-	void sse_pmulhuw_r128_rm128();
-	void sse_pmulhw_r128_rm128();
-	void sse_psubsw_r128_rm128();
-	void sse_psubsb_r128_rm128();
-	void sse_pminsw_r128_rm128();
-	void sse_pmaxsw_r128_rm128();
-	void sse_paddsb_r128_rm128();
-	void sse_paddsw_r128_rm128();
-	void sse_por_r128_rm128();
-	void sse_pxor_r128_rm128();
-	void sse_pmaddwd_r128_rm128();
-	void sse_psubb_r128_rm128();
-	void sse_psubw_r128_rm128();
-	void sse_psubd_r128_rm128();
-	void sse_psadbw_r128_rm128();
-	void sse_pavgb_r128_rm128();
-	void sse_pavgw_r128_rm128();
-	void sse_pmovmskb_r32_r128();
-	void sse_maskmovdqu_r128_r128();
-	void sse_andpd_r128_rm128();
-	void sse_andnpd_r128_rm128();
-	void sse_orpd_r128_rm128();
-	void sse_xorpd_r128_rm128();
-	void sse_unpcklpd_r128_rm128();
-	void sse_unpckhpd_r128_rm128();
-	void sse_shufpd_r128_rm128_i8();
-	void sse_pshufd_r128_rm128_i8();
-	void sse_pshuflw_r128_rm128_i8();
-	void sse_movmskpd_r32_r128();
-	void sse_ucomisd_r128_r128m64();
-	void sse_comisd_r128_r128m64();
-	void sse_psrlw_r128_rm128();
-	void sse_psrld_r128_rm128();
-	void sse_psrlq_r128_rm128();
-	void sse_psllw_r128_rm128();
-	void sse_pslld_r128_rm128();
-	void sse_psllq_r128_rm128();
-	void sse_psraw_r128_rm128();
-	void sse_psrad_r128_rm128();
-	void sse_movntdq_m128_r128();
-	void sse_cvttpd2dq_r128_rm128();
-	void sse_movq_r128m64_r128();
-	void sse_addsubpd_r128_rm128();
-	void sse_cmppd_r128_rm128_i8();
-	void sse_haddpd_r128_rm128();
-	void sse_hsubpd_r128_rm128();
-	void sse_sqrtpd_r128_rm128();
-	void sse_cvtpi2pd_r128_rm64();
-	void sse_cvttpd2pi_r64_rm128();
-	void sse_cvtpd2pi_r64_rm128();
-	void sse_cvtpd2ps_r128_rm128();
-	void sse_cvtps2dq_r128_rm128();
-	void sse_addpd_r128_rm128();
-	void sse_mulpd_r128_rm128();
-	void sse_subpd_r128_rm128();
-	void sse_minpd_r128_rm128();
-	void sse_divpd_r128_rm128();
-	void sse_maxpd_r128_rm128();
-	void sse_movntpd_m128_r128();
-	void sse_movapd_r128_rm128();
-	void sse_movapd_rm128_r128();
-	void sse_movhpd_r128_m64();
-	void sse_movhpd_m64_r128();
-	void sse_movupd_r128_rm128();
-	void sse_movupd_rm128_r128();
-	void sse_movlpd_r128_m64();
-	void sse_movlpd_m64_r128();
-	void sse_movsd_r128_r128m64();
-	void sse_movsd_r128m64_r128();
-	void sse_movddup_r128_r128m64();
-	void sse_cvtsi2sd_r128_rm32();
-	void sse_cvttsd2si_r32_r128m64();
-	void sse_cvtsd2si_r32_r128m64();
-	void sse_sqrtsd_r128_r128m64();
-	void sse_addsd_r128_r128m64();
-	void sse_mulsd_r128_r128m64();
-	void sse_cvtsd2ss_r128_r128m64();
-	void sse_subsd_r128_r128m64();
-	void sse_minsd_r128_r128m64();
-	void sse_divsd_r128_r128m64();
-	void sse_maxsd_r128_r128m64();
-	void sse_haddps_r128_rm128();
-	void sse_hsubps_r128_rm128();
-	void sse_cmpsd_r128_r128m64_i8();
-	void sse_addsubps_r128_rm128();
-	void sse_movdq2q_r64_r128();
-	void sse_cvtpd2dq_r128_rm128();
-	void sse_lddqu_r128_m128();
-	inline void sse_predicate_compare_single(uint8_t imm8, XMM_REG d, XMM_REG s);
-	inline void sse_predicate_compare_double(uint8_t imm8, XMM_REG d, XMM_REG s);
-	inline void sse_predicate_compare_single_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
-	inline void sse_predicate_compare_double_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline extFloat80_t READ80(uint32_t ea);
 	inline void WRITE80(uint32_t ea, extFloat80_t t);
 	inline void x87_set_stack_top(int top);
@@ -1560,53 +1245,6 @@ protected:
 };
 
 
-class i386sx_device : public i386_device
-{
-public:
-	// construction/destruction
-	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); }
-	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); }
-	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); }
-
-	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege) override;
-	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege) override;
-	virtual uint64_t READ64PL(uint32_t ea, uint8_t privilege) override;
-	virtual void WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value) override;
-	virtual void WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value) override;
-	virtual void WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value) override;
-	virtual uint16_t READPORT16(offs_t port) override;
-	virtual void WRITEPORT16(offs_t port, uint16_t value) override;
-	virtual uint32_t READPORT32(offs_t port) override;
-	virtual void WRITEPORT32(offs_t port, uint32_t value) override;
-};
-
-class i486_device : public i386_device
-{
-public:
-	// construction/destruction
-	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-class i486dx4_device : public i486_device
-{
-public:
-	// construction/destruction
-	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
 class pentium_device : public i386_device
 {
 public:
@@ -1625,96 +1263,7 @@ protected:
 };
 
 
-class pentium_mmx_device : public pentium_device
-{
-public:
-	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
-class mediagx_device : public i386_device
-{
-public:
-	// construction/destruction
-	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
-class pentium_pro_device : public pentium_device
-{
-public:
-	// construction/destruction
-	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
-class pentium2_device : public pentium_pro_device
-{
-public:
-	// construction/destruction
-	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
-class pentium3_device : public pentium_pro_device
-{
-public:
-	// construction/destruction
-	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	virtual void opcode_cpuid() override;
-};
-
-
-class pentium4_device : public pentium_device
-{
-public:
-	// construction/destruction
-	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
 DECLARE_DEVICE_TYPE(I386,        i386_device)
-DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
-DECLARE_DEVICE_TYPE(I486,        i486_device)
-DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
-DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
-DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
-DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
-DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
-DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
-DECLARE_DEVICE_TYPE(PENTIUM4,    pentium4_device)
 
 #endif // MAME_CPU_I386_I386_H

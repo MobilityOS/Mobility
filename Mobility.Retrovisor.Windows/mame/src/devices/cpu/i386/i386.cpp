@@ -7,15 +7,7 @@
 
     Currently supports:
         Intel 386
-        Intel 486
         Intel Pentium
-        Cyrix MediaGX
-        Intel Pentium MMX
-        Intel Pentium Pro
-        Intel Pentium II
-        Intel Pentium III
-        Amd Athlon XP (athlon.cpp)
-        Intel Pentium 4
 */
 
 #include "emu.h"
@@ -49,16 +41,7 @@
 #undef i386
 
 DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
-DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
-DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
-DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
-DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
-DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
-DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
-DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -79,26 +62,6 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	set_vtlb_dynamic_entries(32);
 }
 
-i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, I386SX, tag, owner, clock, 16, 24, 16)
-{
-}
-
-i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i486_device(mconfig, I486, tag, owner, clock)
-{
-}
-
-i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
-{
-}
-
-i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i486_device(mconfig, I486DX4, tag, owner, clock)
-{
-}
-
 pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, PENTIUM, tag, owner, clock)
 {
@@ -109,49 +72,6 @@ pentium_device::pentium_device(const machine_config &mconfig, device_type type, 
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb
 	set_vtlb_dynamic_entries(96);
-}
-
-mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, MEDIAGX, tag, owner, clock, 32, 32, 32)
-{
-}
-
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_pro_device(mconfig, PENTIUM_PRO, tag, owner, clock)
-{
-}
-
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, type, tag, owner, clock)
-{
-}
-
-pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_MMX, tag, owner, clock)
-{
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	set_vtlb_dynamic_entries(96);
-}
-
-pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_pro_device(mconfig, PENTIUM2, tag, owner, clock)
-{
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	set_vtlb_dynamic_entries(96);
-}
-
-pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_pro_device(mconfig, PENTIUM3, tag, owner, clock)
-{
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	set_vtlb_dynamic_entries(96);
-}
-
-pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM4, tag, owner, clock)
-{
-	// 128 dtlb, 64 itlb
-	set_vtlb_dynamic_entries(196);
 }
 
 device_memory_interface::space_config_vector i386_device::memory_space_config() const
@@ -538,71 +458,6 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 	return value;
 }
 
-uint16_t i386sx_device::READ16PL(uint32_t ea, uint8_t privilege)
-{
-	uint16_t value;
-	offs_t address = ea;
-	uint32_t error;
-
-	if (WORD_ALIGNED(ea))
-	{
-		if(!translate_address(privilege,TR_READ,&address,&error))
-			PF_THROW(error);
-
-		address &= m_a20_mask;
-		return m_program->read_word(address);
-	}
-	else
-	{
-		/* Unaligned read */
-		value = READ8PL(ea, privilege);
-		value |= READ8PL(ea + 1, privilege) << 8;
-		return value;
-	}
-}
-
-uint32_t i386sx_device::READ32PL(uint32_t ea, uint8_t privilege)
-{
-	uint32_t value;
-
-	if (WORD_ALIGNED(ea))
-	{
-		value = READ16PL(ea, privilege);
-		value |= READ16PL(ea + 2, privilege) << 16;
-		return value;
-	}
-	else
-	{
-		value = READ8PL(ea, privilege);
-		value |= READ16PL(ea + 1, privilege) << 8;
-		value |= READ8PL(ea + 3, privilege) << 24;
-		return value;
-	}
-}
-
-uint64_t i386sx_device::READ64PL(uint32_t ea, uint8_t privilege)
-{
-	uint64_t value;
-
-	if (WORD_ALIGNED(ea))
-	{
-		value = READ16PL(ea, privilege);
-		value |= uint64_t(READ16PL(ea + 2, privilege)) << 16;
-		value |= uint64_t(READ16PL(ea + 4, privilege)) << 32;
-		value |= uint64_t(READ16PL(ea + 6, privilege)) << 48;
-		return value;
-	}
-	else
-	{
-		value = READ8PL(ea, privilege);
-		value |= uint64_t(READ16PL(ea + 1, privilege)) << 8;
-		value |= uint64_t(READ16PL(ea + 3, privilege)) << 24;
-		value |= uint64_t(READ16PL(ea + 5, privilege)) << 40;
-		value |= uint64_t(READ8PL(ea + 7, privilege)) << 56;
-		return value;
-	}
-}
-
 void i386_device::WRITE_TEST(uint32_t ea)
 {
 	offs_t address = ea;
@@ -736,60 +591,6 @@ void i386_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 		address &= m_a20_mask;
 		m_program->write_dword(address, (value >> 40) & 0x00ffffff, 0x00ffffff);
 		break;
-	}
-}
-
-void i386sx_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
-{
-	offs_t address = ea;
-	uint32_t error;
-
-	if (WORD_ALIGNED(ea))
-	{
-		if(!translate_address(privilege,TR_WRITE,&address,&error))
-			PF_THROW(error);
-
-		address &= m_a20_mask;
-		m_program->write_word(address, value);
-	}
-	else
-	{
-		WRITE8PL(ea, privilege, value & 0xff);
-		WRITE8PL(ea + 1, privilege, (value >> 8) & 0xff);
-	}
-}
-
-void i386sx_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
-{
-	if (WORD_ALIGNED(ea))
-	{
-		WRITE16PL(ea, privilege, value & 0xffff);
-		WRITE16PL(ea + 2, privilege, (value >> 16) & 0xffff);
-	}
-	else
-	{
-		WRITE8PL(ea, privilege, value & 0xff);
-		WRITE16PL(ea + 1, privilege, (value >> 8) & 0xffff);
-		WRITE8PL(ea + 3, privilege, (value >> 24) & 0xff);
-	}
-}
-
-void i386sx_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
-{
-	if (WORD_ALIGNED(ea))
-	{
-		WRITE16PL(ea, privilege, value & 0xffff);
-		WRITE16PL(ea + 2, privilege, (value >> 16) & 0xffff);
-		WRITE16PL(ea + 4, privilege, (value >> 32) & 0xffff);
-		WRITE16PL(ea + 6, privilege, (value >> 48) & 0xffff);
-	}
-	else
-	{
-		WRITE8PL(ea, privilege, value & 0xff);
-		WRITE16PL(ea + 1, privilege, (value >> 8) & 0xffff);
-		WRITE16PL(ea + 3, privilege, (value >> 24) & 0xffff);
-		WRITE16PL(ea + 5, privilege, (value >> 40) & 0xffff);
-		WRITE8PL(ea + 7, privilege, (value >> 56) & 0xff);
 	}
 }
 
@@ -1289,67 +1090,6 @@ void i386_device::WRITEPORT32(offs_t port, uint32_t value)
 		check_ioperm(port + 1, 7);
 		m_io->write_dword(port + 1, value >> 8, 0x00ffffff);
 		break;
-	}
-}
-
-uint16_t i386sx_device::READPORT16(offs_t port)
-{
-	if (port & 1)
-	{
-		uint16_t value = READPORT8(port);
-		value |= (READPORT8(port + 1) << 8);
-		return value;
-	}
-	else
-	{
-		check_ioperm(port, 3);
-		return m_io->read_word(port);
-	}
-}
-
-void i386sx_device::WRITEPORT16(offs_t port, uint16_t value)
-{
-	if (port & 1)
-	{
-		WRITEPORT8(port, value & 0xff);
-		WRITEPORT8(port + 1, (value >> 8) & 0xff);
-	}
-	else
-	{
-		check_ioperm(port, 3);
-		m_io->write_word(port, value);
-	}
-}
-
-uint32_t i386sx_device::READPORT32(offs_t port)
-{
-	if (port & 1)
-	{
-		uint32_t value = READPORT8(port);
-		value |= (READPORT16(port + 1) << 8);
-		value |= (READPORT8(port + 3) << 24);
-		return value;
-	}
-	else
-	{
-		uint16_t value = READPORT16(port);
-		value |= (READPORT16(port + 2) << 16);
-		return value;
-	}
-}
-
-void i386sx_device::WRITEPORT32(offs_t port, uint32_t value)
-{
-	if (port & 1)
-	{
-		WRITEPORT8(port, value & 0xff);
-		WRITEPORT16(port + 1, (value >> 8) & 0xffff);
-		WRITEPORT8(port + 3, (value >> 24) & 0xff);
-	}
-	else
-	{
-		WRITEPORT16(port, value & 0xffff);
-		WRITEPORT16((port + 2), (value >> 16) & 0xffff);
 	}
 }
 
@@ -1947,8 +1687,6 @@ void i386_device::i386_common_init()
 	static const int regs16[8] = {AX,CX,DX,BX,SP,BP,SI,DI};
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
 
-	assert((sizeof(XMM_REG)/sizeof(double)) == 2);
-
 	build_cycle_table();
 
 	for( i=0; i < 256; i++ ) {
@@ -2039,8 +1777,6 @@ void i386_device::i386_common_init()
 
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_a20_mask));
-
-	save_item(NAME(m_mxcsr));
 
 	save_item(NAME(m_smm));
 	save_item(NAME(m_smi));
@@ -2183,21 +1919,6 @@ void i386_device::register_state_i386_x87()
 	state_add( X87_ST7,    "ST7", m_debugger_temp ).callexport().formatstr("%15s");
 }
 
-void i386_device::register_state_i386_x87_xmm()
-{
-	register_state_i386_x87();
-
-	state_add( SSE_XMM0, "XMM0", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM1, "XMM1", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM2, "XMM2", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM3, "XMM3", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM4, "XMM4", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM5, "XMM5", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM6, "XMM6", m_debugger_temp ).formatstr("%32s");
-	state_add( SSE_XMM7, "XMM7", m_debugger_temp ).formatstr("%32s");
-
-}
-
 void i386_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -2307,30 +2028,6 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 			break;
 		case X87_ST7:
 			str = string_format("%f", fx80_to_double(ST(7)));
-			break;
-		case SSE_XMM0:
-			str = string_format("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
-			break;
-		case SSE_XMM1:
-			str = string_format("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
-			break;
-		case SSE_XMM2:
-			str = string_format("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
-			break;
-		case SSE_XMM3:
-			str = string_format("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
-			break;
-		case SSE_XMM4:
-			str = string_format("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
-			break;
-		case SSE_XMM5:
-			str = string_format("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
-			break;
-		case SSE_XMM6:
-			str = string_format("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
-			break;
-		case SSE_XMM7:
-			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 	softfloat_exceptionFlags = 0; // kill any float exceptions that occur here
@@ -2469,7 +2166,6 @@ void i386_device::zero_state()
 	m_ext = 0;
 	m_halted = 0;
 	m_operand_size = 0;
-	m_xmm_operand_size = 0;
 	m_address_size = 0;
 	m_operand_prefix = 0;
 	m_address_prefix = 0;
@@ -2496,8 +2192,6 @@ void i386_device::zero_state()
 	m_x87_data_ptr = 0;
 	m_x87_inst_ptr = 0;
 	m_x87_opcode = 0;
-	memset( m_sse_reg, 0, sizeof(m_sse_reg) );
-	m_mxcsr = 0;
 	m_smm = false;
 	m_smi = false;
 	m_smi_latched = false;
@@ -2847,7 +2541,6 @@ void i386_device::execute_run()
 		}
 
 		m_operand_size = m_sreg[CS].d;
-		m_xmm_operand_size = 0;
 		m_address_size = m_sreg[CS].d;
 		m_operand_prefix = 0;
 		m_address_prefix = 0;
@@ -2936,73 +2629,6 @@ void i386_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 }
 
 /*****************************************************************************/
-/* Intel 486 */
-
-
-void i486_device::device_start()
-{
-	i386_common_init();
-
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
-	build_x87_opcode_table();
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486].get();
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I486].get();
-
-	register_state_i386_x87();
-}
-
-void i486_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x00000010;
-	m_eflags = 0;
-	m_eflags_mask = 0x00077fd7;
-	m_eip = 0xfff0;
-	m_smm = false;
-	m_smi_latched = false;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 4 (486), Model 0/1 (DX), Stepping 3
-	REG32(EAX) = 0;
-	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
-	m_cpu_version = REG32(EDX);
-
-	CHANGE_PC(m_eip);
-}
-
-void i486dx4_device::device_reset()
-{
-	i486_device::device_reset();
-	m_cpuid_id0 = 0x756e6547;   // Genu
-	m_cpuid_id1 = 0x49656e69;   // ineI
-	m_cpuid_id2 = 0x6c65746e;   // ntel
-
-	m_cpuid_max_input_value_eax = 0x01;
-	m_cpu_version = REG32(EDX);
-}
-
-/*****************************************************************************/
 /* Pentium */
 
 
@@ -3039,7 +2665,6 @@ void pentium_device::device_reset()
 	m_eflags = 0x00200000;
 	m_eflags_mask = 0x003f7fd7;
 	m_eip = 0xfff0;
-	m_mxcsr = 0x1f80;
 	m_smm = false;
 	m_smi_latched = false;
 	m_smbase = 0x30000;
@@ -3069,460 +2694,6 @@ void pentium_device::device_reset()
 	// [ 7:7] Machine Check Exception
 	// [ 8:8] CMPXCHG8B instruction
 	m_feature_flags = 0x000001bf;
-
-	CHANGE_PC(m_eip);
-}
-
-
-/*****************************************************************************/
-/* Cyrix MediaGX */
-
-
-void mediagx_device::device_start()
-{
-	i386_common_init();
-	register_state_i386_x87();
-
-	build_x87_opcode_table();
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_CYRIX);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX].get();
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_MEDIAGX].get();
-}
-
-void mediagx_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x00000010;
-	m_eflags = 0x00200000;
-	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
-	m_eip = 0xfff0;
-	m_smm = false;
-	m_smi_latched = false;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 4, Model 4 (MediaGX)
-	REG32(EAX) = 0;
-	REG32(EDX) = (4 << 8) | (4 << 4) | (1); /* TODO: is this correct? */
-
-	m_cpuid_id0 = 0x69727943;   // Cyri
-	m_cpuid_id1 = 0x736e4978;   // xIns
-	m_cpuid_id2 = 0x6d616574;   // tead
-
-	m_cpuid_max_input_value_eax = 0x01;
-	m_cpu_version = REG32(EDX);
-
-	// [ 0:0] FPU on chip
-	m_feature_flags = 0x00000001;
-
-	CHANGE_PC(m_eip);
-}
-
-/*****************************************************************************/
-/* Intel Pentium Pro */
-
-void pentium_pro_device::device_start()
-{
-	i386_common_init();
-	register_state_i386_x87();
-
-	build_x87_opcode_table();
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-}
-
-void pentium_pro_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x60000010;
-	m_eflags = 0x00200000;
-	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
-	m_eip = 0xfff0;
-	m_mxcsr = 0x1f80;
-	m_smm = false;
-	m_smi_latched = false;
-	m_smbase = 0x30000;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 6, Model 1 (Pentium Pro)
-	REG32(EAX) = 0;
-	REG32(EDX) = (6 << 8) | (1 << 4) | (1); /* TODO: is this correct? */
-
-	m_cpuid_id0 = 0x756e6547;   // Genu
-	m_cpuid_id1 = 0x49656e69;   // ineI
-	m_cpuid_id2 = 0x6c65746e;   // ntel
-
-	m_cpuid_max_input_value_eax = 0x02;
-	m_cpu_version = REG32(EDX);
-
-	// [ 0:0] FPU on chip
-	// [ 2:2] I/O breakpoints
-	// [ 4:4] Time Stamp Counter
-	// [ 5:5] Pentium CPU style model specific registers
-	// [ 7:7] Machine Check Exception
-	// [ 8:8] CMPXCHG8B instruction
-	// [15:15] CMOV and FCMOV
-	// No MMX
-	m_feature_flags = 0x000081bf;
-
-	CHANGE_PC(m_eip);
-}
-
-
-/*****************************************************************************/
-/* Intel Pentium MMX */
-
-void pentium_mmx_device::device_start()
-{
-	i386_common_init();
-	register_state_i386_x87();
-
-	build_x87_opcode_table();
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_MMX);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-}
-
-void pentium_mmx_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x60000010;
-	m_eflags = 0x00200000;
-	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
-	m_eip = 0xfff0;
-	m_mxcsr = 0x1f80;
-	m_smm = false;
-	m_smi_latched = false;
-	m_smbase = 0x30000;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 5, Model 4 (P55C)
-	REG32(EAX) = 0;
-	REG32(EDX) = (5 << 8) | (4 << 4) | (1);
-
-	m_cpuid_id0 = 0x756e6547;   // Genu
-	m_cpuid_id1 = 0x49656e69;   // ineI
-	m_cpuid_id2 = 0x6c65746e;   // ntel
-
-	m_cpuid_max_input_value_eax = 0x01;
-	m_cpu_version = REG32(EDX);
-
-	// [ 0:0] FPU on chip
-	// [ 2:2] I/O breakpoints
-	// [ 4:4] Time Stamp Counter
-	// [ 5:5] Pentium CPU style model specific registers
-	// [ 7:7] Machine Check Exception
-	// [ 8:8] CMPXCHG8B instruction
-	// [23:23] MMX instructions
-	m_feature_flags = 0x008001bf;
-
-	CHANGE_PC(m_eip);
-}
-
-/*****************************************************************************/
-/* Intel Pentium II */
-
-void pentium2_device::device_start()
-{
-	i386_common_init();
-	register_state_i386_x87();
-
-	build_x87_opcode_table();
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-}
-
-void pentium2_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x60000010;
-	m_eflags = 0x00200000;
-	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
-	m_eip = 0xfff0;
-	m_mxcsr = 0x1f80;
-	m_smm = false;
-	m_smi_latched = false;
-	m_smbase = 0x30000;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 6, Model 3 (Pentium II / Klamath)
-	REG32(EAX) = 0;
-	REG32(EDX) = (6 << 8) | (3 << 4) | (1); /* TODO: is this correct? */
-
-	m_cpuid_id0 = 0x756e6547;   // Genu
-	m_cpuid_id1 = 0x49656e69;   // ineI
-	m_cpuid_id2 = 0x6c65746e;   // ntel
-
-	m_cpuid_max_input_value_eax = 0x02;
-	m_cpu_version = REG32(EDX);
-
-	// [ 0: 0] FPU on chip
-	// [ 1: 1] VME Virtual 8086 Mode Enhancements
-	// [ 2: 2] DE Debugging Extensions
-	// [ 3: 3] PSE Page Size Extension
-	// [ 4: 4] TSC Time Stamp Counter
-	// [ 5: 5] MSR Model Specific Registers
-	// [ 6: 6] PAE Physical Address Extension
-	// [ 7: 7] MCE Machine Check Exception
-	// [ 8: 8] CMPXCHG8B opcode supported
-	// [11:11] SEP SYSENTER and SYSEXIT opcodes
-	// [12:12] MTRR Memory type range register
-	// [13:13] PGE Page Global Enable
-	// [14:14] MCA Machine Check Architecture
-	// [15:15] CMOV Conditional Move instructions
-	// [23:23] MMX instructions
-	//m_feature_flags = 0x0080f9ff;
-	m_feature_flags = 0x008081bf;  // TODO: enable missing flags
-
-	CHANGE_PC(m_eip);
-}
-
-/*****************************************************************************/
-/* Intel Pentium III */
-
-void pentium3_device::device_start()
-{
-	i386_common_init();
-	register_state_i386_x87_xmm();
-
-	build_x87_opcode_table();
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-}
-
-void pentium3_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x60000010;
-	m_eflags = 0x00200000;
-	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
-	m_eip = 0xfff0;
-	m_mxcsr = 0x1f80;
-	m_smm = false;
-	m_smi_latched = false;
-	m_smbase = 0x30000;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [11:8] Family
-	// [ 7:4] Model
-	// [ 3:0] Stepping ID
-	// Family 6, Model 8 (Pentium III / Coppermine)
-	REG32(EAX) = 0;
-	REG32(EDX) = (6 << 8) | (8 << 4) | (10);
-
-	m_cpuid_id0 = 0x756e6547;   // Genu
-	m_cpuid_id1 = 0x49656e69;   // ineI
-	m_cpuid_id2 = 0x6c65746e;   // ntel
-
-	m_cpuid_max_input_value_eax = 0x03;
-	m_cpu_version = REG32(EDX);
-
-	// [ 0:0] FPU on chip
-	// [ 4:4] Time Stamp Counter
-	// [ 8:8] CMPXCHG8B instruction
-	// [ D:D] PTE Global Bit
-	// [15:15] CMOV and FCMOV
-	// [18:18] PSN (Processor Serial Number, P3 only)
-	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
-	m_brand_id = 0x02;
-
-	CHANGE_PC(m_eip);
-}
-
-void pentium3_device::opcode_cpuid()
-{
-	switch (REG32(EAX))
-	{
-		case 0x00000003:
-		{
-			// TODO: lower part of 96 bits s/n for Pentium III processors only (ditched in 4)
-			// (upper 32-bits part is in EAX=1 EAX return)
-			// NOTE: if this is triggered from an Arcade system then there's a very good chance
-			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
-			LOGMASKED(LOG_MSR, "CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
-			REG32(EAX) = 0x00000000;
-			REG32(EBX) = 0x00000000;
-			REG32(ECX) = 0x01234567;
-			REG32(EDX) = 0x89abcdef;
-			CYCLES(CYCLES_CPUID);
-			break;
-		}
-		default:
-			pentium_pro_device::opcode_cpuid();
-	}
-}
-
-/*****************************************************************************/
-/* Intel Pentium 4 */
-
-void pentium4_device::device_start()
-{
-	i386_common_init();
-	register_state_i386_x87_xmm();
-
-	build_x87_opcode_table();
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE | OP_SSE2);
-	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
-}
-
-void pentium4_device::device_reset()
-{
-	zero_state();
-
-	m_sreg[CS].selector = 0xf000;
-	m_sreg[CS].base     = 0xffff0000;
-	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x0093;
-
-	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
-	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
-
-	m_idtr.base = 0;
-	m_idtr.limit = 0x3ff;
-
-	m_a20_mask = ~0;
-
-	m_cr[0] = 0x60000010;
-	m_eflags = 0x00200000;
-	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
-	m_eip = 0xfff0;
-	m_mxcsr = 0x1f80;
-	m_smm = false;
-	m_smi_latched = false;
-	m_smbase = 0x30000;
-	m_nmi_masked = false;
-	m_nmi_latched = false;
-
-	x87_reset();
-
-	// [27:20] Extended family
-	// [19:16] Extended model
-	// [13:12] Type
-	// [11: 8] Family
-	// [ 7: 4] Model
-	// [ 3: 0] Stepping ID
-	// Family 15, Model 0 (Pentium 4 / Willamette)
-	REG32(EAX) = 0;
-	REG32(EDX) = (0 << 20) | (0xf << 8) | (0 << 4) | (1);
-
-	m_cpuid_id0 = 0x756e6547;   // Genu
-	m_cpuid_id1 = 0x49656e69;   // ineI
-	m_cpuid_id2 = 0x6c65746e;   // ntel
-
-	m_cpuid_max_input_value_eax = 0x02;
-	m_cpu_version = REG32(EDX);
-
-	// [ 0:0] FPU on chip
-	// [ 8:8] CMPXCHG8B instruction
-	// [15:15] CMOV and FCMOV
-	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
-	m_brand_id = 0x08;
 
 	CHANGE_PC(m_eip);
 }

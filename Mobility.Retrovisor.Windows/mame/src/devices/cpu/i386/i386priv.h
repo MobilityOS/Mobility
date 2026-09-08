@@ -14,8 +14,6 @@
 #define I386OP(XX)      i386_##XX
 #define I486OP(XX)      i486_##XX
 #define PENTIUMOP(XX)   pentium_##XX
-#define MMXOP(XX)       mmx_##XX
-#define SSEOP(XX)       sse_##XX
 
 enum SREGS { ES, CS, SS, DS, FS, GS };
 
@@ -153,29 +151,7 @@ enum
 	X87_ST4,
 	X87_ST5,
 	X87_ST6,
-	X87_ST7,
-
-	SSE_XMM0,
-	SSE_XMM1,
-	SSE_XMM2,
-	SSE_XMM3,
-	SSE_XMM4,
-	SSE_XMM5,
-	SSE_XMM6,
-	SSE_XMM7
-};
-
-enum
-{
-	/* mmx registers aliased to x87 ones */
-	MMX_MM0 = X87_ST0,
-	MMX_MM1 = X87_ST1,
-	MMX_MM2 = X87_ST2,
-	MMX_MM3 = X87_ST3,
-	MMX_MM4 = X87_ST4,
-	MMX_MM5 = X87_ST5,
-	MMX_MM6 = X87_ST6,
-	MMX_MM7 = X87_ST7
+	X87_ST7
 };
 
 enum smram
@@ -262,38 +238,6 @@ enum pm_faults
 	FAULT_MF = 16  // Match (Coprocessor) Fault
 };
 
-/* MXCSR Control and Status Register */
-enum mxcsr_bits
-{
-	MXCSR_IE  = 1 << 0,  // Invalid Operation Flag
-	MXCSR_DE  = 1 << 1,  // Denormal Flag
-	MXCSR_ZE  = 1 << 2,  // Divide-by-Zero Flag
-	MXCSR_OE  = 1 << 3,  // Overflow Flag
-	MXCSR_UE  = 1 << 4,  // Underflow Flag
-	MXCSR_PE  = 1 << 5,  // Precision Flag
-	MXCSR_DAZ = 1 << 6,  // Denormals Are Zeros
-	MXCSR_IM  = 1 << 7,  // Invalid Operation Mask
-	MXCSR_DM  = 1 << 8,  // Denormal Operation Mask
-	MXCSR_ZM  = 1 << 9,  // Divide-by-Zero Mask
-	MXCSR_OM  = 1 << 10, // Overflow Mask
-	MXCSR_UM  = 1 << 11, // Underflow Mask
-	MXCSR_PM  = 1 << 12, // Precision Mask
-	MXCSR_RC  = 3 << 13, // Rounding Control
-	MXCSR_FZ  = 1 << 15  // Flush to Zero
-};
-
-union MMX_REG {
-	uint32_t d[2];
-	int32_t  i[2];
-	uint16_t w[4];
-	int16_t  s[4];
-	uint8_t  b[8];
-	int8_t   c[8];
-	float    f[2];
-	uint64_t q;
-	int64_t  l;
-};
-
 extern int i386_parity_table[256];
 
 #define FAULT_THROW(fault,error) { throw (uint64_t)(fault | (uint64_t)error << 32); }
@@ -325,9 +269,6 @@ extern int i386_parity_table[256];
 #define SetSZPF8(x)         {m_ZF = ((uint8_t)(x)==0);  m_SF = ((x)&0x80) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF16(x)        {m_ZF = ((uint16_t)(x)==0);  m_SF = ((x)&0x8000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF32(x)        {m_ZF = ((uint32_t)(x)==0);  m_SF = ((x)&0x80000000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
-
-#define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].signif)))
-#define XMM(n)              m_sse_reg[(n)]
 
 #define FLAG_DIRTY          0x100 // VTLB flag
 #define CYCLES_NUM(x)       (m_cycles -= (x))
@@ -708,12 +649,6 @@ enum X86_CYCLES
 #define OP_FPU          0x2
 #define OP_I486         0x4
 #define OP_PENTIUM      0x8
-#define OP_MMX          0x10
-#define OP_PPRO         0x20
-#define OP_SSE          0x40
-#define OP_SSE2         0x80
-#define OP_SSE3         0x100
-#define OP_CYRIX        0x8000
 #define OP_2BYTE        0x80000000
 #define OP_3BYTE66      0x40000000
 #define OP_3BYTEF2      0x20000000
