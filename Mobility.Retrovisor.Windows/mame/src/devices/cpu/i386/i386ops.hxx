@@ -1114,10 +1114,7 @@ void i386_device::i386_repeat(int invert_flag)
 	opcode = FETCH();
 	switch(opcode) {
 		case 0x0f:
-		if (invert_flag == 0)
-			i386_decode_three_bytef3(); // sse f3 0f
-		else
-			i386_decode_three_bytef2(); // sse f2 0f
+		i386_decode_two_byte();
 		return;
 		case 0x26:
 		m_segment_override=ES;
@@ -2310,7 +2307,7 @@ void i386_device::i386_operand_size()      // Opcode prefix 0x66
 	}
 	m_opcode = FETCH();
 	if (m_opcode == 0x0f)
-		i386_decode_three_byte66();
+		i386_decode_two_byte();
 	else
 	{
 		if( m_operand_size )

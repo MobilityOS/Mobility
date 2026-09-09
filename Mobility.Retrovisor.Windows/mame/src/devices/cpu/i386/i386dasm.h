@@ -29,9 +29,6 @@ private:
 		PARAM_REG32,        /* 32-bit register */
 		PARAM_REG3264,      /* 32-bit or 64-bit register */
 		PARAM_REG2_32,      /* 32-bit register */
-		PARAM_MMX,          /* MMX register */
-		PARAM_MMX2,         /* MMX register in modrm */
-		PARAM_XMM,          /* XMM register */
 		PARAM_RM,           /* 16 or 32-bit memory or register */
 		PARAM_RM8,          /* 8-bit memory or register */
 		PARAM_RM16,         /* 16-bit memory or register */
@@ -40,12 +37,8 @@ private:
 		PARAM_RMPTR8,       /* 8-bit memory or register */
 		PARAM_RMPTR16,      /* 16-bit memory or register */
 		PARAM_RMPTR32,      /* 32-bit memory or register */
-		PARAM_RMXMM,        /* 32 or 64-bit memory or register */
-		PARAM_REGORXMM,     /* 32 or 64-bit register or XMM register */
 		PARAM_M64,          /* 64-bit memory */
 		PARAM_M64PTR,       /* 64-bit memory */
-		PARAM_MMXM,         /* 64-bit memory or MMX register */
-		PARAM_XMMM,         /* 128-bit memory or XMM register */
 		PARAM_I4,           /* 4-bit signed immediate */
 		PARAM_I8,           /* 8-bit signed immediate */
 		PARAM_I16,          /* 16-bit signed immediate */
@@ -79,11 +72,7 @@ private:
 		PARAM_ESP,          /* ESP or SP */
 		PARAM_EBP,          /* EBP or BP */
 		PARAM_ESI,          /* ESI or SI */
-		PARAM_EDI,          /* EDI or DI */
-		PARAM_XMM0,
-		PARAM_XMM64,            /* 64-bit memory or XMM register */
-		PARAM_XMM32,            /* 32-bit memory or XMM register */
-		PARAM_XMM16             /* 16-bit memory or XMM register */
+		PARAM_EDI           /* EDI or DI */
 	};
 
 	enum
@@ -101,16 +90,13 @@ private:
 		SEG_FS,
 		SEG_GS,
 		SEG_SS,
-		ISREX,
-		THREE_BYTE          /* [prefix] 0f op1 op2 and then mod/rm */
+		ISREX
 	};
 
 	static constexpr unsigned FLAGS_MASK =   0x0ff;
 	static constexpr unsigned VAR_NAME   =   0x100;
-	static constexpr unsigned VAR_NAME4  =   0x200;
 	static constexpr unsigned ALWAYS64   =   0x400;
 	static constexpr unsigned SPECIAL64  =   0x800;
-	static constexpr unsigned GROUP_MOD  =  0x1000;
 
 	struct I386_OPCODE {
 		const char *mnemonic;
@@ -133,8 +119,6 @@ private:
 	static const I386_OPCODE i386_opcode_table1[256];
 	static const I386_OPCODE x64_opcode_alt[];
 	static const I386_OPCODE i386_opcode_table2[256];
-	static const I386_OPCODE i386_opcode_table0F38[256];
-	static const I386_OPCODE i386_opcode_table0F3A[256];
 	static const I386_OPCODE group80_table[8];
 	static const I386_OPCODE group81_table[8];
 	static const I386_OPCODE group83_table[8];
@@ -150,14 +134,6 @@ private:
 	static const I386_OPCODE groupFF_table[8];
 	static const I386_OPCODE group0F00_table[8];
 	static const I386_OPCODE group0F01_table[8];
-	static const I386_OPCODE group0F0D_table[8];
-	static const I386_OPCODE group0F12_table[4];
-	static const I386_OPCODE group0F16_table[4];
-	static const I386_OPCODE group0F18_table[8];
-	static const I386_OPCODE group0F71_table[8];
-	static const I386_OPCODE group0F72_table[8];
-	static const I386_OPCODE group0F73_table[8];
-	static const I386_OPCODE group0FAE_table[8];
 	static const I386_OPCODE group0FBA_table[8];
 	static const I386_OPCODE group0FC7_table[8];
 	static const GROUP_OP group_op_table[];
@@ -186,10 +162,6 @@ private:
 
 	inline u8 MODRM_REG2() const {
 		return modrm & 0x7;
-	}
-
-	inline u8 MODRM_MOD() const {
-		return (modrm >> 6) & 0x7;
 	}
 
 	inline uint8_t FETCH(offs_t base_pc, offs_t &pc, const data_buffer &opcodes);
