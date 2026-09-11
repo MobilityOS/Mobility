@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EF6A0C11-CE3F-4143-A2BF-E41A102BF0C7}</ProjectGuid>
+    <RootNamespace>Mobility.Core.Runtime</RootNamespace>
+    <MileProjectType>StaticLibrary</MileProjectType>
+    <MileUefiDisableUefiHeaders>true</MileUefiDisableUefiHeaders>
+    <MileUefiDisableUefiGuidSources>true</MileUefiDisableUefiGuidSources>
+  </PropertyGroup>
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Platform.x64.props" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.Default.props" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.props" />
+  <Import Sdk="Mile.Uefi" Project="Mile.Uefi.props" />
+  <Import Project="..\Mobility.Core\Mobility.Core.props" />
+  <ItemGroup>
+    <None Include="Mobility.Core.Runtime.props" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mile.Mobility">
+      <Version>1.1.602</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Sdk="Mile.Uefi" Project="Mile.Uefi.targets" />
+  <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.targets" />
+</Project>
