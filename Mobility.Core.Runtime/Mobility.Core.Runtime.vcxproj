@@ -21,7 +21,11 @@
     <None Include="cstdbool" />
     <None Include="cstddef" />
     <None Include="cstdint" />
+    <None Include="initializer_list" />
     <None Include="Mobility.Core.Runtime.props" />
+    <None Include="new" />
+    <None Include="source_location" />
+    <None Include="version" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mile.Mobility">
@@ -38,6 +42,9 @@
     <ClInclude Include="stddef.h" />
     <ClInclude Include="stdint.h" />
     <ClInclude Include="stdnoreturn.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="new.cpp" />
   </ItemGroup>
   <Import Sdk="Mile.Uefi" Project="Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.targets" />

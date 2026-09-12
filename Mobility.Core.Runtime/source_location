@@ -1,0 +1,79 @@
+﻿/*
+ * PROJECT:    Mobility
+ * FILE:       source_location
+ * PURPOSE:    Definition for the C++ Standard Library <source_location> header
+ *
+ * LICENSE:    The MIT License
+ *
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+ */
+
+#ifndef MOBILITY_RUNTIME_SOURCE_LOCATION
+#define MOBILITY_RUNTIME_SOURCE_LOCATION
+
+#if (defined(__cplusplus) && __cplusplus >= 202002L) || \
+    (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+
+#include "cstdint"
+
+namespace std
+{
+    struct source_location
+    {
+        [[nodiscard]] static consteval source_location current(
+            uint_least32_t Line = __builtin_LINE(),
+            uint_least32_t Column = __builtin_COLUMN(),
+            const char* File = __builtin_FILE(),
+#if defined(_MSC_VER) && \
+    ((!defined(__clang__) && (_MSC_VER >= 1939)) || \
+    (defined(__clang__) && (__clang_major__ >= 17)))
+            const char* Function = __builtin_FUNCSIG()
+#elif defined(_MSC_VER) || defined(__GNUC__) || defined(__clang__)
+            const char* Function = __builtin_FUNCTION()
+#else
+            const char* Function = ""
+#endif
+        ) noexcept
+        {
+            source_location Result{};
+            Result.m_Line = Line;
+            Result.m_Column = Column;
+            Result.m_File = File;
+            Result.m_Function = Function;
+            return Result;
+        }
+
+        [[nodiscard]] constexpr source_location() noexcept = default;
+
+        [[nodiscard]] constexpr uint_least32_t line() const noexcept
+        {
+            return this->m_Line;
+        }
+
+        [[nodiscard]] constexpr uint_least32_t column() const noexcept
+        {
+            return this->m_Column;
+        }
+
+        [[nodiscard]] constexpr const char* file_name() const noexcept
+        {
+            return this->m_File;
+        }
+
+        [[nodiscard]] constexpr const char* function_name() const noexcept
+        {
+            return this->m_Function;
+        }
+
+    private:
+
+        uint_least32_t m_Line{};
+        uint_least32_t m_Column{};
+        const char* m_File = "";
+        const char* m_Function = "";
+    };
+}
+
+#endif
+
+#endif // !MOBILITY_RUNTIME_SOURCE_LOCATION

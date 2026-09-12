@@ -1,0 +1,109 @@
+﻿/*
+ * PROJECT:    Mobility
+ * FILE:       initializer_list
+ * PURPOSE:    Definition for the C++ Standard Library <initializer_list> header
+ *
+ * LICENSE:    The MIT License
+ *
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+ */
+
+#ifndef MOBILITY_RUNTIME_INITIALIZER_LIST
+#define MOBILITY_RUNTIME_INITIALIZER_LIST
+
+#if (defined(__cplusplus) && __cplusplus >= 201103L) || \
+    (defined(_MSVC_LANG) && _MSVC_LANG >= 201103L)
+
+#include "cstddef"
+
+namespace std
+{
+    template <typename T>
+    class initializer_list
+    {
+    public:
+
+        using value_type = T;
+        using reference = const T&;
+        using const_reference = const T&;
+        using size_type = size_t;
+
+        using iterator = const T*;
+        using const_iterator = const T*;
+
+        constexpr initializer_list() noexcept :
+            m_First(nullptr),
+#if defined(_MSC_VER)
+            m_Last(nullptr)
+#else
+            m_Size(0)
+#endif
+        {
+        }
+
+#if defined(_MSC_VER)
+        constexpr initializer_list(
+            const_iterator First,
+            const_iterator Last) noexcept :
+            m_First(First),
+            m_Last(Last)
+        {
+        }
+#endif
+
+        constexpr const_iterator data() const noexcept
+        {
+            return this->begin();
+        }
+
+        constexpr size_type size() const noexcept
+        {
+#if defined(_MSC_VER)
+            return static_cast<size_type>(this->m_Last - this->m_First);
+#else
+            return this->m_Size;
+#endif
+        }
+
+        constexpr bool empty() const noexcept
+        {
+            return this->begin() == this->end();
+        }
+
+        constexpr const_iterator begin() const noexcept
+        {
+            return this->m_First;
+        }
+
+        constexpr const_iterator end() const noexcept
+        {
+#if defined(_MSC_VER)
+            return this->m_Last;
+#else
+            return this->begin() + this->size();
+#endif
+        }
+
+    private:
+#if !defined(_MSC_VER)
+        constexpr initializer_list(
+            const_iterator First,
+            size_type Size) noexcept :
+            m_First(First),
+            m_Size(Size)
+        {
+        }
+#endif
+
+        const_iterator m_First;
+#if defined(_MSC_VER)
+        const_iterator m_Last;
+#else
+        size_type m_Size;
+#endif
+    };
+}
+
+#endif
+
+#endif // !MOBILITY_RUNTIME_INITIALIZER_LIST

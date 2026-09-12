@@ -19,6 +19,8 @@ namespace std
     using ::nullptr_t;
     using ::max_align_t;
     using ::size_t;
+
+    // TODO: std::byte
 }
 
 #endif // !MOBILITY_RUNTIME_CSTDDEF
