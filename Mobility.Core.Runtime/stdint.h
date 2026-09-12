@@ -144,15 +144,15 @@ typedef MO_UINTN uintptr_t;
 #define WINT_MAX MO_WIDE_CHAR_MAX
 #define WINT_WIDTH MO_WIDE_CHAR_WIDTH
 
-#define INT8_C(x) (x)
-#define INT16_C(x) (x)
-#define INT32_C(x) (x)
-#define INT64_C(x) (x ## LL)
-#define UINT8_C(x) (x)
-#define UINT16_C(x) (x)
-#define UINT32_C(x) (x ## U)
-#define UINT64_C(x) (x ## ULL)
-#define INTMAX_C(x) INT64_C(x)
-#define UINTMAX_C(x) UINT64_C(x)
+#define INT8_C(Value) MO_INT8_C(Value)
+#define INT16_C(Value) MO_INT16_C(Value)
+#define INT32_C(Value) MO_INT32_C(Value)
+#define INT64_C(Value) MO_INT64_C(Value)
+#define UINT8_C(Value) MO_UINT8_C(Value)
+#define UINT16_C(Value) MO_UINT16_C(Value)
+#define UINT32_C(Value) MO_UINT32_C(Value)
+#define UINT64_C(Value) MO_UINT64_C(Value)
+#define INTMAX_C(Value) MO_INT64_C(Value)
+#define UINTMAX_C(Value) MO_UINT64_C(Value)
 
 #endif // !MOBILITY_RUNTIME_STDINT

@@ -5,6 +5,7 @@
     <RootNamespace>Mobility.Core.Uefi</RootNamespace>
     <MileProjectType>StaticLibrary</MileProjectType>
     <MileUefiDisableUefiGuidSources>true</MileUefiDisableUefiGuidSources>
+    <MileMobilityDisableSourceCompilation>true</MileMobilityDisableSourceCompilation>
   </PropertyGroup>
   <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Platform.x64.props" />
   <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Platform.ARM64.props" />
