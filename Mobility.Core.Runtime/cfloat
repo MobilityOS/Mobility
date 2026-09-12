@@ -1,0 +1,16 @@
+﻿/*
+ * PROJECT:    Mobility
+ * FILE:       cfloat
+ * PURPOSE:    Definition for the C++ Standard Library <cfloat> header
+ *
+ * LICENSE:    The MIT License
+ *
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+ */
+
+#ifndef MOBILITY_RUNTIME_CFLOAT
+#define MOBILITY_RUNTIME_CFLOAT
+
+#include "float.h"
+
+#endif // !MOBILITY_RUNTIME_CFLOAT

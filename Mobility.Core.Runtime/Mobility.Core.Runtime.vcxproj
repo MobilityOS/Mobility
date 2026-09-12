@@ -13,12 +13,31 @@
   <Import Sdk="Mile.Uefi" Project="Mile.Uefi.props" />
   <Import Project="..\Mobility.Core\Mobility.Core.props" />
   <ItemGroup>
+    <None Include="cfloat" />
+    <None Include="ciso646" />
+    <None Include="climits" />
+    <None Include="cstdalign" />
+    <None Include="cstdarg" />
+    <None Include="cstdbool" />
+    <None Include="cstddef" />
+    <None Include="cstdint" />
     <None Include="Mobility.Core.Runtime.props" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mile.Mobility">
       <Version>1.1.677</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="float.h" />
+    <ClInclude Include="iso646.h" />
+    <ClInclude Include="limits.h" />
+    <ClInclude Include="stdalign.h" />
+    <ClInclude Include="stdarg.h" />
+    <ClInclude Include="stdbool.h" />
+    <ClInclude Include="stddef.h" />
+    <ClInclude Include="stdint.h" />
+    <ClInclude Include="stdnoreturn.h" />
   </ItemGroup>
   <Import Sdk="Mile.Uefi" Project="Mile.Uefi.targets" />
   <Import Sdk="Mile.Project.Configurations" Project="Mile.Project.Cpp.targets" />

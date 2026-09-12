@@ -1,0 +1,16 @@
+﻿/*
+ * PROJECT:    Mobility
+ * FILE:       ciso646
+ * PURPOSE:    Definition for the C++ Standard Library <ciso646> header
+ *
+ * LICENSE:    The MIT License
+ *
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+ */
+
+#ifndef MOBILITY_RUNTIME_CISO646
+#define MOBILITY_RUNTIME_CISO646
+
+#include "iso646.h"
+
+#endif // !MOBILITY_RUNTIME_CISO646

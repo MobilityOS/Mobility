@@ -1,0 +1,16 @@
+﻿/*
+ * PROJECT:    Mobility
+ * FILE:       cstdalign
+ * PURPOSE:    Definition for the C++ Standard Library <cstdalign> header
+ *
+ * LICENSE:    The MIT License
+ *
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+ */
+
+#ifndef MOBILITY_RUNTIME_CSTDALIGN
+#define MOBILITY_RUNTIME_CSTDALIGN
+
+#include "stdalign.h"
+
+#endif // !MOBILITY_RUNTIME_CSTDALIGN

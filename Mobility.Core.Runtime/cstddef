@@ -1,0 +1,24 @@
+﻿/*
+ * PROJECT:    Mobility
+ * FILE:       cstddef
+ * PURPOSE:    Definition for the C++ Standard Library <cstddef> header
+ *
+ * LICENSE:    The MIT License
+ *
+ * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
+ */
+
+#ifndef MOBILITY_RUNTIME_CSTDDEF
+#define MOBILITY_RUNTIME_CSTDDEF
+
+#include "stddef.h"
+
+namespace std
+{
+    using ::ptrdiff_t;
+    using ::nullptr_t;
+    using ::max_align_t;
+    using ::size_t;
+}
+
+#endif // !MOBILITY_RUNTIME_CSTDDEF
