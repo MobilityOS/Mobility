@@ -64,6 +64,7 @@ Here are the RDP specifications referenced in this project:
 - Alice implements only the necessary parts.
 - Alice supports both framebuffer-primary and GDI-drawing-order-primary output
   models.
+- The minimum implementation supports only slow-path input and output.
 
 ## Rationale
 
