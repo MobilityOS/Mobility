@@ -206,26 +206,33 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     push qword ptr [rbp + 24]
 
     ; MO_UINT64 Gdtr[2], Idtr[2];
+    ;
+    ; convert struct IA32_DESCRIPTOR { MO_UINT16 Limit; MO_UINT64 Base; }
+    ; to      struct                 { MO_UINT64 Base; MO_UINT64 Limit; }
 
-    xor rax, rax
+    xor eax, eax ; rax=0
+    push rax ; push 16 bytes
     push rax
-    push rax
-    sidt [rsp]
-    xchg rax, [rsp + 2]
-    xchg rax, [rsp]
-    xchg rax, [rsp + 8]
+    sidt [rsp] ; store 10 bytes
+    mov cx, [rsp] ; cx = MO_UINT16 Limit
+    mov rax, [rsp + 2] ; rax = MO_UINT64 Base
+    mov [rsp], rax ; rsp[0] = MO_UINT64 Base
+    mov [rsp + 8], cx ; rsp[1] = MO_UINT64 Limit
+    ; Upper 6bytes 48bits are zero because of push 0 and sidt did not write
+    ; there.
 
-    xor rax, rax
+    xor eax, eax ; Again, sgdt instead of sidt.
     push rax
     push rax
     sgdt [rsp]
-    xchg rax, [rsp + 2]
-    xchg rax, [rsp]
-    xchg rax, [rsp + 8]
+    mov cx, [rsp]
+    mov rax, [rsp + 2]
+    mov [rsp], rax
+    mov [rsp + 8], cx
 
     ; MO_UINT64 Ldtr, Tr;
 
-    xor rax, rax
+    xor eax, eax
     str ax
     push rax
     sldt ax
@@ -246,7 +253,7 @@ MoPlatformInterruptCommonEntry PROC PUBLIC FRAME
     push rax
     mov rax, cr2
     push rax
-    xor rax, rax
+    xor eax, eax
     push rax
     mov rax, cr0
     push rax
@@ -396,9 +403,7 @@ Vector = 0
 REPEAT 256
 ALIGN 8
 
-    ; The following interrupts have error codes associated with them.
-    ; For all other interrupts, a dummy error code is pushed.
-    ; This mask covers the following exceptions:
+    ; The following exceptions have error codes associated with them:
     ;   8 - Double Fault (#DF)
     ;   10 - Invalid TSS (#TS)
     ;   11 - Segment Not Present (#NP)
@@ -407,6 +412,8 @@ ALIGN 8
     ;   14 - Page Fault (#PF)
     ;   17 - Alignment Check (#AC)
     ;   21 - Control Protection Exception (#CP)
+    ;   29 - VMM Communication Exception (#VC, AMD)
+    ; For all other interrupts, a dummy error code is pushed.
     DummyCodeNeeded = 1
     IF Vector EQ 8
         DummyCodeNeeded = 0
@@ -423,6 +430,8 @@ ALIGN 8
     ELSEIF Vector EQ 17
         DummyCodeNeeded = 0
     ELSEIF Vector EQ 21
+        DummyCodeNeeded = 0
+    ELSEIF Vector EQ 29
         DummyCodeNeeded = 0
     ENDIF
 
