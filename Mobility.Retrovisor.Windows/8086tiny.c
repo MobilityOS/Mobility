@@ -37,26 +37,9 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(MO_VOID);
 #include <sys/timeb.h>
 #include <string.h>
 
-#ifdef _WIN32
-
 #include <conio.h>
 #include <fcntl.h>
 #include <io.h>
-
-// Use the function names declared by the Microsoft CRT.
-#define open _open
-#define read _read
-#define write _write
-#define lseek _lseek
-#define kbhit _kbhit
-#define getch _getch
-
-#else
-
-#include <unistd.h>
-#include <fcntl.h>
-
-#endif
 
 // Emulator system constants
 #define IO_PORT_COUNT 0x10000
@@ -238,20 +221,6 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(MO_VOID);
 
 // Reinterpretation cast
 #define CAST(a) *(a*)&
-
-// Keyboard driver for console.
-// This may need changing for UNIX/non-UNIX platforms
-#ifdef _WIN32
-#define KEYBOARD_DRIVER \
-    kbhit() && ( \
-        mem[0x4A6] = getch(), \
-        pc_interrupt(7))
-#else
-#define KEYBOARD_DRIVER \
-    read(0, mem + 0x4A6, 1) && ( \
-        int8_asap = (mem[0x4A6] == 0x1B), \
-        pc_interrupt(7))
-#endif
 
 // Global variable definitions
 uint8_t mem[RAM_SIZE];
@@ -436,13 +405,13 @@ int main_8086tiny(int argc, char **argv)
     // Open BIOS (file id disk[2]), floppy disk image (disk[1]), and hard disk
     // image (disk[0]) if specified
     for (file_index = 3; file_index;)
-        disk[--file_index] = *++argv ? open(*argv, 32898) : 0;
+        disk[--file_index] = *++argv ? _open(*argv, 32898) : 0;
 
     // Set CX:AX equal to the hard disk image size, if present
-    CAST(uint32_t)regs16[REG_AX] = *disk ? lseek(*disk, 0, 2) >> 9 : 0;
+    CAST(uint32_t)regs16[REG_AX] = *disk ? _lseek(*disk, 0, 2) >> 9 : 0;
 
     // Load BIOS image into F000:0100, and set IP to 0100
-    read(disk[2], regs8 + (reg_ip = 0x100), 0xFF00);
+    _read(disk[2], regs8 + (reg_ip = 0x100), 0xFF00);
 
     // Load instruction decoding helper table
     for (int i = 0; i < 20; i++)
@@ -942,7 +911,7 @@ int main_8086tiny(int argc, char **argv)
                 switch ((int8_t)i_data0)
                 {
                     OPCODE_CHAIN 0: // PUTCHAR_AL
-                        write(1, regs8, 1)
+                        _write(1, regs8, 1)
                     OPCODE 1: // GET_RTC
                         time(&clock_buf);
                         ftime(&ms_clock);
@@ -954,13 +923,13 @@ int main_8086tiny(int argc, char **argv)
                             ms_clock.millitm;
                     OPCODE 2: // DISK_READ
                     OPCODE_CHAIN 3: // DISK_WRITE
-                        regs8[REG_AL] = ~lseek(
+                        regs8[REG_AL] = ~_lseek(
                             disk[regs8[REG_DL]],
                             CAST(uint32_t)regs16[REG_BP] << 9,
                             0)
                             ? ((int8_t)i_data0 == 3
-                                ? (int(*)())write
-                                : (int(*)())read)(
+                                ? (int(*)())_write
+                                : (int(*)())_read)(
                                     disk[regs8[REG_DL]],
                                     mem + SEGREG(REG_ES, REG_BX,),
                                     regs16[REG_AX])
@@ -1142,9 +1111,11 @@ int main_8086tiny(int argc, char **argv)
                     pc_interrupt(7);
                 }
             }
-            else
+            else if (_kbhit())
             {
-                KEYBOARD_DRIVER;
+                // Keyboard driver for console.
+                mem[0x4A6] = _getch();
+                pc_interrupt(7);
             }
         }
     }
