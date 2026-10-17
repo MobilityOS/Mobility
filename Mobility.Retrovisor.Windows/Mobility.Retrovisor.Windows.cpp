@@ -48,15 +48,15 @@ namespace
             return MO_TRUE;
         }
 
-        if (::waveOutReset(g_PcSpeakerWaveOut) != MMSYSERR_NOERROR)
+        if (MMSYSERR_NOERROR != ::waveOutReset(g_PcSpeakerWaveOut))
         {
             return MO_FALSE;
         }
 
-        if (::waveOutUnprepareHeader(
+        if (MMSYSERR_NOERROR != ::waveOutUnprepareHeader(
             g_PcSpeakerWaveOut,
             &g_PcSpeakerWaveHeader,
-            sizeof(g_PcSpeakerWaveHeader)) != MMSYSERR_NOERROR)
+            sizeof(g_PcSpeakerWaveHeader)))
         {
             return MO_FALSE;
         }
@@ -68,8 +68,7 @@ namespace
     }
 }
 
-MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerInitialize(
-    MO_VOID)
+MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerInitialize(MO_VOID)
 {
     WAVEFORMATEX WaveFormat = {};
 
@@ -81,13 +80,13 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerInitialize(
     WaveFormat.nAvgBytesPerSec = PcSpeakerSampleRate;
     WaveFormat.cbSize = 0;
 
-    if (::waveOutOpen(
+    if (MMSYSERR_NOERROR != ::waveOutOpen(
         &g_PcSpeakerWaveOut,
         WAVE_MAPPER,
         &WaveFormat,
         0,
         0,
-        CALLBACK_NULL) != MMSYSERR_NOERROR)
+        CALLBACK_NULL))
     {
         g_PcSpeakerWaveOut = nullptr;
         return;
@@ -105,19 +104,15 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
         return;
     }
 
-    MO_BOOL RequestedEnabled =
-        Enabled && PitDivisor
-        ? MO_TRUE
-        : MO_FALSE;
+    MO_BOOL RequestedEnabled = Enabled && PitDivisor ? MO_TRUE : MO_FALSE;
 
     if (g_PcSpeakerEnabled == RequestedEnabled &&
-        (!RequestedEnabled ||
-            g_PcSpeakerPitDivisor == PitDivisor))
+        (!RequestedEnabled || g_PcSpeakerPitDivisor == PitDivisor))
     {
         return;
     }
 
-    if (!MoRetroVPcSpeakerStopPlayback())
+    if (!::MoRetroVPcSpeakerStopPlayback())
     {
         g_PcSpeakerAvailable = MO_FALSE;
         return;
@@ -131,9 +126,7 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
         return;
     }
 
-    for (MO_UINT32 Index = 0;
-        Index < PcSpeakerSampleCount;
-        ++Index)
+    for (MO_UINT32 Index = 0; Index < PcSpeakerSampleCount; ++Index)
     {
         g_PcSpeakerSamples[Index] =
             ((MO_UINT32_C(54) * Index / PitDivisor) & 1)
@@ -148,10 +141,10 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
         static_cast<DWORD>(sizeof(g_PcSpeakerSamples));
     g_PcSpeakerWaveHeader.dwLoops = MO_UINT32_MAX;
 
-    if (::waveOutPrepareHeader(
+    if (MMSYSERR_NOERROR != ::waveOutPrepareHeader(
         g_PcSpeakerWaveOut,
         &g_PcSpeakerWaveHeader,
-        sizeof(g_PcSpeakerWaveHeader)) != MMSYSERR_NOERROR)
+        sizeof(g_PcSpeakerWaveHeader)))
     {
         g_PcSpeakerAvailable = MO_FALSE;
         return;
@@ -159,18 +152,17 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
 
     g_PcSpeakerWaveHeaderPrepared = MO_TRUE;
 
-    g_PcSpeakerWaveHeader.dwFlags |=
-        WHDR_BEGINLOOP | WHDR_ENDLOOP;
+    g_PcSpeakerWaveHeader.dwFlags |= WHDR_BEGINLOOP | WHDR_ENDLOOP;
 
-    if (::waveOutWrite(
+    if (MMSYSERR_NOERROR != ::waveOutWrite(
         g_PcSpeakerWaveOut,
         &g_PcSpeakerWaveHeader,
-        sizeof(g_PcSpeakerWaveHeader)) != MMSYSERR_NOERROR)
+        sizeof(g_PcSpeakerWaveHeader)))
     {
-        if (::waveOutUnprepareHeader(
+        if (MMSYSERR_NOERROR == ::waveOutUnprepareHeader(
             g_PcSpeakerWaveOut,
             &g_PcSpeakerWaveHeader,
-            sizeof(g_PcSpeakerWaveHeader)) == MMSYSERR_NOERROR)
+            sizeof(g_PcSpeakerWaveHeader)))
         {
             g_PcSpeakerWaveHeader = {};
             g_PcSpeakerWaveHeaderPrepared = MO_FALSE;
@@ -184,8 +176,7 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
     g_PcSpeakerPitDivisor = PitDivisor;
 }
 
-MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerUninitialize(
-    MO_VOID)
+MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerUninitialize(MO_VOID)
 {
     if (!g_PcSpeakerWaveOut)
     {
@@ -215,65 +206,62 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerUninitialize(
 
 namespace
 {
-    constexpr wchar_t RetroVDisplayWindowClassName[] =
+    constexpr wchar_t DisplayWindowClassName[] =
         L"Mobility.Retrovisor.Windows.Display";
 
-    HANDLE g_RetroVDisplayThread = nullptr;
-    HANDLE g_RetroVDisplayReadyEvent = nullptr;
-    HWND g_RetroVDisplayWindow = nullptr;
+    HANDLE g_DisplayThread = nullptr;
+    HANDLE g_DisplayReadyEvent = nullptr;
+    HWND g_DisplayWindow = nullptr;
 
-    std::vector<MO_UINT32> g_RetroVDisplayPixels;
-    MO_DISPLAY_BGRA32_FRAMEBUFFER g_RetroVDisplayFrameBuffer = {};
-    BITMAPINFO g_RetroVDisplayBitmapInformation = {};
+    std::vector<MO_UINT32> g_DisplayPixels;
+    MO_DISPLAY_BGRA32_FRAMEBUFFER g_DisplayFrameBuffer = {};
+    BITMAPINFO g_DisplayBitmapInformation = {};
 
-    constexpr MO_UINT32 RetroVKeyboardQueueCapacity = MO_UINT32_C(256);
+    constexpr MO_UINT32 KeyboardQueueCapacity = MO_UINT32_C(256);
 
-    std::mutex g_RetroVKeyboardQueueLock;
+    std::mutex g_KeyboardQueueLock;
 
-    MO_UINT16 g_RetroVKeyboardQueue[RetroVKeyboardQueueCapacity] = {};
+    MO_UINT16 g_KeyboardQueue[KeyboardQueueCapacity] = {};
 
-    MO_UINT16 g_RetroVPressedKeys[256] = {};
+    MO_UINT16 g_PressedKeys[256] = {};
 
-    MO_UINT32 g_RetroVKeyboardQueueReadIndex = 0;
-    MO_UINT32 g_RetroVKeyboardQueueWriteIndex = 0;
+    MO_UINT32 g_KeyboardQueueReadIndex = 0;
+    MO_UINT32 g_KeyboardQueueWriteIndex = 0;
 
     MO_VOID MoRetroVDisplayClearKeyboardQueue()
     {
-        std::lock_guard<std::mutex> LockGuard(g_RetroVKeyboardQueueLock);
+        std::lock_guard<std::mutex> LockGuard(g_KeyboardQueueLock);
 
-        g_RetroVKeyboardQueueReadIndex = 0;
-        g_RetroVKeyboardQueueWriteIndex = 0;
+        g_KeyboardQueueReadIndex = 0;
+        g_KeyboardQueueWriteIndex = 0;
 
         for (MO_UINT32 Index = 0; Index < 256; ++Index)
         {
-            g_RetroVPressedKeys[Index] = 0;
+            g_PressedKeys[Index] = 0;
         }
     }
 
     MO_VOID MoRetroVDisplayEnqueueKey(
-        MO_UINT16 KeyEvent)
+        _Mo_In_ MO_UINT16 KeyEvent)
     {
-        std::lock_guard<std::mutex> LockGuard(g_RetroVKeyboardQueueLock);
+        std::lock_guard<std::mutex> LockGuard(g_KeyboardQueueLock);
 
         MO_UINT32 NextWriteIndex =
-            (g_RetroVKeyboardQueueWriteIndex + 1) &
-            (RetroVKeyboardQueueCapacity - 1);
+            (g_KeyboardQueueWriteIndex + 1) & (KeyboardQueueCapacity - 1);
 
-        if (NextWriteIndex != g_RetroVKeyboardQueueReadIndex)
+        if (NextWriteIndex != g_KeyboardQueueReadIndex)
         {
-            g_RetroVKeyboardQueue[g_RetroVKeyboardQueueWriteIndex] = KeyEvent;
-
-            g_RetroVKeyboardQueueWriteIndex = NextWriteIndex;
+            g_KeyboardQueue[g_KeyboardQueueWriteIndex] = KeyEvent;
+            g_KeyboardQueueWriteIndex = NextWriteIndex;
         }
     }
 
     MO_UINT16 MoRetroVDisplayTranslateKey(
-        WPARAM WParam,
-        LPARAM LParam)
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam)
     {
-        UINT VirtualKey = static_cast<UINT>(WParam);
-
-        UINT ScanCode = static_cast<UINT>((LParam >> 16) & 0xFF);
+        UINT VirtualKey = static_cast<UINT>(wParam);
+        UINT ScanCode = static_cast<UINT>((lParam >> 16) & 0xFF);
 
         if (VirtualKey >= VK_NUMPAD0 && VirtualKey <= VK_NUMPAD9)
         {
@@ -289,128 +277,91 @@ namespace
         {
         case VK_BACK:
             return 8;
-
         case VK_TAB:
             return 9;
-
         case VK_CLEAR:
             return 12;
-
         case VK_RETURN:
-            return (LParam & (1 << 24)) ? 271 : 13;
-
+            return (lParam & (1 << 24)) ? 271 : 13;
         case VK_PAUSE:
             return 19;
-
         case VK_ESCAPE:
             return 27;
-
         case VK_SPACE:
             return 32;
-
         case VK_DELETE:
             return 127;
-
         case VK_DECIMAL:
             return 266;
-
         case VK_DIVIDE:
             return 267;
-
         case VK_MULTIPLY:
             return 268;
-
         case VK_SUBTRACT:
             return 269;
-
         case VK_ADD:
             return 270;
-
         case VK_UP:
             return 273;
-
         case VK_DOWN:
             return 274;
-
         case VK_RIGHT:
             return 275;
-
         case VK_LEFT:
             return 276;
-
         case VK_INSERT:
             return 277;
-
         case VK_HOME:
             return 278;
-
         case VK_END:
             return 279;
-
         case VK_PRIOR:
             return 280;
-
         case VK_NEXT:
             return 281;
-
         case VK_NUMLOCK:
             return 300;
-
         case VK_CAPITAL:
             return 301;
-
         case VK_SCROLL:
             return 302;
-
         case VK_RSHIFT:
             return 303;
-
         case VK_LSHIFT:
             return 304;
-
         case VK_SHIFT:
-            return ::MapVirtualKeyW(
-                ScanCode,
-                MAPVK_VSC_TO_VK_EX) == VK_RSHIFT
+            return VK_RSHIFT == ::MapVirtualKeyW(ScanCode, MAPVK_VSC_TO_VK_EX)
                 ? 303
                 : 304;
-
         case VK_RCONTROL:
             return 305;
-
         case VK_LCONTROL:
             return 306;
-
         case VK_CONTROL:
-            return (LParam & (1 << 24)) ? 305 : 306;
-
+            return (lParam & (1 << 24)) ? 305 : 306;
         case VK_RMENU:
             return 307;
-
         case VK_LMENU:
             return 308;
-
         case VK_MENU:
-            return (LParam & (1 << 24)) ? 307 : 308;
-
+            return (lParam & (1 << 24)) ? 307 : 308;
         case VK_SNAPSHOT:
             return 316;
-
         case VK_CANCEL:
             return 318;
-
         case VK_APPS:
             return 319;
+        default:
+            break;
         }
 
         BYTE KeyboardState[256] = {};
-        WCHAR Characters[4] = {};
-
         if (!::GetKeyboardState(KeyboardState))
         {
             return 0;
         }
 
+        WCHAR Characters[4] = {};
         int CharacterCount = ::ToUnicodeEx(
             VirtualKey,
             ScanCode,
@@ -420,188 +371,168 @@ namespace
             0,
             ::GetKeyboardLayout(0));
 
-        if (CharacterCount == 1 &&
-            Characters[0] > 0 &&
-            Characters[0] <= 0x7F)
+        if (1 == CharacterCount && Characters[0] > 0 && Characters[0] <= 0x7F)
         {
-            return static_cast<MO_UINT16>(
-                Characters[0]);
+            return static_cast<MO_UINT16>(Characters[0]);
         }
 
         return 0;
     }
 
     MO_VOID MoRetroVDisplayProcessKey(
-        UINT Message,
-        WPARAM WParam,
-        LPARAM LParam)
+        _In_ UINT uMsg,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam)
     {
-        MO_BOOL Released =
-            Message == WM_KEYUP ||
-            Message == WM_SYSKEYUP
-            ? MO_TRUE
-            : MO_FALSE;
+        MO_BOOL Released = MO_FALSE;
+        if (WM_KEYUP == uMsg || WM_SYSKEYUP == uMsg)
+        {
+            Released = MO_TRUE;
+        }
 
-        MO_UINT32 VirtualKey = static_cast<MO_UINT32>(WParam) & 0xFF;
+        MO_UINT32 VirtualKey = static_cast<MO_UINT32>(wParam) & 0xFF;
 
         MO_UINT16 KeyCode = 0;
-
         if (Released)
         {
-            KeyCode = g_RetroVPressedKeys[VirtualKey];
-
+            KeyCode = g_PressedKeys[VirtualKey];
             if (!KeyCode)
             {
-                KeyCode = MoRetroVDisplayTranslateKey(WParam, LParam);
+                KeyCode = ::MoRetroVDisplayTranslateKey(wParam, lParam);
             }
-
-            g_RetroVPressedKeys[VirtualKey] = 0;
+            g_PressedKeys[VirtualKey] = 0;
         }
         else
         {
-            KeyCode = MoRetroVDisplayTranslateKey(WParam, LParam);
-
-            g_RetroVPressedKeys[VirtualKey] = KeyCode;
+            KeyCode = ::MoRetroVDisplayTranslateKey(wParam, lParam);
+            g_PressedKeys[VirtualKey] = KeyCode;
         }
-
         if (!KeyCode)
         {
             return;
         }
 
         MO_UINT16 KeyEvent = static_cast<MO_UINT16>(0x0400 | KeyCode);
-
         if (::GetKeyState(VK_MENU) & 0x8000)
         {
             KeyEvent |= 0x0800;
         }
-
         if (::GetKeyState(VK_SHIFT) & 0x8000)
         {
             KeyEvent |= 0x1000;
         }
-
         if (::GetKeyState(VK_CONTROL) & 0x8000)
         {
             KeyEvent |= 0x2000;
         }
-
         if (Released)
         {
             KeyEvent |= 0x4000;
         }
 
-        MoRetroVDisplayEnqueueKey(KeyEvent);
+        ::MoRetroVDisplayEnqueueKey(KeyEvent);
     }
 
     LRESULT CALLBACK MoRetroVDisplayWindowProcedure(
-        HWND WindowHandle,
-        UINT Message,
-        WPARAM WParam,
-        LPARAM LParam)
+        _In_ HWND hWnd,
+        _In_ UINT uMsg,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam)
     {
-        switch (Message)
+        switch (uMsg)
         {
         case WM_KEYDOWN:
         case WM_KEYUP:
         case WM_SYSKEYDOWN:
         case WM_SYSKEYUP:
-            MoRetroVDisplayProcessKey(Message, WParam, LParam);
+            ::MoRetroVDisplayProcessKey(uMsg, wParam, lParam);
             return 0;
-
         case WM_CHAR:
         case WM_SYSCHAR:
             return 0;
-
         case WM_PAINT:
         {
             PAINTSTRUCT PaintStructure = {};
-            HDC DeviceContext = ::BeginPaint(WindowHandle, &PaintStructure);
+            HDC DeviceContext = ::BeginPaint(hWnd, &PaintStructure);
 
             ::StretchDIBits(
                 DeviceContext,
                 0,
                 0,
                 static_cast<int>(
-                    g_RetroVDisplayFrameBuffer.HorizontalResolution),
+                    g_DisplayFrameBuffer.HorizontalResolution),
                 static_cast<int>(
-                    g_RetroVDisplayFrameBuffer.VerticalResolution),
+                    g_DisplayFrameBuffer.VerticalResolution),
                 0,
                 0,
                 static_cast<int>(
-                    g_RetroVDisplayFrameBuffer.HorizontalResolution),
+                    g_DisplayFrameBuffer.HorizontalResolution),
                 static_cast<int>(
-                    g_RetroVDisplayFrameBuffer.VerticalResolution),
-                g_RetroVDisplayFrameBuffer.FrameBufferBase,
-                &g_RetroVDisplayBitmapInformation,
+                    g_DisplayFrameBuffer.VerticalResolution),
+                g_DisplayFrameBuffer.FrameBufferBase,
+                &g_DisplayBitmapInformation,
                 DIB_RGB_COLORS,
                 SRCCOPY);
 
-            ::EndPaint(WindowHandle, &PaintStructure);
+            ::EndPaint(hWnd, &PaintStructure);
 
             return 0;
         }
-
         case WM_ERASEBKGND:
             return 1;
-
         case WM_CLOSE:
-            ::DestroyWindow(WindowHandle);
+            ::DestroyWindow(hWnd);
             return 0;
-
         case WM_DESTROY:
             ::PostQuitMessage(0);
             return 0;
+        default:
+            break;
         }
 
-        return ::DefWindowProcW(
-            WindowHandle,
-            Message,
-            WParam,
-            LParam);
+        return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
     }
 
     DWORD WINAPI MoRetroVDisplayThreadProcedure(
-        LPVOID)
+        _In_ LPVOID lpThreadParameter)
     {
-        HINSTANCE InstanceHandle =
-            ::GetModuleHandleW(nullptr);
+        UNREFERENCED_PARAMETER(lpThreadParameter);
+
+        HINSTANCE InstanceHandle = ::GetModuleHandleW(nullptr);
 
         WNDCLASSEXW WindowClass = {};
         WindowClass.cbSize = sizeof(WindowClass);
         WindowClass.style = CS_HREDRAW | CS_VREDRAW;
-        WindowClass.lpfnWndProc = MoRetroVDisplayWindowProcedure;
+        WindowClass.lpfnWndProc = ::MoRetroVDisplayWindowProcedure;
         WindowClass.hInstance = InstanceHandle;
         WindowClass.hCursor = ::LoadCursorW(nullptr, IDC_ARROW);
         WindowClass.hbrBackground =
             reinterpret_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
-        WindowClass.lpszClassName = RetroVDisplayWindowClassName;
+        WindowClass.lpszClassName = DisplayWindowClassName;
 
         ATOM WindowClassAtom = ::RegisterClassExW(&WindowClass);
 
         if (!WindowClassAtom)
         {
-            ::SetEvent(g_RetroVDisplayReadyEvent);
+            ::SetEvent(g_DisplayReadyEvent);
             return 0;
         }
 
         DWORD WindowStyle = WS_OVERLAPPED | WS_CAPTION;
 
-        RECT WindowRectangle =
-        {
-            0,
-            0,
-            static_cast<LONG>(
-                g_RetroVDisplayFrameBuffer.HorizontalResolution),
-            static_cast<LONG>(
-                g_RetroVDisplayFrameBuffer.VerticalResolution)
-        };
+        RECT WindowRectangle = {};
+        WindowRectangle.left = 0;
+        WindowRectangle.top = 0;
+        WindowRectangle.right = static_cast<LONG>(
+            g_DisplayFrameBuffer.HorizontalResolution);
+        WindowRectangle.bottom = static_cast<LONG>(
+            g_DisplayFrameBuffer.VerticalResolution);
 
         ::AdjustWindowRect(&WindowRectangle, WindowStyle, FALSE);
 
-        g_RetroVDisplayWindow = ::CreateWindowExW(
+        g_DisplayWindow = ::CreateWindowExW(
             0,
-            RetroVDisplayWindowClassName,
+            DisplayWindowClassName,
             L"Mobility Retrovisor for Windows",
             WindowStyle,
             CW_USEDEFAULT,
@@ -613,32 +544,28 @@ namespace
             InstanceHandle,
             nullptr);
 
-        if (!g_RetroVDisplayWindow)
+        if (!g_DisplayWindow)
         {
-            ::SetEvent(g_RetroVDisplayReadyEvent);
-
-            ::UnregisterClassW(RetroVDisplayWindowClassName, InstanceHandle);
-
+            ::SetEvent(g_DisplayReadyEvent);
+            ::UnregisterClassW(DisplayWindowClassName, InstanceHandle);
             return 0;
         }
 
-        ::ShowWindow(g_RetroVDisplayWindow, SW_SHOWNORMAL);
+        ::ShowWindow(g_DisplayWindow, SW_SHOWNORMAL);
+        ::UpdateWindow(g_DisplayWindow);
 
-        ::UpdateWindow(g_RetroVDisplayWindow);
-
-        ::SetEvent(g_RetroVDisplayReadyEvent);
+        ::SetEvent(g_DisplayReadyEvent);
 
         MSG Message = {};
-
         while (::GetMessageW(&Message, nullptr, 0, 0) > 0)
         {
             ::TranslateMessage(&Message);
             ::DispatchMessageW(&Message);
         }
 
-        g_RetroVDisplayWindow = nullptr;
+        g_DisplayWindow = nullptr;
 
-        ::UnregisterClassW(RetroVDisplayWindowClassName, InstanceHandle);
+        ::UnregisterClassW(DisplayWindowClassName, InstanceHandle);
 
         return 0;
     }
@@ -649,63 +576,55 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayCreate(
     _Mo_In_ MO_UINT32 VerticalResolution,
     _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER FrameBuffer)
 {
-    MoRetroVDisplayClearKeyboardQueue();
+    ::MoRetroVDisplayClearKeyboardQueue();
 
-    g_RetroVDisplayPixels.assign(
+    g_DisplayPixels.assign(
         static_cast<MO_UINTN>(HorizontalResolution) *
         VerticalResolution,
         MO_DISPLAY_BGRA32_MAKE(0, 0, 0, MO_UINT8_MAX));
 
-    g_RetroVDisplayFrameBuffer.FrameBufferBase =
-        g_RetroVDisplayPixels.data();
-    g_RetroVDisplayFrameBuffer.HorizontalResolution =
-        HorizontalResolution;
-    g_RetroVDisplayFrameBuffer.VerticalResolution =
-        VerticalResolution;
-    g_RetroVDisplayFrameBuffer.PixelsPerScanLine =
-        HorizontalResolution;
+    g_DisplayFrameBuffer.FrameBufferBase = g_DisplayPixels.data();
+    g_DisplayFrameBuffer.HorizontalResolution = HorizontalResolution;
+    g_DisplayFrameBuffer.VerticalResolution = VerticalResolution;
+    g_DisplayFrameBuffer.PixelsPerScanLine = HorizontalResolution;
 
-    g_RetroVDisplayBitmapInformation = {};
-    g_RetroVDisplayBitmapInformation.bmiHeader.biSize =
-        sizeof(BITMAPINFOHEADER);
-    g_RetroVDisplayBitmapInformation.bmiHeader.biWidth =
+    g_DisplayBitmapInformation = {};
+    g_DisplayBitmapInformation.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    g_DisplayBitmapInformation.bmiHeader.biWidth =
         static_cast<LONG>(HorizontalResolution);
-    g_RetroVDisplayBitmapInformation.bmiHeader.biHeight =
+    g_DisplayBitmapInformation.bmiHeader.biHeight =
         -static_cast<LONG>(VerticalResolution);
-    g_RetroVDisplayBitmapInformation.bmiHeader.biPlanes = 1;
-    g_RetroVDisplayBitmapInformation.bmiHeader.biBitCount = 32;
-    g_RetroVDisplayBitmapInformation.bmiHeader.biCompression =
-        BI_RGB;
+    g_DisplayBitmapInformation.bmiHeader.biPlanes = 1;
+    g_DisplayBitmapInformation.bmiHeader.biBitCount = 32;
+    g_DisplayBitmapInformation.bmiHeader.biCompression = BI_RGB;
 
-    g_RetroVDisplayReadyEvent = ::CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    g_DisplayReadyEvent = ::CreateEventW(nullptr, FALSE, FALSE, nullptr);
 
-    if (g_RetroVDisplayReadyEvent)
+    if (g_DisplayReadyEvent)
     {
-        g_RetroVDisplayThread = ::MileCreateThread(
+        g_DisplayThread = ::MileCreateThread(
             nullptr,
             0,
-            MoRetroVDisplayThreadProcedure,
+            ::MoRetroVDisplayThreadProcedure,
             nullptr,
             0,
             nullptr);
 
-        if (g_RetroVDisplayThread)
+        if (g_DisplayThread)
         {
-            ::WaitForSingleObject(g_RetroVDisplayReadyEvent, INFINITE);
+            ::WaitForSingleObject(g_DisplayReadyEvent, INFINITE);
         }
 
-        ::CloseHandle(g_RetroVDisplayReadyEvent);
-        g_RetroVDisplayReadyEvent = nullptr;
+        ::CloseHandle(g_DisplayReadyEvent);
+        g_DisplayReadyEvent = nullptr;
     }
 
-    *FrameBuffer = g_RetroVDisplayFrameBuffer;
+    *FrameBuffer = g_DisplayFrameBuffer;
 }
 
-MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(
-    MO_VOID)
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(MO_VOID)
 {
-    HWND WindowHandle = g_RetroVDisplayWindow;
-
+    HWND WindowHandle = g_DisplayWindow;
     if (WindowHandle)
     {
         ::InvalidateRect(WindowHandle, nullptr, FALSE);
@@ -715,46 +634,43 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(
 MO_EXTERN_C MO_BOOL MOAPI MoRetroVDisplayReadKey(
     _Mo_Out_ PMO_UINT16 KeyEvent)
 {
-    std::lock_guard<std::mutex> LockGuard(g_RetroVKeyboardQueueLock);
+    std::lock_guard<std::mutex> LockGuard(g_KeyboardQueueLock);
 
-    if (g_RetroVKeyboardQueueReadIndex == g_RetroVKeyboardQueueWriteIndex)
+    if (g_KeyboardQueueReadIndex == g_KeyboardQueueWriteIndex)
     {
         return MO_FALSE;
     }
 
-    *KeyEvent = g_RetroVKeyboardQueue[g_RetroVKeyboardQueueReadIndex];
+    *KeyEvent = g_KeyboardQueue[g_KeyboardQueueReadIndex];
 
-    g_RetroVKeyboardQueueReadIndex =
-        (g_RetroVKeyboardQueueReadIndex + 1) &
-        (RetroVKeyboardQueueCapacity - 1);
+    g_KeyboardQueueReadIndex =
+        (g_KeyboardQueueReadIndex + 1) & (KeyboardQueueCapacity - 1);
 
     return MO_TRUE;
 }
 
-MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(
-    MO_VOID)
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(MO_VOID)
 {
-    if (g_RetroVDisplayThread)
+    if (g_DisplayThread)
     {
-        HWND WindowHandle = g_RetroVDisplayWindow;
-
+        HWND WindowHandle = g_DisplayWindow;
         if (WindowHandle)
         {
             ::PostMessageW(WindowHandle, WM_CLOSE, 0, 0);
         }
 
-        ::WaitForSingleObject(g_RetroVDisplayThread, INFINITE);
+        ::WaitForSingleObject(g_DisplayThread, INFINITE);
 
-        ::CloseHandle(g_RetroVDisplayThread);
-        g_RetroVDisplayThread = nullptr;
+        ::CloseHandle(g_DisplayThread);
+        g_DisplayThread = nullptr;
     }
 
-    g_RetroVDisplayWindow = nullptr;
-    g_RetroVDisplayPixels.clear();
-    g_RetroVDisplayFrameBuffer = {};
-    g_RetroVDisplayBitmapInformation = {};
+    g_DisplayWindow = nullptr;
+    g_DisplayPixels.clear();
+    g_DisplayFrameBuffer = {};
+    g_DisplayBitmapInformation = {};
 
-    MoRetroVDisplayClearKeyboardQueue();
+    ::MoRetroVDisplayClearKeyboardQueue();
 }
 
 extern "C" int main_8086tiny(int argc, char** argv);

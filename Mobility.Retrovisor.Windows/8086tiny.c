@@ -24,14 +24,12 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayCreate(
     _Mo_In_ MO_UINT32 VerticalResolution,
     _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER FrameBuffer);
 
-MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(
-    MO_VOID);
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(MO_VOID);
 
 MO_EXTERN_C MO_BOOL MOAPI MoRetroVDisplayReadKey(
     _Mo_Out_ PMO_UINT16 KeyEvent);
 
-MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(
-    MO_VOID);
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(MO_VOID);
 
 #include <stdint.h>
 #include <time.h>
