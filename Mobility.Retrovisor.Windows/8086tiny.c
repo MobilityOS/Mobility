@@ -13,6 +13,12 @@
 //
 // This work is licensed under the MIT License. See included LICENSE.TXT.
 
+#include <Mile.Mobility.Portable.Types.h>
+
+MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
+    _Mo_In_ MO_BOOL Enabled,
+    _Mo_In_ MO_UINT16 PitDivisor);
+
 #include <stdint.h>
 #include <time.h>
 #include <sys/timeb.h>
@@ -202,16 +208,15 @@ uint8_t trap_flag;
 uint8_t int8_asap;
 uint8_t scratch_uchar;
 uint8_t io_hi_lo;
+uint8_t pc_speaker_mode_enabled;
 
 uint8_t* vid_mem_base;
-uint8_t spkr_en;
 uint8_t bios_table_lookup[20][256];
 
 uint16_t* regs16;
 uint16_t reg_ip;
 uint16_t seg_override;
 uint16_t file_index;
-uint16_t wave_counter;
 
 uint32_t op_source;
 uint32_t op_dest;
@@ -238,7 +243,7 @@ time_t clock_buf;
 struct timeb ms_clock;
 
 #ifndef NO_GRAPHICS
-SDL_AudioSpec sdl_audio = {44100, AUDIO_U8, 1, 0, 128};
+
 SDL_Surface *sdl_screen;
 SDL_Event sdl_event;
 
@@ -250,6 +255,7 @@ uint16_t cga_colors[4] =
     0xE3E3, /* Magenta */
     0xFFFF /* White */
 };
+
 #endif
 
 // Helper functions
@@ -328,29 +334,20 @@ int32_t AAA_AAS(int8_t which_operation)
     return (regs16[REG_AX] += 262 * which_operation * set_AF(set_CF(((regs8[REG_AL] & 0x0F) > 9) || regs8[FLAG_AF])), regs8[REG_AL] &= 0x0F);
 }
 
-#ifndef NO_GRAPHICS
-void audio_callback(void *data, unsigned char *stream, int len)
+static void update_pc_speaker(void)
 {
-	for (int i = 0; i < len; i++)
-		stream[i] = (spkr_en == 3) && CAST(uint16_t)mem[0x4AA] ? -((54 * wave_counter++ / CAST(uint16_t)mem[0x4AA]) & 1) : sdl_audio.silence;
+    MO_BOOL enabled = pc_speaker_mode_enabled && ((io_ports[0x61] & 3) == 3)
+        ? MO_TRUE
+        : MO_FALSE;
 
-	spkr_en = io_ports[0x61] & 3;
+    MoRetroVPcSpeakerSetTone(
+        enabled,
+        CAST(uint16_t)mem[0x4AA]);
 }
-#endif
 
 // Emulator entry point
 int main_8086tiny(int argc, char **argv)
 {
-#ifndef NO_GRAPHICS
-	// Initialise SDL
-	SDL_Init(SDL_INIT_AUDIO);
-	sdl_audio.callback = audio_callback;
-#ifdef _WIN32
-	sdl_audio.samples = 512;
-#endif
-	SDL_OpenAudio(&sdl_audio, 0);
-#endif
-
 	// regs16 and reg8 point to F000:0, the start of memory-mapped registers. CS is initialised to F000
 	regs16 = (uint16_t*)(regs8 = mem + REGS_BASE);
 	regs16[REG_CS] = 0xF000;
@@ -665,11 +662,36 @@ int main_8086tiny(int argc, char **argv)
 			OPCODE 22: // OUT DX/imm8, AL/AX
 				scratch_uint = extra ? regs16[REG_DX] : (uint8_t)i_data0;
 				R_M_OP(io_ports[scratch_uint], =, regs8[REG_AL]);
-				scratch_uint == 0x61 && (io_hi_lo = 0, spkr_en |= regs8[REG_AL] & 3); // Speaker control
-				(scratch_uint == 0x40 || scratch_uint == 0x42) && (io_ports[0x43] & 6) && (mem[0x469 + scratch_uint - (io_hi_lo ^= 1)] = regs8[REG_AL]); // PIT rate programming
-#ifndef NO_GRAPHICS
-				scratch_uint == 0x43 && (io_hi_lo = 0, regs8[REG_AL] >> 6 == 2) && (SDL_PauseAudio((regs8[REG_AL] & 0xF7) != 0xB6), 0); // Speaker enable
-#endif
+
+                if (scratch_uint == 0x61)
+                {
+                    io_hi_lo = 0;
+                    update_pc_speaker();
+                }
+
+                if ((scratch_uint == 0x40 || scratch_uint == 0x42) &&
+                    (io_ports[0x43] & 6))
+                {
+                    io_hi_lo ^= 1;
+                    mem[0x469 + scratch_uint - io_hi_lo] = regs8[REG_AL];
+
+                    if (scratch_uint == 0x42 && !io_hi_lo)
+                        update_pc_speaker();
+                }
+
+                if (scratch_uint == 0x43)
+                {
+                    io_hi_lo = 0;
+
+                    if (regs8[REG_AL] >> 6 == 2)
+                    {
+                        pc_speaker_mode_enabled =
+                            ((regs8[REG_AL] & 0xF7) == 0xB6);
+
+                        update_pc_speaker();
+                    }
+                }
+
 				scratch_uint == 0x3D5 && (io_ports[0x3D4] >> 1 == 6) && (mem[0x4AD + !(io_ports[0x3D4] & 1)] = regs8[REG_AL]); // CRT video RAM start offset
 				scratch_uint == 0x3D5 && (io_ports[0x3D4] >> 1 == 7) && (scratch2_uint = ((mem[0x49E]*80 + mem[0x49D] + CAST(int16_t)mem[0x4AD]) & (io_ports[0x3D4] & 1 ? 0xFF00 : 0xFF)) + (regs8[REG_AL] << (io_ports[0x3D4] & 1 ? 0 : 8)) - CAST(int16_t)mem[0x4AD], mem[0x49D] = scratch2_uint % 80, mem[0x49E] = scratch2_uint / 80); // CRT cursor position
 				scratch_uint == 0x3B5 && io_ports[0x3B4] == 1 && (GRAPHICS_X = regs8[REG_AL] * 16); // Hercules resolution reprogramming. Defaults are set in the BIOS
