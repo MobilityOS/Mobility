@@ -1,5 +1,4 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
-#define NO_GRAPHICS
 
 #pragma warning(disable:4018)
 #pragma warning(disable:4146)
@@ -14,10 +13,25 @@
 // This work is licensed under the MIT License. See included LICENSE.TXT.
 
 #include <Mile.Mobility.Portable.Types.h>
+#include <Mobility.Display.Core.h>
 
 MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
     _Mo_In_ MO_BOOL Enabled,
     _Mo_In_ MO_UINT16 PitDivisor);
+
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayCreate(
+    _Mo_In_ MO_UINT32 HorizontalResolution,
+    _Mo_In_ MO_UINT32 VerticalResolution,
+    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER FrameBuffer);
+
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(
+    MO_VOID);
+
+MO_EXTERN_C MO_BOOL MOAPI MoRetroVDisplayReadKey(
+    _Mo_Out_ PMO_UINT16 KeyEvent);
+
+MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayDestroy(
+    MO_VOID);
 
 #include <stdint.h>
 #include <time.h>
@@ -43,10 +57,6 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
 #include <unistd.h>
 #include <fcntl.h>
 
-#endif
-
-#ifndef NO_GRAPHICS
-#include "SDL.h"
 #endif
 
 // Emulator system constants
@@ -178,13 +188,6 @@ MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
 #define KEYBOARD_DRIVER read(0, mem + 0x4A6, 1) && (int8_asap = (mem[0x4A6] == 0x1B), pc_interrupt(7))
 #endif
 
-// Keyboard driver for SDL
-#ifdef NO_GRAPHICS
-#define SDL_KEYBOARD_DRIVER KEYBOARD_DRIVER
-#else
-#define SDL_KEYBOARD_DRIVER sdl_screen ? SDL_PollEvent(&sdl_event) && (sdl_event.type == SDL_KEYDOWN || sdl_event.type == SDL_KEYUP) && (scratch_uint = sdl_event.key.keysym.unicode, scratch2_uint = sdl_event.key.keysym.mod, CAST(int16_t)mem[0x4A6] = 0x400 + 0x800*!!(scratch2_uint & KMOD_ALT) + 0x1000*!!(scratch2_uint & KMOD_SHIFT) + 0x2000*!!(scratch2_uint & KMOD_CTRL) + 0x4000*(sdl_event.type == SDL_KEYUP) + ((!scratch_uint || scratch_uint > 0x7F) ? sdl_event.key.keysym.sym : scratch_uint), pc_interrupt(7)) : (KEYBOARD_DRIVER)
-#endif
-
 // Global variable definitions
 uint8_t mem[RAM_SIZE];
 uint8_t io_ports[IO_PORT_COUNT];
@@ -233,21 +236,20 @@ uint32_t set_flags_type;
 uint32_t GRAPHICS_X;
 uint32_t GRAPHICS_Y;
 uint32_t pixel_colors[16];
+uint32_t rgb332_colors[256];
 uint32_t vmem_ctr;
 
 int32_t op_result;
 int disk[3];
 int32_t scratch_int;
 
+MO_DISPLAY_BGRA32_FRAMEBUFFER display_frame_buffer;
+
 time_t clock_buf;
 struct timeb ms_clock;
 
-#ifndef NO_GRAPHICS
-
-SDL_Surface *sdl_screen;
-SDL_Event sdl_event;
-
 uint16_t vid_addr_lookup[VIDEO_RAM_SIZE];
+
 uint16_t cga_colors[4] =
 {
     0, /* Black */
@@ -255,8 +257,6 @@ uint16_t cga_colors[4] =
     0xE3E3, /* Magenta */
     0xFFFF /* White */
 };
-
-#endif
 
 // Helper functions
 
@@ -806,45 +806,123 @@ int main_8086tiny(int argc, char **argv)
 		if (!(++inst_counter % KEYBOARD_TIMER_UPDATE_DELAY))
 			int8_asap = 1;
 
-#ifndef NO_GRAPHICS
-		// Update the video graphics display every GRAPHICS_UPDATE_DELAY instructions
-		if (!(inst_counter % GRAPHICS_UPDATE_DELAY))
-		{
-			// Video card in graphics mode?
-			if (io_ports[0x3B8] & 2)
-			{
-				// If we don't already have an SDL window open, set it up and compute color and video memory translation tables
-				if (!sdl_screen)
-				{
-					for (int i = 0; i < 16; i++)
-						pixel_colors[i] = mem[0x4AC] ? // CGA?
-							cga_colors[(i & 12) >> 2] + (cga_colors[i & 3] << 16) // CGA -> RGB332
-							: 0xFF*(((i & 1) << 24) + ((i & 2) << 15) + ((i & 4) << 6) + ((i & 8) >> 3)); // Hercules -> RGB332
+        // Update the graphics display every GRAPHICS_UPDATE_DELAY instructions
+        if (!(inst_counter % GRAPHICS_UPDATE_DELAY))
+        {
+            // Video card in graphics mode?
+            if (io_ports[0x3B8] & 2)
+            {
+                // Create the display and compute color and video memory
+                // translation tables when entering graphics mode.
+                if (!display_frame_buffer.FrameBufferBase)
+                {
+                    for (uint32_t i = 0; i < 256; ++i)
+                    {
+                        uint8_t red = (uint8_t)((i >> 5) & 7);
+                        uint8_t green = (uint8_t)((i >> 2) & 7);
+                        uint8_t blue = (uint8_t)(i & 3);
 
-					for (int i = 0; i < GRAPHICS_X * GRAPHICS_Y / 4; i++)
-						vid_addr_lookup[i] = i / GRAPHICS_X * (GRAPHICS_X / 8) + (i / 2) % (GRAPHICS_X / 8) + 0x2000*(mem[0x4AC] ? (2 * i / GRAPHICS_X) % 2 : (4 * i / GRAPHICS_X) % 4);
+                        red = (uint8_t)(
+                            (red << 5) |
+                            (red << 2) |
+                            (red >> 1));
 
-					SDL_Init(SDL_INIT_VIDEO);
-					sdl_screen = SDL_SetVideoMode(GRAPHICS_X, GRAPHICS_Y, 8, 0);
-					SDL_EnableUNICODE(1);
-					SDL_EnableKeyRepeat(500, 30);
-				}
+                        green = (uint8_t)(
+                            (green << 5) |
+                            (green << 2) |
+                            (green >> 1));
 
-				// Refresh SDL display from emulated graphics card video RAM
-				vid_mem_base = mem + 0xB0000 + 0x8000*(mem[0x4AC] ? 1 : io_ports[0x3B8] >> 7); // B800:0 for CGA/Hercules bank 2, B000:0 for Hercules bank 1
-				for (int i = 0; i < GRAPHICS_X * GRAPHICS_Y / 4; i++)
-					((uint32_t*)sdl_screen->pixels)[i] = pixel_colors[15 & (vid_mem_base[vid_addr_lookup[i]] >> 4*!(i & 1))];
+                        blue = (uint8_t)(blue * 85);
 
-				SDL_Flip(sdl_screen);
-			}
-			else if (sdl_screen) // Application has gone back to text mode, so close the SDL window
-			{
-				SDL_QuitSubSystem(SDL_INIT_VIDEO);
-				sdl_screen = 0;
-			}
-			SDL_PumpEvents();
-		}
-#endif
+                        rgb332_colors[i] = MO_DISPLAY_BGRA32_MAKE(
+                            red,
+                            green,
+                            blue,
+                            MO_UINT8_MAX);
+                    }
+
+                    for (uint32_t i = 0; i < 16; ++i)
+                    {
+                        pixel_colors[i] = mem[0x4AC]
+                            ? (uint32_t)cga_colors[(i & 12) >> 2] +
+                            ((uint32_t)cga_colors[i & 3] << 16)
+                            : UINT32_C(0xFF) * (
+                                ((uint32_t)(i & 1) << 24) +
+                                ((uint32_t)(i & 2) << 15) +
+                                ((uint32_t)(i & 4) << 6) +
+                                ((uint32_t)(i & 8) >> 3));
+                    }
+
+                    for (uint32_t i = 0;
+                        i < GRAPHICS_X * GRAPHICS_Y / 4;
+                        ++i)
+                    {
+                        vid_addr_lookup[i] =
+                            i / GRAPHICS_X * (GRAPHICS_X / 8) +
+                            (i / 2) % (GRAPHICS_X / 8) +
+                            0x2000 * (
+                                mem[0x4AC]
+                                ? (2 * i / GRAPHICS_X) % 2
+                                : (4 * i / GRAPHICS_X) % 4);
+                    }
+
+                    MoRetroVDisplayCreate(
+                        GRAPHICS_X,
+                        GRAPHICS_Y,
+                        &display_frame_buffer);
+                }
+
+                // Refresh the BGRA32 frame buffer from emulated video RAM.
+                vid_mem_base =
+                    mem +
+                    0xB0000 +
+                    0x8000 * (
+                        mem[0x4AC]
+                        ? 1
+                        : io_ports[0x3B8] >> 7);
+
+                uint32_t pixel_group_count = GRAPHICS_X * GRAPHICS_Y / 4;
+
+                uint32_t pixel_groups_per_line = GRAPHICS_X / 4;
+
+                for (uint32_t i = 0;
+                    i < pixel_group_count;
+                    ++i)
+                {
+                    uint32_t packed_colors =
+                        pixel_colors[
+                            15 & (
+                                vid_mem_base[vid_addr_lookup[i]] >>
+                                (4 * !(i & 1)))];
+
+                    PMO_UINT32 destination =
+                        display_frame_buffer.FrameBufferBase +
+                        (i / pixel_groups_per_line) *
+                        display_frame_buffer.PixelsPerScanLine +
+                        (i % pixel_groups_per_line) * 4;
+
+                    destination[0] =
+                        rgb332_colors[(uint8_t)(packed_colors >> 0)];
+
+                    destination[1] =
+                        rgb332_colors[(uint8_t)(packed_colors >> 8)];
+
+                    destination[2] =
+                        rgb332_colors[(uint8_t)(packed_colors >> 16)];
+
+                    destination[3] =
+                        rgb332_colors[(uint8_t)(packed_colors >> 24)];
+                }
+
+                MoRetroVDisplayPresent();
+            }
+            else if (display_frame_buffer.FrameBufferBase)
+            {
+                // The application has returned to text mode.
+                MoRetroVDisplayDestroy();
+                display_frame_buffer.FrameBufferBase = nullptr;
+            }
+        }
 
 		// Application has set trap flag, so fire INT 1
 		if (trap_flag)
@@ -854,12 +932,38 @@ int main_8086tiny(int argc, char **argv)
 
 		// If a timer tick is pending, interrupts are enabled, and no overrides/REP are active,
 		// then process the tick and check for new keystrokes
-		if (int8_asap && !seg_override_en && !rep_override_en && regs8[FLAG_IF] && !regs8[FLAG_TF])
-			pc_interrupt(0xA), int8_asap = 0, SDL_KEYBOARD_DRIVER;
+        if (int8_asap &&
+            !seg_override_en &&
+            !rep_override_en &&
+            regs8[FLAG_IF] &&
+            !regs8[FLAG_TF])
+        {
+            pc_interrupt(0xA);
+            int8_asap = 0;
+
+            if (display_frame_buffer.FrameBufferBase)
+            {
+                MO_UINT16 key_event = 0;
+
+                if (MoRetroVDisplayReadKey(&key_event))
+                {
+                    CAST(uint16_t)mem[0x4A6] = key_event;
+
+                    pc_interrupt(7);
+                }
+            }
+            else
+            {
+                KEYBOARD_DRIVER;
+            }
+        }
 	}
 
-#ifndef NO_GRAPHICS
-	SDL_Quit();
-#endif
-	return 0;
+    if (display_frame_buffer.FrameBufferBase)
+    {
+        MoRetroVDisplayDestroy();
+        display_frame_buffer.FrameBufferBase = nullptr;
+    }
+
+    return 0;
 }
