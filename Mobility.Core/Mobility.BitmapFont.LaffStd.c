@@ -15,7 +15,7 @@
 /**
  * @brief The LaffStd 8x19 font glyph data.
  */
-static MO_UINT8 LaffStdGlyphs[] =
+static MO_CONST MO_UINT8 g_Glyphs[] =
 {
     /* Basic Latin (ASCII) (U+0020 to U+007E) */
 
@@ -1008,146 +1008,123 @@ static MO_UINT8 LaffStdGlyphs[] =
     0x00, 0x00, 0x00,
 };
 
-#define LAFFSTD_WIDTH 8
-#define LAFFSTD_HEIGHT 19
-
-#define LAFFSTD_ARROWS_GLYPH_COUNT 4
-#define LAFFSTD_ARROWS_START 0x2190
-#define LAFFSTD_ARROWS_END 0x2193
-
-#define LAFFSTD_BOX_DRAWING_GLYPH_COUNT 11
-#define LAFFSTD_BOX_DRAWING_START 0x2500
-#define LAFFSTD_BOX_DRAWING_END 0x253C
-
-#define LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_COUNT 29
-#define LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_START 0x2550
-#define LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_END 0x256C
-
-#define LAFFSTD_BLOCK_ELEMENTS_GLYPH_COUNT 3
-
-#define LAFFSTD_GEOMETRIC_SHAPES_GLYPH_COUNT 4
-
-#define LAFFSTD_GLYPH_END 0x25C4
-
-MO_EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetWidth()
+enum
 {
-    return LAFFSTD_WIDTH;
-}
+    Width = 8,
+    Height = 19
+};
 
-MO_EXTERN_C MO_UINT8 MOAPI MoBitmapFontLaffStdGetHeight()
+static MO_CONST MO_WIDE_CHAR g_SparseCharacters[] =
 {
-    return LAFFSTD_HEIGHT;
-}
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_HORIZONTAL,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_RIGHT,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_LEFT,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_RIGHT,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_LEFT,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_RIGHT,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_LEFT,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_HORIZONTAL,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_HORIZONTAL,
+    MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_HORIZONTAL,
 
-MO_EXTERN_C MO_CONST PMO_UINT8 MOAPI MoBitmapFontLaffStdQueryGlyph(
+    MO_UNICODE_LOWER_ONE_EIGHTH_BLOCK,
+    MO_UNICODE_FULL_BLOCK,
+    MO_UNICODE_LIGHT_SHADE,
+
+    MO_UNICODE_BLACK_UP_POINTING_TRIANGLE,
+    MO_UNICODE_BLACK_RIGHT_POINTING_POINTER,
+    MO_UNICODE_BLACK_DOWN_POINTING_TRIANGLE,
+    MO_UNICODE_BLACK_LEFT_POINTING_POINTER,
+};
+
+static MO_CONST MO_UINT8* MOAPI Query(
     _Mo_In_ MO_WIDE_CHAR Character)
 {
-    if (Character > LAFFSTD_GLYPH_END)
+    enum
+    {
+        DoubleBoxDrawingStart = MO_UNICODE_BOX_DRAWINGS_DOUBLE_HORIZONTAL,
+        DoubleBoxDrawingEnd =
+            MO_UNICODE_BOX_DRAWINGS_DOUBLE_VERTICAL_HORIZONTAL,
+
+        BoxDrawingGlyphCount = 11,
+        Latin1GlyphBase = MO_UNICODE_BASIC_LATIN_GLYPH_COUNT,
+        ArrowsGlyphBase =
+            Latin1GlyphBase + MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_COUNT,
+        BoxDrawingGlyphBase = ArrowsGlyphBase +
+            (MO_UNICODE_DOWNWARDS_ARROW - MO_UNICODE_LEFTWARDS_ARROW + 1),
+        DoubleBoxDrawingGlyphBase =
+            BoxDrawingGlyphBase + BoxDrawingGlyphCount,
+        BlockElementsGlyphBase = DoubleBoxDrawingGlyphBase +
+            (DoubleBoxDrawingEnd - DoubleBoxDrawingStart + 1)
+    };
+
+    if (Character < MO_UNICODE_BASIC_LATIN_GLYPH_START ||
+        Character > MO_UNICODE_BLACK_LEFT_POINTING_POINTER)
     {
         return nullptr;
     }
 
-    MO_UINTN BaseOffset = 0;
+    MO_UINTN Index;
 
-    if (Character < MO_UNICODE_BASIC_LATIN_GLYPH_START)
+    if (Character >= MO_UNICODE_BASIC_LATIN_GLYPH_START &&
+        Character <= MO_UNICODE_BASIC_LATIN_GLYPH_END)
     {
-        return nullptr;
+        Index = Character - MO_UNICODE_BASIC_LATIN_GLYPH_START;
     }
-    if (Character < MO_UNICODE_BASIC_LATIN_GLYPH_END + 1)
+    else if (Character >= MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_START &&
+        Character <= MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_END)
     {
-        MO_UINTN Index = Character - MO_UNICODE_BASIC_LATIN_GLYPH_START;
-        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
+        Index = Latin1GlyphBase +
+            (Character - MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_START);
     }
-    BaseOffset += MO_UNICODE_BASIC_LATIN_GLYPH_COUNT;
-
-    if (Character < MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_START)
+    else if (Character >= MO_UNICODE_LEFTWARDS_ARROW &&
+        Character <= MO_UNICODE_DOWNWARDS_ARROW)
     {
-        return nullptr;
+        Index = ArrowsGlyphBase +
+            (Character - MO_UNICODE_LEFTWARDS_ARROW);
     }
-    if (Character < MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_END + 1)
+    else if (Character >= DoubleBoxDrawingStart &&
+        Character <= DoubleBoxDrawingEnd)
     {
-        MO_UINTN Index = Character - MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_START;
-        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
+        Index = DoubleBoxDrawingGlyphBase + (Character - DoubleBoxDrawingStart);
     }
-    BaseOffset += MO_UNICODE_LATIN_1_SUPPLEMENT_GLYPH_COUNT;
-
-    if (Character < LAFFSTD_ARROWS_START)
+    else
     {
-        return nullptr;
-    }
-    if (Character < LAFFSTD_ARROWS_END + 1)
-    {
-        MO_UINTN Index = Character - LAFFSTD_ARROWS_START;
-        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
-    }
-    BaseOffset += LAFFSTD_ARROWS_GLYPH_COUNT;
-
-    if (Character < LAFFSTD_BOX_DRAWING_START)
-    {
-        return nullptr;
-    }
-    if (Character < LAFFSTD_BOX_DRAWING_END + 1)
-    {
-        switch (Character)
+        if (Character < MO_UNICODE_BOX_DRAWINGS_LIGHT_HORIZONTAL)
         {
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_HORIZONTAL:
-            return &LaffStdGlyphs[(BaseOffset + 0) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL:
-            return &LaffStdGlyphs[(BaseOffset + 1) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_RIGHT:
-            return &LaffStdGlyphs[(BaseOffset + 2) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_LEFT:
-            return &LaffStdGlyphs[(BaseOffset + 3) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_RIGHT:
-            return &LaffStdGlyphs[(BaseOffset + 4) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_LEFT:
-            return &LaffStdGlyphs[(BaseOffset + 5) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_RIGHT:
-            return &LaffStdGlyphs[(BaseOffset + 6) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_LEFT:
-            return &LaffStdGlyphs[(BaseOffset + 7) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_DOWN_HORIZONTAL:
-            return &LaffStdGlyphs[(BaseOffset + 8) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_UP_HORIZONTAL:
-            return &LaffStdGlyphs[(BaseOffset + 9) * LAFFSTD_HEIGHT];
-        case MO_UNICODE_BOX_DRAWINGS_LIGHT_VERTICAL_HORIZONTAL:
-            return &LaffStdGlyphs[(BaseOffset + 10) * LAFFSTD_HEIGHT];
-        default:
             return nullptr;
         }
-    }
-    BaseOffset += LAFFSTD_BOX_DRAWING_GLYPH_COUNT;
 
-    if (Character < LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_START)
-    {
-        return nullptr;
-    }
-    if (Character < LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_END + 1)
-    {
-        MO_UINTN Index = Character - LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_START;
-        return &LaffStdGlyphs[(BaseOffset + Index) * LAFFSTD_HEIGHT];
-    }
-    BaseOffset += LAFFSTD_BOX_DRAWING_CONTINUOUS‌_GLYPH_COUNT;
-
-    switch (Character)
-    {
-    case MO_UNICODE_LOWER_ONE_EIGHTH_BLOCK:
-        return &LaffStdGlyphs[(BaseOffset + 0) * LAFFSTD_HEIGHT];
-    case MO_UNICODE_FULL_BLOCK:
-        return &LaffStdGlyphs[(BaseOffset + 1) * LAFFSTD_HEIGHT];
-    case MO_UNICODE_LIGHT_SHADE:
-        return &LaffStdGlyphs[(BaseOffset + 2) * LAFFSTD_HEIGHT];
-    case MO_UNICODE_BLACK_UP_POINTING_TRIANGLE:
-        return &LaffStdGlyphs[(BaseOffset + 3) * LAFFSTD_HEIGHT];
-    case MO_UNICODE_BLACK_RIGHT_POINTING_POINTER:
-        return &LaffStdGlyphs[(BaseOffset + 4) * LAFFSTD_HEIGHT];
-    case MO_UNICODE_BLACK_DOWN_POINTING_TRIANGLE:
-        return &LaffStdGlyphs[(BaseOffset + 5) * LAFFSTD_HEIGHT];
-    case MO_UNICODE_BLACK_LEFT_POINTING_POINTER:
-        return &LaffStdGlyphs[(BaseOffset + 6) * LAFFSTD_HEIGHT];
-    default:
-        break;
+        MO_UINTN Count = sizeof(g_SparseCharacters) /
+            sizeof(g_SparseCharacters[0]);
+        MO_UINTN SparseIndex = 0;
+        while (SparseIndex < Count &&
+            g_SparseCharacters[SparseIndex] != Character)
+        {
+            ++SparseIndex;
+        }
+        if (SparseIndex == Count)
+        {
+            return nullptr;
+        }
+        if (SparseIndex < BoxDrawingGlyphCount)
+        {
+            Index = BoxDrawingGlyphBase + SparseIndex;
+        }
+        else
+        {
+            Index = BlockElementsGlyphBase +
+                (SparseIndex - BoxDrawingGlyphCount);
+        }
     }
 
-    return nullptr;
+    return &g_Glyphs[Index * Height];
 }
+
+MO_CONST MO_BITMAP_FONT MoBitmapFontLaffStd =
+{
+    Width,
+    Height,
+    Query
+};
