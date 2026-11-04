@@ -35,6 +35,7 @@
   <ItemGroup>
     <ClInclude Include="microui.h" />
     <ClInclude Include="Mile.Mobility.Utilities.Memory.Unstaged.h" />
+    <ClInclude Include="Mobility.BitmapFont.Core.h" />
     <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
     <ClInclude Include="Mobility.Console.Core.h" />
     <ClInclude Include="Mobility.Display.Core.h" />
