@@ -155,21 +155,40 @@
 #define MO_UNICODE_BLACK_LEFT_POINTING_POINTER 0x25C4
 
 /**
- * @brief Parse a UCS-2 character from a UTF-8 byte sequence.
- * @param Destination The memory address to store the UCS-2 character. This
- *                    parameter can be nullptr if you only want to get the
- *                    number of bytes to parse from the UTF-8 byte sequence.
- * @param Source The UTF-8 byte sequence to parse.
- * @param SourceLength The number of bytes to parse from the UTF-8 byte sequence.
- * @return If Source points to a valid UTF-8 byte sequence, the return value is
- *         the number of bytes parsed from the UTF-8 byte sequence. If Source is
- *         nullptr or points to a UCS-2 null character, the return value is 0.
- *         If Source points to a character out of the UCS-2 range, the return
- *         value is -1.
+ * @brief Parses one UCS-2 character from the start of a UTF-8 byte sequence.
+ * @param Destination Optional character output. If nullptr, only the parsing
+ *                    result is returned. Invalid or missing input leaves this
+ *                    output unchanged.
+ * @param Source The input bytes, which are not modified. A null pointer
+ *               represents missing input.
+ * @param SourceLength The number of available input bytes. Bytes after the
+ *                     first character are not inspected.
+ * @return The number of bytes parsed, from 1 to 3, or 0 for missing input or
+ *         U+0000. U+0000 is stored when Destination is not nullptr. Malformed,
+ *         truncated, overlong, surrogate or non-BMP input returns -1. The
+ *         result is the same with or without Destination.
  */
 MO_EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUcs2FromUtf8(
     _Mo_Out_Opt_ PMO_WIDE_CHAR Destination,
     _Mo_In_ PMO_CHAR Source,
     _Mo_In_ MO_UINTN SourceLength);
+
+/**
+ * @brief Encodes one UCS-2 character as a UTF-8 byte sequence.
+ * @param Destination Optional output buffer. If nullptr, only the conversion
+ *                    result is returned and DestinationLength is ignored.
+ * @param Source The UCS-2 character. Surrogate code units are invalid.
+ * @param DestinationLength The output capacity in bytes. U+0000 needs one byte
+ *                          to store its zero byte. No extra terminator is
+ *                          appended for other characters.
+ * @return The number of bytes written, from 1 to 3, or 0 for U+0000. Invalid
+ *         input or insufficient output capacity returns -1 without modifying
+ *         Destination. A null Destination returns the same result without
+ *         writing bytes or checking capacity.
+ */
+MO_EXTERN_C MO_INT32 MOAPI MoUnicodeCoreParseUtf8FromUcs2(
+    _Mo_Out_Opt_ PMO_CHAR Destination,
+    _Mo_In_ MO_WIDE_CHAR Source,
+    _Mo_In_ MO_UINTN DestinationLength);
 
 #endif // !MOBILITY_UNICODE_CORE
