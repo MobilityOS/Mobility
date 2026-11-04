@@ -102,8 +102,8 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
         return;
     }
 
-    MO_UINT8 FontWidth = MoBitmapFontLaffStdGetWidth();
-    MO_UINT8 FontHeight = MoBitmapFontLaffStdGetHeight();
+    MO_UINT16 FontWidth = MoBitmapFontLaffStd.Width;
+    MO_UINT16 FontHeight = MoBitmapFontLaffStd.Height;
 
     MO_CONSOLE_COORDINATE MaximumScreenBufferSize;
     MaximumScreenBufferSize.X = (MO_UINT16)(
@@ -119,12 +119,12 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
 
     // Query the glyph data if the character is not null, or query the space
     // character instead.
-    PMO_UINT8 GlyphData = MoBitmapFontLaffStdQueryGlyph(
+    MO_CONST MO_UINT8* GlyphData = MoBitmapFontLaffStd.Query(
         Character ? Character : MO_UNICODE_SPACE);
     if (!GlyphData)
     {
         // Query the full block character if the glyph data is not found.
-        GlyphData = MoBitmapFontLaffStdQueryGlyph(MO_UNICODE_FULL_BLOCK);
+        GlyphData = MoBitmapFontLaffStd.Query(MO_UNICODE_FULL_BLOCK);
         if (!GlyphData)
         {
             // Just return if the glyph data is still not found.
