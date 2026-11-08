@@ -21,7 +21,7 @@
       <Version>1.1.732</Version>
     </PackageReference>
     <PackageReference Include="Mile.HyperV">
-      <Version>1.2.1116</Version>
+      <Version>1.2.1145</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
