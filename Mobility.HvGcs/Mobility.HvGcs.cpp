@@ -378,7 +378,7 @@ EFI_STATUS EFIAPI UefiMain(
     {
         ExtendedSystemDescriptionTable = 0u;
     }
-    if (MO_RESULT_SUCCESS_OK == ::MoHyperVCheckAvailability() &&
+    if (MO_RESULT_SUCCESS_OK == ::MoHvCheckAvailability() &&
         ExtendedSystemDescriptionTable)
     {
         ::MoUefiConsoleWriteAsciiString(
