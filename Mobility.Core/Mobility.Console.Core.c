@@ -102,8 +102,8 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
         return;
     }
 
-    MO_UINT16 FontWidth = MoBitmapFontLaffStd.Width;
-    MO_UINT16 FontHeight = MoBitmapFontLaffStd.Height;
+    MO_UINT16 FontWidth = MoBitmapFontLaffStd.Size.Width;
+    MO_UINT16 FontHeight = MoBitmapFontLaffStd.Size.Height;
 
     MO_CONSOLE_COORDINATE MaximumScreenBufferSize;
     MaximumScreenBufferSize.X = (MO_UINT16)(

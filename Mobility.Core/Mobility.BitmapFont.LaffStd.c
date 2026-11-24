@@ -1122,9 +1122,8 @@ static MO_CONST MO_UINT8* MOAPI Query(
     return &g_Glyphs[Index * Height];
 }
 
-MO_CONST MO_BITMAP_FONT MoBitmapFontLaffStd =
+MO_CONST MO_GRAPHICS_BITMAP_FONT MoBitmapFontLaffStd =
 {
-    Width,
-    Height,
+    { Width, Height },
     Query
 };

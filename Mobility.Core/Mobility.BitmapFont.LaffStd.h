@@ -11,11 +11,11 @@
 #ifndef MOBILITY_BITMAPFONT_LAFFSTD
 #define MOBILITY_BITMAPFONT_LAFFSTD
 
-#include "Mobility.BitmapFont.Core.h"
+#include "Mobility.Graphics.Core.h"
 
 /**
  * @brief The LaffStd 8x19 fixed-cell monochrome bitmap font.
  */
-MO_EXTERN_C MO_CONST MO_BITMAP_FONT MoBitmapFontLaffStd;
+MO_EXTERN_C MO_CONST MO_GRAPHICS_BITMAP_FONT MoBitmapFontLaffStd;
 
 #endif // !MOBILITY_BITMAPFONT_LAFFSTD
