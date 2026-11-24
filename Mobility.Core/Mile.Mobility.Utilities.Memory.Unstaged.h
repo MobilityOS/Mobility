@@ -56,50 +56,50 @@ typedef struct _MO_MEMORY_BLOCK
 #endif // !MO_MEMORY_BLOCK_EXPAND_ARGUMENTS
 
 /**
-  * @brief Determines whether a memory range representation is valid.
-  * @param EndAddress The optional pointer to the variable that receives the end
-  *                   boundary address of the memory range. EndAddress may be
-  *                   null. If the return value is MO_FALSE, the value pointed
-  *                   to by EndAddress is not modified. The received address is
-  *                   the end boundary of the half-open range and is not
-  *                   guaranteed to be readable or writable.
-  * @param BaseAddress The base address of the memory range. If Length is zero,
-  *                    BaseAddress may be null. If Length is nonzero,
-  *                    BaseAddress must not be null.
-  * @param Length The length, in bytes, of the memory range.
-  * @return MO_TRUE if the memory range is a valid half-open range
-  *         [BaseAddress, the computed end boundary address), and the address
-  *         computation does not wrap around. MO_FALSE otherwise. The boundary
-  *         computation is performed by using native-width unsigned address
-  *         representations. This function only validates the range
-  *         representation; it does not prove that the memory range is actually
-  *         readable or writable.
-  */
+ * @brief Determines whether a memory range representation is valid.
+ * @param EndAddress The optional pointer to the variable that receives the end
+ *                   boundary address of the memory range. EndAddress may be
+ *                   null. If the return value is MO_FALSE, the value pointed
+ *                   to by EndAddress is not modified. The received address is
+ *                   the end boundary of the half-open range and is not
+ *                   guaranteed to be readable or writable.
+ * @param BaseAddress The base address of the memory range. If Length is zero,
+ *                    BaseAddress may be null. If Length is nonzero,
+ *                    BaseAddress must not be null.
+ * @param Length The length, in bytes, of the memory range.
+ * @return MO_TRUE if the memory range is a valid half-open range
+ *         [BaseAddress, the computed end boundary address), and the address
+ *         computation does not wrap around. MO_FALSE otherwise. The boundary
+ *         computation is performed by using native-width unsigned address
+ *         representations. This function only validates the range
+ *         representation; it does not prove that the memory range is actually
+ *         readable or writable.
+ */
 MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeValidate(
     _Mo_Out_Opt_ PMO_CONSTANT_POINTER EndAddress,
     _Mo_In_Opt_ MO_CONSTANT_POINTER BaseAddress,
     _Mo_In_ MO_UINTN Length);
 
 /**
-  * @brief Determines whether a memory range fully contains another memory
-  *        range.
-  * @param BaseAddress The base address of the memory range. If Length is zero,
-  *                    BaseAddress may be null. If Length is nonzero,
-  *                    BaseAddress must not be null.
-  * @param Length The length, in bytes, of the memory range.
-  * @param TargetBaseAddress The base address of the target memory range. If
-  *                          TargetLength is zero, TargetBaseAddress may be
-  *                          null. If TargetLength is nonzero,
-  *                          TargetBaseAddress must not be null.
-  * @param TargetLength The length, in bytes, of the target memory range.
-  * @return MO_TRUE if both memory ranges are valid and the target memory range
-  *         is fully contained in the memory range. MO_FALSE otherwise. The
-  *         containment test is based on the native-width unsigned address
-  *         representations of the boundary addresses. If TargetLength is zero,
-  *         the target memory range is empty and is considered contained if and
-  *         only if its boundary address lies within the boundary addresses of
-  *         the containing memory range.
-  */
+ * @brief Determines whether a memory range fully contains another memory
+ *        range.
+ * @param BaseAddress The base address of the memory range. If Length is zero,
+ *                    BaseAddress may be null. If Length is nonzero,
+ *                    BaseAddress must not be null.
+ * @param Length The length, in bytes, of the memory range.
+ * @param TargetBaseAddress The base address of the target memory range. If
+ *                          TargetLength is zero, TargetBaseAddress may be
+ *                          null. If TargetLength is nonzero,
+ *                          TargetBaseAddress must not be null.
+ * @param TargetLength The length, in bytes, of the target memory range.
+ * @return MO_TRUE if both memory ranges are valid and the target memory range
+ *         is fully contained in the memory range. MO_FALSE otherwise. The
+ *         containment test is based on the native-width unsigned address
+ *         representations of the boundary addresses. If TargetLength is zero,
+ *         the target memory range is empty and is considered contained if and
+ *         only if its boundary address lies within the boundary addresses of
+ *         the containing memory range.
+ */
 MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeContains(
     _Mo_In_Opt_ MO_CONSTANT_POINTER BaseAddress,
     _Mo_In_ MO_UINTN Length,
@@ -107,22 +107,22 @@ MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeContains(
     _Mo_In_ MO_UINTN TargetLength);
 
 /**
-  * @brief Determines whether two memory ranges have a non-empty overlap.
-  * @param LeftBaseAddress The base address of the left memory range. If
-  *                        LeftLength is zero, LeftBaseAddress may be null. If
-  *                        LeftLength is nonzero, LeftBaseAddress must not be
-  *                        null.
-  * @param LeftLength The length, in bytes, of the left memory range.
-  * @param RightBaseAddress The base address of the right memory range. If
-  *                         RightLength is zero, RightBaseAddress may be null.
-  *                         If RightLength is nonzero, RightBaseAddress must not
-  *                         be null.
-  * @param RightLength The length, in bytes, of the right memory range.
-  * @return MO_TRUE if both memory ranges are valid and have a non-empty
-  *         overlap. MO_FALSE otherwise. Empty memory ranges do not overlap any
-  *         memory range. The overlap test is based on the native-width unsigned
-  *         address representations of the boundary addresses.
-  */
+ * @brief Determines whether two memory ranges have a non-empty overlap.
+ * @param LeftBaseAddress The base address of the left memory range. If
+ *                        LeftLength is zero, LeftBaseAddress may be null. If
+ *                        LeftLength is nonzero, LeftBaseAddress must not be
+ *                        null.
+ * @param LeftLength The length, in bytes, of the left memory range.
+ * @param RightBaseAddress The base address of the right memory range. If
+ *                         RightLength is zero, RightBaseAddress may be null.
+ *                         If RightLength is nonzero, RightBaseAddress must not
+ *                         be null.
+ * @param RightLength The length, in bytes, of the right memory range.
+ * @return MO_TRUE if both memory ranges are valid and have a non-empty
+ *         overlap. MO_FALSE otherwise. Empty memory ranges do not overlap any
+ *         memory range. The overlap test is based on the native-width unsigned
+ *         address representations of the boundary addresses.
+ */
 MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeOverlaps(
     _Mo_In_Opt_ MO_CONSTANT_POINTER LeftBaseAddress,
     _Mo_In_ MO_UINTN LeftLength,
@@ -130,26 +130,26 @@ MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryRangeOverlaps(
     _Mo_In_ MO_UINTN RightLength);
 
 /**
-  * @brief Determines whether a range within a memory block is valid.
-  * @param StartAddress The optional pointer to the variable that receives the
-  *                     start address of the range within the memory block.
-  *                     StartAddress may be null. If the return value is
-  *                     MO_FALSE, the value pointed to by StartAddress is not
-  *                     modified. If Length is zero, the received address may
-  *                     be an end boundary address and is not guaranteed to be
-  *                     readable or writable.
-  * @param MemoryBlock The pointer to the memory block structure. MemoryBlock
-  *                    must not be null.
-  * @param Index The starting index, in bytes, of the range within the memory
-  *              block.
-  * @param Length The length, in bytes, of the range.
-  * @return MO_TRUE if the memory block is a valid memory range representation,
-  *         the index computation does not wrap around, and the half-open index
-  *         range [Index, Index + Length) is fully contained in
-  *         [0, MemoryBlock->Size). MO_FALSE otherwise. This function only
-  *         validates the range representation; it does not prove that the
-  *         memory range is actually readable or writable.
-  */
+ * @brief Determines whether a range within a memory block is valid.
+ * @param StartAddress The optional pointer to the variable that receives the
+ *                     start address of the range within the memory block.
+ *                     StartAddress may be null. If the return value is
+ *                     MO_FALSE, the value pointed to by StartAddress is not
+ *                     modified. If Length is zero, the received address may
+ *                     be an end boundary address and is not guaranteed to be
+ *                     readable or writable.
+ * @param MemoryBlock The pointer to the memory block structure. MemoryBlock
+ *                    must not be null.
+ * @param Index The starting index, in bytes, of the range within the memory
+ *              block.
+ * @param Length The length, in bytes, of the range.
+ * @return MO_TRUE if the memory block is a valid memory range representation,
+ *         the index computation does not wrap around, and the half-open index
+ *         range [Index, Index + Length) is fully contained in
+ *         [0, MemoryBlock->Size). MO_FALSE otherwise. This function only
+ *         validates the range representation; it does not prove that the
+ *         memory range is actually readable or writable.
+ */
 MO_EXTERN_C MO_BOOL MOAPI MoMileMemoryBlockValidate(
     _Mo_Out_Opt_ PMO_POINTER StartAddress,
     _Mo_In_ PMO_MEMORY_BLOCK MemoryBlock,

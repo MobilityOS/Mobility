@@ -13,9 +13,9 @@
 
 #include <Mile.Mobility.Portable.Types.h>
 
- /**
-  * @brief The temporarily function example for noting the API prefix.
-  */
+/**
+ * @brief The temporarily function example for noting the API prefix.
+ */
 MO_EXTERN_C MO_VOID MOAPI MoAliceSimpleFunction();
 
 #endif // !MOBILITY_ALICE
