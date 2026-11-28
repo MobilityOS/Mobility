@@ -21,7 +21,7 @@
 #include <mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
 
-#include <Mobility.Display.Core.h>
+#include <Mobility.Graphics.Core.h>
 
 #include <mutex>
 
@@ -214,7 +214,7 @@ namespace
     HWND g_DisplayWindow = nullptr;
 
     std::vector<MO_UINT32> g_DisplayPixels;
-    MO_DISPLAY_BGRA32_FRAMEBUFFER g_DisplayFrameBuffer = {};
+    MO_GRAPHICS_FRAMEBUFFER g_DisplayFrameBuffer = {};
     BITMAPINFO g_DisplayBitmapInformation = {};
 
     constexpr MO_UINT32 KeyboardQueueCapacity = MO_UINT32_C(256);
@@ -459,17 +459,13 @@ namespace
                 DeviceContext,
                 0,
                 0,
-                static_cast<int>(
-                    g_DisplayFrameBuffer.HorizontalResolution),
-                static_cast<int>(
-                    g_DisplayFrameBuffer.VerticalResolution),
+                g_DisplayFrameBuffer.Size.Width,
+                g_DisplayFrameBuffer.Size.Height,
                 0,
                 0,
-                static_cast<int>(
-                    g_DisplayFrameBuffer.HorizontalResolution),
-                static_cast<int>(
-                    g_DisplayFrameBuffer.VerticalResolution),
-                g_DisplayFrameBuffer.FrameBufferBase,
+                g_DisplayFrameBuffer.Size.Width,
+                g_DisplayFrameBuffer.Size.Height,
+                g_DisplayFrameBuffer.Base,
                 &g_DisplayBitmapInformation,
                 DIB_RGB_COLORS,
                 SRCCOPY);
@@ -523,10 +519,8 @@ namespace
         RECT WindowRectangle = {};
         WindowRectangle.left = 0;
         WindowRectangle.top = 0;
-        WindowRectangle.right = static_cast<LONG>(
-            g_DisplayFrameBuffer.HorizontalResolution);
-        WindowRectangle.bottom = static_cast<LONG>(
-            g_DisplayFrameBuffer.VerticalResolution);
+        WindowRectangle.right = g_DisplayFrameBuffer.Size.Width;
+        WindowRectangle.bottom = g_DisplayFrameBuffer.Size.Height;
 
         ::AdjustWindowRect(&WindowRectangle, WindowStyle, FALSE);
 
@@ -572,28 +566,26 @@ namespace
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayCreate(
-    _Mo_In_ MO_UINT32 HorizontalResolution,
-    _Mo_In_ MO_UINT32 VerticalResolution,
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER FrameBuffer)
+    _Mo_In_ MO_INT16 Width,
+    _Mo_In_ MO_INT16 Height,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER FrameBuffer)
 {
     ::MoRetroVDisplayClearKeyboardQueue();
 
     g_DisplayPixels.assign(
-        static_cast<MO_UINTN>(HorizontalResolution) *
-        VerticalResolution,
-        MO_DISPLAY_BGRA32_MAKE(0, 0, 0, MO_UINT8_MAX));
+        static_cast<MO_UINTN>(Width) * Height,
+        MO_UINT32_C(0xFF000000));
 
-    g_DisplayFrameBuffer.FrameBufferBase = g_DisplayPixels.data();
-    g_DisplayFrameBuffer.HorizontalResolution = HorizontalResolution;
-    g_DisplayFrameBuffer.VerticalResolution = VerticalResolution;
-    g_DisplayFrameBuffer.PixelsPerScanLine = HorizontalResolution;
+    g_DisplayFrameBuffer.Base = g_DisplayPixels.data();
+    g_DisplayFrameBuffer.Size.Width = Width;
+    g_DisplayFrameBuffer.Size.Height = Height;
+    g_DisplayFrameBuffer.Pitch =
+        static_cast<MO_UINT32>(Width) * sizeof(MO_UINT32);
 
     g_DisplayBitmapInformation = {};
     g_DisplayBitmapInformation.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    g_DisplayBitmapInformation.bmiHeader.biWidth =
-        static_cast<LONG>(HorizontalResolution);
-    g_DisplayBitmapInformation.bmiHeader.biHeight =
-        -static_cast<LONG>(VerticalResolution);
+    g_DisplayBitmapInformation.bmiHeader.biWidth = Width;
+    g_DisplayBitmapInformation.bmiHeader.biHeight = -static_cast<LONG>(Height);
     g_DisplayBitmapInformation.bmiHeader.biPlanes = 1;
     g_DisplayBitmapInformation.bmiHeader.biBitCount = 32;
     g_DisplayBitmapInformation.bmiHeader.biCompression = BI_RGB;

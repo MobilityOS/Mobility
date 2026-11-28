@@ -14,16 +14,16 @@
 // This work is licensed under the MIT License. See included LICENSE.TXT.
 
 #include <Mile.Mobility.Portable.Types.h>
-#include <Mobility.Display.Core.h>
+#include <Mobility.Graphics.Core.h>
 
 MO_EXTERN_C MO_VOID MOAPI MoRetroVPcSpeakerSetTone(
     _Mo_In_ MO_BOOL Enabled,
     _Mo_In_ MO_UINT16 PitDivisor);
 
 MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayCreate(
-    _Mo_In_ MO_UINT32 HorizontalResolution,
-    _Mo_In_ MO_UINT32 VerticalResolution,
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER FrameBuffer);
+    _Mo_In_ MO_INT16 Width,
+    _Mo_In_ MO_INT16 Height,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER FrameBuffer);
 
 MO_EXTERN_C MO_VOID MOAPI MoRetroVDisplayPresent(MO_VOID);
 
@@ -277,7 +277,7 @@ int32_t op_result;
 int disk[3];
 int32_t scratch_int;
 
-MO_DISPLAY_BGRA32_FRAMEBUFFER display_frame_buffer;
+MO_GRAPHICS_FRAMEBUFFER display_frame_buffer;
 
 time_t clock_buf;
 struct timeb ms_clock;
@@ -972,7 +972,7 @@ int main_8086tiny(int argc, char **argv)
             {
                 // Create the display and compute color and video memory
                 // translation tables when entering graphics mode.
-                if (!display_frame_buffer.FrameBufferBase)
+                if (!display_frame_buffer.Base)
                 {
                     for (uint32_t i = 0; i < 256; ++i)
                     {
@@ -992,11 +992,11 @@ int main_8086tiny(int argc, char **argv)
 
                         blue = (uint8_t)(blue * 85);
 
-                        rgb332_colors[i] = MO_DISPLAY_BGRA32_MAKE(
-                            red,
-                            green,
-                            blue,
-                            MO_UINT8_MAX);
+                        rgb332_colors[i] =
+                            (MO_UINT32_C(0xFF) << 24) |
+                            ((MO_UINT32)red << 16) |
+                            ((MO_UINT32)green << 8) |
+                            (MO_UINT32)blue;
                     }
 
                     for (uint32_t i = 0; i < 16; ++i)
@@ -1025,8 +1025,8 @@ int main_8086tiny(int argc, char **argv)
                     }
 
                     MoRetroVDisplayCreate(
-                        GRAPHICS_X,
-                        GRAPHICS_Y,
+                        (MO_INT16)GRAPHICS_X,
+                        (MO_INT16)GRAPHICS_Y,
                         &display_frame_buffer);
                 }
 
@@ -1054,9 +1054,10 @@ int main_8086tiny(int argc, char **argv)
                                 (4 * !(i & 1)))];
 
                     PMO_UINT32 destination =
-                        display_frame_buffer.FrameBufferBase +
-                        (i / pixel_groups_per_line) *
-                        display_frame_buffer.PixelsPerScanLine +
+                        (PMO_UINT32)(
+                            (PMO_UINT8)display_frame_buffer.Base +
+                            (i / pixel_groups_per_line) *
+                            display_frame_buffer.Pitch) +
                         (i % pixel_groups_per_line) * 4;
 
                     destination[0] =
@@ -1074,11 +1075,11 @@ int main_8086tiny(int argc, char **argv)
 
                 MoRetroVDisplayPresent();
             }
-            else if (display_frame_buffer.FrameBufferBase)
+            else if (display_frame_buffer.Base)
             {
                 // The application has returned to text mode.
                 MoRetroVDisplayDestroy();
-                display_frame_buffer.FrameBufferBase = nullptr;
+                display_frame_buffer.Base = nullptr;
             }
         }
 
@@ -1100,7 +1101,7 @@ int main_8086tiny(int argc, char **argv)
             pc_interrupt(0xA);
             int8_asap = 0;
 
-            if (display_frame_buffer.FrameBufferBase)
+            if (display_frame_buffer.Base)
             {
                 MO_UINT16 key_event = 0;
 
@@ -1120,10 +1121,10 @@ int main_8086tiny(int argc, char **argv)
         }
     }
 
-    if (display_frame_buffer.FrameBufferBase)
+    if (display_frame_buffer.Base)
     {
         MoRetroVDisplayDestroy();
-        display_frame_buffer.FrameBufferBase = nullptr;
+        display_frame_buffer.Base = nullptr;
     }
 
     return 0;
