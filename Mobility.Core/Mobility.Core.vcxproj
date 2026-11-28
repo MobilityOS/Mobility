@@ -27,7 +27,6 @@
     <ClCompile Include="Mile.Mobility.Utilities.Memory.Unstaged.c" />
     <ClCompile Include="Mobility.BitmapFont.LaffStd.c" />
     <ClCompile Include="Mobility.Console.Core.c" />
-    <ClCompile Include="Mobility.Display.Core.c" />
     <ClCompile Include="Mobility.Memory.SmallHeap.c" />
     <ClCompile Include="Mobility.Runtime.Core.c" />
     <ClCompile Include="Mobility.Unicode.Core.c" />
@@ -37,7 +36,6 @@
     <ClInclude Include="Mile.Mobility.Utilities.Memory.Unstaged.h" />
     <ClInclude Include="Mobility.BitmapFont.LaffStd.h" />
     <ClInclude Include="Mobility.Console.Core.h" />
-    <ClInclude Include="Mobility.Display.Core.h" />
     <ClInclude Include="Mobility.Graphics.Core.h" />
     <ClInclude Include="Mobility.Memory.SmallHeap.h" />
     <ClInclude Include="Mobility.Platform.Interface.h" />
