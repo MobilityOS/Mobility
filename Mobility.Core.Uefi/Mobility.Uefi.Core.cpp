@@ -41,7 +41,7 @@ MO_EXTERN_C MO_VOID MOAPI MoUefiConsoleWriteAsciiString(
 }
 
 MO_EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer,
     _Mo_In_ EFI_BOOT_SERVICES* BootServices)
 {
     if (!DisplayFrameBuffer || !BootServices)
@@ -51,7 +51,7 @@ MO_EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
     ::MoRuntimeMemoryFillByte(
         DisplayFrameBuffer,
         0u,
-        sizeof(MO_DISPLAY_BGRA32_FRAMEBUFFER));
+        sizeof(MO_GRAPHICS_FRAMEBUFFER));
 
     EFI_GRAPHICS_OUTPUT_PROTOCOL* GraphicsOutputProtocol = nullptr;
     EFI_STATUS Status = BootServices->LocateProtocol(
@@ -62,25 +62,45 @@ MO_EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
     {
         return Status;
     }
+    if (!GraphicsOutputProtocol ||
+        !GraphicsOutputProtocol->Mode ||
+        !GraphicsOutputProtocol->Mode->Info)
+    {
+        return EFI_UNSUPPORTED;
+    }
     if (PixelBlueGreenRedReserved8BitPerColor !=
         GraphicsOutputProtocol->Mode->Info->PixelFormat)
     {
         return EFI_UNSUPPORTED;
     }
 
-    DisplayFrameBuffer->FrameBufferBase = reinterpret_cast<PMO_UINT32>(
+    MO_POINTER Base = reinterpret_cast<MO_POINTER>(
         GraphicsOutputProtocol->Mode->FrameBufferBase);
-    DisplayFrameBuffer->HorizontalResolution =
+    UINT32 HorizontalResolution =
         GraphicsOutputProtocol->Mode->Info->HorizontalResolution;
-    DisplayFrameBuffer->VerticalResolution =
+    UINT32 VerticalResolution =
         GraphicsOutputProtocol->Mode->Info->VerticalResolution;
-    DisplayFrameBuffer->PixelsPerScanLine =
+    UINT32 PixelsPerScanLine =
         GraphicsOutputProtocol->Mode->Info->PixelsPerScanLine;
 
-    if (!::MoDisplayFrameBufferValidate(DisplayFrameBuffer))
+    if (!Base ||
+        !HorizontalResolution ||
+        HorizontalResolution > MO_INT16_MAX ||
+        !VerticalResolution ||
+        VerticalResolution > MO_INT16_MAX ||
+        PixelsPerScanLine < HorizontalResolution ||
+        PixelsPerScanLine > (MO_UINT32_MAX / sizeof(MO_UINT32)))
     {
         return EFI_UNSUPPORTED;
     }
+
+    DisplayFrameBuffer->Base = Base;
+    DisplayFrameBuffer->Size.Width =
+        static_cast<MO_INT16>(HorizontalResolution);
+    DisplayFrameBuffer->Size.Height =
+        static_cast<MO_INT16>(VerticalResolution);
+    DisplayFrameBuffer->Pitch =
+        static_cast<MO_UINT32>(PixelsPerScanLine * sizeof(MO_UINT32));
 
     return EFI_SUCCESS;
 }

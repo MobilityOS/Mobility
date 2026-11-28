@@ -16,7 +16,7 @@
 #undef NULL
 #include <Uefi.h>
 
-#include <Mobility.Display.Core.h>
+#include <Mobility.Graphics.Core.h>
 
 /**
  * @brief Write a UCS-2 string to the console.
@@ -53,7 +53,7 @@ MO_EXTERN_C MO_VOID MOAPI MoUefiConsoleWriteAsciiString(
  *          returns EFI_UNSUPPORTED.
  */
 MO_EXTERN_C EFI_STATUS MOAPI MoUefiInitializeDisplayFrameBuffer(
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer,
     _Mo_In_ EFI_BOOT_SERVICES* BootServices);
 
 /**

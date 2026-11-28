@@ -104,10 +104,10 @@ typedef struct MO_PLATFORM_X64_PAGE_ALIGNED _MO_PLATFORM_X64_PLATFORM_CONTEXT
 
     MO_PLATFORM_X64_GDT_DESCRIPTORS GlobalDescriptorTable;
     MO_PLATFORM_X64_TASK_STATE_SEGMENT TaskStateSegment;
-    MO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer;
+    MO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer;
     bool HypercallInitialized;
     MO_UINT8 Reserved1_0[7];
-    MO_UINT8 Reserved1_1[40];
+    MO_UINT8 Reserved1_1[48];
     MO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer;
     MO_UINT8 Reserved1_2[512];
     MO_UINT8 Reserved2[1024];
@@ -175,6 +175,26 @@ MO_EXTERN_C MO_RESULT MOAPI MoPlatformHeapReallocate(
         static_cast<MO_UINT16>(NewSize));
 }
 
+namespace
+{
+    void RefreshConsoleScreen()
+    {
+        MO_DISPLAY_BGRA32_FRAMEBUFFER LegacyFrameBuffer = {};
+        LegacyFrameBuffer.FrameBufferBase = reinterpret_cast<PMO_UINT32>(
+            g_PlatformContext.DisplayFrameBuffer.Base);
+        LegacyFrameBuffer.HorizontalResolution = static_cast<MO_UINT32>(
+            g_PlatformContext.DisplayFrameBuffer.Size.Width);
+        LegacyFrameBuffer.VerticalResolution = static_cast<MO_UINT32>(
+            g_PlatformContext.DisplayFrameBuffer.Size.Height);
+        LegacyFrameBuffer.PixelsPerScanLine =
+            g_PlatformContext.DisplayFrameBuffer.Pitch / sizeof(MO_UINT32);
+
+        ::MoConsoleCoreRefreshScreen(
+            &LegacyFrameBuffer,
+            &g_PlatformContext.ConsoleScreenBuffer);
+    }
+}
+
 MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteAsciiString(
     _Mo_In_ MO_CONSTANT_STRING String)
 {
@@ -182,9 +202,7 @@ MO_EXTERN_C MO_VOID MOAPI MoPlatformWriteAsciiString(
         &g_PlatformContext.ConsoleScreenBuffer,
         String,
         static_cast<MO_UINT32>(::MoRuntimeStringLength(String)));
-    ::MoConsoleCoreRefreshScreen(
-        &g_PlatformContext.DisplayFrameBuffer,
-        &g_PlatformContext.ConsoleScreenBuffer);
+    ::RefreshConsoleScreen();
 }
 
 MO_EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
@@ -230,9 +248,7 @@ MO_EXTERN_C MO_RESULT MOAPI MoPlatformInitialize(
         MO_CONSOLE_DEFAULT_FOREGROUND_COLOR,
         g_PlatformContext.ConsoleCharacterBuffer);
 
-    MoConsoleCoreRefreshScreen(
-        &g_PlatformContext.DisplayFrameBuffer,
-        &g_PlatformContext.ConsoleScreenBuffer);
+    ::RefreshConsoleScreen();
 
     return MO_RESULT_SUCCESS_OK;
 }
