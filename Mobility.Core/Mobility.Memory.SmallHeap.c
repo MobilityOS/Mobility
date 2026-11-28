@@ -12,10 +12,30 @@
 
 #include "Mobility.Runtime.Core.h"
 
+#include <Mile.Mobility.Utilities.FixedInteger.h>
+
+MO_FORCEINLINE MO_BOOL MoMemorySmallHeapInstanceValidate(
+    _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance)
+{
+    MO_UINTN InstanceStart = (MO_UINTN)Instance;
+    if (!InstanceStart ||
+        (InstanceStart & (MO_MEMORY_SMALL_HEAP_UNIT_SIZE - 1u)))
+    {
+        return MO_FALSE;
+    }
+
+    MO_UINTN InstanceLastByte = 0u;
+    return MoMileFixedIntegerCheckedAddition(
+        &InstanceLastByte,
+        MO_FALSE,
+        InstanceStart,
+        MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE - 1u);
+}
+
 MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
     _Mo_Out_ PMO_MEMORY_SMALL_HEAP Instance)
 {
-    if (!Instance)
+    if (!MoMemorySmallHeapInstanceValidate(Instance))
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
@@ -60,6 +80,11 @@ MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapInitialize(
 MO_FORCEINLINE MO_BOOL MoMemorySmallHeapHeaderValidate(
     _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance)
 {
+    if (!MoMemorySmallHeapInstanceValidate(Instance))
+    {
+        return MO_FALSE;
+    }
+
     PMO_MEMORY_SMALL_HEAP_HEADER Header = &Instance->Header;
 
     if (MO_MEMORY_SMALL_HEAP_SIGNATURE != Header->Signature)
@@ -280,41 +305,80 @@ MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapAllocate(
     return MO_RESULT_ERROR_OUT_OF_MEMORY;
 }
 
-MO_FORCEINLINE MO_BOOL MoMemorySmallHeapItemHeaderValidate(
+MO_FORCEINLINE PMO_MEMORY_SMALL_HEAP_ITEM_HEADER MoMemorySmallHeapGetItemHeader(
     _Mo_In_ PMO_MEMORY_SMALL_HEAP Instance,
-    _Mo_In_ PMO_MEMORY_SMALL_HEAP_ITEM_HEADER Header)
+    _Mo_In_ MO_POINTER Block)
 {
+    MO_UINTN HeaderAddress = 0u;
+    if (!MoMileFixedIntegerCheckedSubtraction(
+        &HeaderAddress,
+        MO_FALSE,
+        (MO_UINTN)Block,
+        MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE))
+    {
+        return nullptr;
+    }
+
+    MO_UINTN ByteOffset = 0u;
+    if (!MoMileFixedIntegerCheckedSubtraction(
+        &ByteOffset,
+        MO_FALSE,
+        HeaderAddress,
+        (MO_UINTN)Instance))
+    {
+        return nullptr;
+    }
+
+    if ((ByteOffset & (MO_MEMORY_SMALL_HEAP_UNIT_SIZE - 1u)) ||
+        ByteOffset < MO_MEMORY_SMALL_HEAP_SERVICE_AREA_SIZE ||
+        ByteOffset > (MO_MEMORY_SMALL_HEAP_PHYSICAL_SIZE -
+            MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_SIZE))
+    {
+        return nullptr;
+    }
+
+    PMO_MEMORY_SMALL_HEAP_ITEM_HEADER Header =
+        (PMO_MEMORY_SMALL_HEAP_ITEM_HEADER)HeaderAddress;
+
     MO_UINT16 Checksum = MoMemorySmallHeapCalculateItemHeaderChecksum(Header);
     if (Header->Checksum != Checksum)
     {
-        return MO_FALSE;
+        return nullptr;
     }
 
-    if (Header->HeapHeaderOffsetUnits < MO_MEMORY_SMALL_HEAP_SERVICE_AREA_UNITS)
-    {
-        return MO_FALSE;
-    }
-
-    MO_UINTN OffsetUnits = MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(
-        ((MO_UINTN)Header) - ((MO_UINTN)Instance));
+    MO_UINTN OffsetUnits = MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(ByteOffset);
     if (Header->HeapHeaderOffsetUnits != OffsetUnits)
     {
-        return MO_FALSE;
+        return nullptr;
     }
 
-    if (!Header->AllocatedUnits ||
+    if (Header->AllocatedUnits <
+        MO_MEMORY_SMALL_HEAP_USER_AREA_MINIMUM_ALLOCATION_UNITS ||
         Header->AllocatedUnits > MO_MEMORY_SMALL_HEAP_USER_AREA_UNITS)
     {
-        return MO_FALSE;
+        return nullptr;
     }
 
-    MO_UINTN EndUnits = Header->HeapHeaderOffsetUnits + Header->AllocatedUnits;
-    if (EndUnits > MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
+    MO_UINT16 EndUnits = 0u;
+    if (!MoMileFixedIntegerCheckedAddition16(
+        &EndUnits,
+        MO_FALSE,
+        Header->HeapHeaderOffsetUnits,
+        Header->AllocatedUnits) ||
+        EndUnits > MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
     {
-        return MO_FALSE;
+        return nullptr;
     }
 
-    return MO_TRUE;
+    MO_UINT16 MaximumUserSize =
+        MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE(Header->AllocatedUnits) -
+        MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE;
+    if (!Header->RequestedSize || Header->RequestedSize > MaximumUserSize)
+    {
+        return nullptr;
+    }
+
+    return Header;
 }
 
 MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
@@ -331,14 +395,9 @@ MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapFree(
         return MO_RESULT_ERROR_INVALID_HANDLE;
     }
 
-    // Get the item header from the block.
     PMO_MEMORY_SMALL_HEAP_ITEM_HEADER ItemHeader =
-        (PMO_MEMORY_SMALL_HEAP_ITEM_HEADER)(
-            (MO_UINTN)Block - MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE);
-
-    if (!MoMemorySmallHeapItemHeaderValidate(
-        Instance,
-        ItemHeader))
+        MoMemorySmallHeapGetItemHeader(Instance, Block);
+    if (!ItemHeader)
     {
         return MO_RESULT_ERROR_INVALID_POINTER;
     }
@@ -400,16 +459,18 @@ MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
             NewSize);
     }
 
-    // Get the item header from the original block.
     PMO_MEMORY_SMALL_HEAP_ITEM_HEADER OriginalItemHeader =
-        (PMO_MEMORY_SMALL_HEAP_ITEM_HEADER)(
-            (MO_UINTN)Block - MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE);
-
-    if (!MoMemorySmallHeapItemHeaderValidate(
-        Instance,
-        OriginalItemHeader))
+        MoMemorySmallHeapGetItemHeader(Instance, Block);
+    if (!OriginalItemHeader)
     {
         return MO_RESULT_ERROR_INVALID_POINTER;
+    }
+
+    if (NewSize > MO_MEMORY_SMALL_HEAP_USER_AREA_SIZE
+        - MO_MEMORY_SMALL_HEAP_ITEM_HEADER_SIZE)
+    {
+        // Exceeds the maximum allocatable size.
+        return MO_RESULT_ERROR_OUT_OF_MEMORY;
     }
 
     MO_UINT16 OriginalAllocatedSize = MO_MEMORY_SMALL_HEAP_UNITS_TO_SIZE(
@@ -429,15 +490,16 @@ MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
         return MO_RESULT_SUCCESS_OK;
     }
 
+    MO_UINT16 NextBlockUnitIndex =
+        OriginalItemHeader->HeapHeaderOffsetUnits +
+        OriginalItemHeader->AllocatedUnits;
+    if (NextBlockUnitIndex < MO_MEMORY_SMALL_HEAP_PHYSICAL_UNITS)
     {
         MO_UINT16 AdditionalRequiredSize = (MO_UINT16)MoRuntimeGetAlignedSize(
             NewSize - MaximumSizeWithoutReallocation,
             MO_MEMORY_SMALL_HEAP_UNIT_SIZE);
         MO_UINT16 AdditionalRequiredUnits =
             MO_MEMORY_SMALL_HEAP_SIZE_TO_UNITS(AdditionalRequiredSize);
-        MO_UINT16 NextBlockUnitIndex =
-            OriginalItemHeader->HeapHeaderOffsetUnits +
-            OriginalItemHeader->AllocatedUnits;
 
         MO_UINTN RunUnits = 0u;
         MO_BOOL BitValue = MO_FALSE;
@@ -467,7 +529,8 @@ MO_EXTERN_C MO_RESULT MOAPI MoMemorySmallHeapReallocate(
 
             // Clear the newly allocated area.
             if (MO_RESULT_SUCCESS_OK != MoRuntimeMemoryFillByte(
-                (MO_POINTER)(((MO_UINTN)Block) + OriginalAllocatedSize),
+                (MO_POINTER)(
+                    ((MO_UINTN)Block) + MaximumSizeWithoutReallocation),
                 MO_MEMORY_SMALL_HEAP_USER_AREA_ALLOCATED_BYTE,
                 AdditionalRequiredSize))
             {

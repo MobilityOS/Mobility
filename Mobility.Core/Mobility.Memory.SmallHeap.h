@@ -178,6 +178,8 @@ MO_C_STATIC_ASSERT(sizeof(MO_MEMORY_SMALL_HEAP_ITEM_HEADER) \
 /**
  * @brief Initializes the Small Heap (v1) instance.
  * @param Instance The pointer to the Small Heap instance to be initialized.
+ *                 This pointer must be aligned to
+ *                 MO_MEMORY_SMALL_HEAP_UNIT_SIZE.
  * @return If the function succeeds, it returns MO_RESULT_SUCCESS_OK. Otherwise,
  *         it returns an MO_RESULT error code.
  */
@@ -191,7 +193,8 @@ typedef struct _MO_MEMORY_SMALL_HEAP_SUMMARY
 {
     /**
      * @brief The allocated size in bytes.
-     *        Note: The service area is also considered allocated.
+     *        Note: The service area is also considered allocated, and 0
+     *        indicates all 65536 bytes (64 KiB) are allocated.
      */
     MO_UINT16 AllocatedSize;
     /**
@@ -199,7 +202,8 @@ typedef struct _MO_MEMORY_SMALL_HEAP_SUMMARY
      */
     MO_UINT16 FreeSize;
     /**
-     * @brief The largest free block size in bytes.
+     * @brief The largest free block size in bytes from HintUnit, including the
+     *        item header overhead.
      */
     MO_UINT16 LargestFreeBlockSize;
 } MO_MEMORY_SMALL_HEAP_SUMMARY, *PMO_MEMORY_SMALL_HEAP_SUMMARY;
