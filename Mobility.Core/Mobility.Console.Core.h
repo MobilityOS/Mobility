@@ -11,7 +11,7 @@
 #ifndef MOBILITY_CONSOLE_CORE
 #define MOBILITY_CONSOLE_CORE
 
-#include "Mobility.Display.Core.h"
+#include "Mobility.Graphics.Core.h"
 #include "Mobility.Unicode.Core.h"
 
 #define MO_CONSOLE_COLORLUT_BITS 4
@@ -39,33 +39,20 @@ typedef MO_UINT32 MO_CONSOLE_COLORLUT_ITEM[MO_CONSOLE_COLORLUT_BITS];
 typedef MO_CONSOLE_COLORLUT_ITEM MO_CONSOLE_COLORLUT[MO_CONSOLE_COLORLUT_ITEMS];
 
 /**
- * @brief Defines the coordinates of the specific character cell in the specific
- *        console screen buffer. The origin of the coordinate system (0,0) is at
- *        the top, left cell of the buffer.
- */
-typedef struct _MO_CONSOLE_COORDINATE
-{
-    MO_UINT16 X;
-    MO_UINT16 Y;
-} MO_CONSOLE_COORDINATE, *PMO_CONSOLE_COORDINATE;
-
-/**
  * @brief Contains the information of the console screen buffer.
  */
 typedef struct _MO_CONSOLE_SCREEN_BUFFER
 {
-    MO_CONSOLE_COORDINATE ScreenBufferSize;
-    MO_CONSOLE_COORDINATE CursorPosition;
+    MO_GRAPHICS_SIZE ScreenBufferSize;
+    MO_GRAPHICS_POINT CursorPosition;
     PMO_WIDE_CHAR CharacterBuffer;
     MO_UINT32 CharacterBufferMaximumSize;
     MO_UINT32 CharacterBufferStartOffset;
     MO_CONSOLE_COLORLUT ColorLookupTable;
 } MO_CONSOLE_SCREEN_BUFFER, *PMO_CONSOLE_SCREEN_BUFFER;
 
-#define MO_CONSOLE_DEFAULT_BACKGROUND_COLOR \
-    MO_DISPLAY_BGRA32_MAKE(0, 0, 0, 0)
-#define MO_CONSOLE_DEFAULT_FOREGROUND_COLOR \
-    MO_DISPLAY_BGRA32_MAKE(255, 255, 255, 0)
+#define MO_CONSOLE_DEFAULT_BACKGROUND_COLOR MO_UINT32_C(0x00000000)
+#define MO_CONSOLE_DEFAULT_FOREGROUND_COLOR MO_UINT32_C(0x00FFFFFF)
 
 /**
  * @brief Gets the background color from the console screen buffer.
@@ -107,21 +94,20 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreUpdateColorSettings(
  * @param ConsoleScreenBuffer The console screen buffer you want to initialize.
  *                            This function will do nothing if the memory
  *                            address of the console screen buffer is invalid.
- * @param MaximumColumn The maximum column of the console screen buffer.
- * @param MaximumRow The maximum row of the console screen buffer.
+ * @param ScreenBufferSize The size of the console screen buffer in character
+ *                         cells. Both dimensions must be positive.
  * @param BackgroundColor The background color of the console screen buffer.
  * @param ForegroundColor The foreground color of the console screen buffer.
  * @param CharacterBuffer The character buffer of the console screen buffer. The
  *                        caller must ensure the memory address of the character
  *                        buffer is valid with the size which is satisfied with
- *                        the MaximumColumn and the MaximumRow. Also, the caller
- *                        must ensure the content in the character buffer is
- *                        properly initialized.
+ *                        the ScreenBufferSize. Also, the caller must ensure the
+ *                        content in the character buffer is properly
+ *                        initialized.
  */
 MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
     _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _Mo_In_ MO_UINT32 MaximumColumn,
-    _Mo_In_ MO_UINT32 MaximumRow,
+    _Mo_In_ MO_GRAPHICS_SIZE ScreenBufferSize,
     _Mo_In_ MO_UINT32 BackgroundColor,
     _Mo_In_ MO_UINT32 ForegroundColor,
     _Mo_In_ PMO_WIDE_CHAR CharacterBuffer);
@@ -138,9 +124,9 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
  * @param Character The character to draw.
  */
 MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer,
     _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _Mo_In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
+    _Mo_In_ MO_GRAPHICS_POINT DestinationCoordinate,
     _Mo_In_ MO_WIDE_CHAR Character);
 
 /**
@@ -153,7 +139,7 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
  *                            address of the console screen buffer is invalid.
  */
 MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreRefreshScreen(
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer,
     _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer);
 
 /**

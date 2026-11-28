@@ -59,19 +59,19 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreUpdateColorSettings(
 
 MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
     _Mo_Out_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _Mo_In_ MO_UINT32 MaximumColumn,
-    _Mo_In_ MO_UINT32 MaximumRow,
+    _Mo_In_ MO_GRAPHICS_SIZE ScreenBufferSize,
     _Mo_In_ MO_UINT32 BackgroundColor,
     _Mo_In_ MO_UINT32 ForegroundColor,
     _Mo_In_ PMO_WIDE_CHAR CharacterBuffer)
 {
-    if (!ConsoleScreenBuffer)
+    if (!ConsoleScreenBuffer ||
+        ScreenBufferSize.Width <= 0 ||
+        ScreenBufferSize.Height <= 0)
     {
         return;
     }
 
-    ConsoleScreenBuffer->ScreenBufferSize.X = (MO_UINT16)MaximumColumn;
-    ConsoleScreenBuffer->ScreenBufferSize.Y = (MO_UINT16)MaximumRow;
+    ConsoleScreenBuffer->ScreenBufferSize = ScreenBufferSize;
     ConsoleScreenBuffer->CursorPosition.X = 0;
     ConsoleScreenBuffer->CursorPosition.Y = 0;
     MoConsoleCoreUpdateColorSettings(
@@ -80,39 +80,47 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreInitializeScreenBuffer(
         ForegroundColor);
     ConsoleScreenBuffer->CharacterBuffer = CharacterBuffer;
     ConsoleScreenBuffer->CharacterBufferMaximumSize =
-        ConsoleScreenBuffer->ScreenBufferSize.X *
-        ConsoleScreenBuffer->ScreenBufferSize.Y;
+        (MO_UINT32)ConsoleScreenBuffer->ScreenBufferSize.Width *
+        (MO_UINT32)ConsoleScreenBuffer->ScreenBufferSize.Height;
     ConsoleScreenBuffer->CharacterBufferStartOffset = 0;
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer,
     _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer,
-    _Mo_In_ MO_CONSOLE_COORDINATE DestinationCoordinate,
+    _Mo_In_ MO_GRAPHICS_POINT DestinationCoordinate,
     _Mo_In_ MO_WIDE_CHAR Character)
 {
-    if (!DisplayFrameBuffer || !ConsoleScreenBuffer)
+    if (!DisplayFrameBuffer ||
+        !DisplayFrameBuffer->Base ||
+        DisplayFrameBuffer->Size.Width <= 0 ||
+        DisplayFrameBuffer->Size.Height <= 0 ||
+        DisplayFrameBuffer->Pitch <
+        (MO_UINT32)DisplayFrameBuffer->Size.Width * sizeof(MO_UINT32) ||
+        !ConsoleScreenBuffer ||
+        ConsoleScreenBuffer->ScreenBufferSize.Width <= 0 ||
+        ConsoleScreenBuffer->ScreenBufferSize.Height <= 0)
     {
         return;
     }
 
-    if (DestinationCoordinate.X >= ConsoleScreenBuffer->ScreenBufferSize.X ||
-        DestinationCoordinate.Y >= ConsoleScreenBuffer->ScreenBufferSize.Y)
+    if (DestinationCoordinate.X < 0 ||
+        DestinationCoordinate.Y < 0 ||
+        DestinationCoordinate.X >= ConsoleScreenBuffer->ScreenBufferSize.Width ||
+        DestinationCoordinate.Y >= ConsoleScreenBuffer->ScreenBufferSize.Height)
     {
         return;
     }
 
-    MO_UINT16 FontWidth = MoBitmapFontLaffStd.Size.Width;
-    MO_UINT16 FontHeight = MoBitmapFontLaffStd.Size.Height;
+    MO_INT16 FontWidth = MoBitmapFontLaffStd.Size.Width;
+    MO_INT16 FontHeight = MoBitmapFontLaffStd.Size.Height;
 
-    MO_CONSOLE_COORDINATE MaximumScreenBufferSize;
-    MaximumScreenBufferSize.X = (MO_UINT16)(
-        DisplayFrameBuffer->HorizontalResolution / FontWidth);
-    MaximumScreenBufferSize.Y = (MO_UINT16)(
-        DisplayFrameBuffer->VerticalResolution / FontHeight);
+    MO_GRAPHICS_SIZE MaximumScreenBufferSize;
+    MaximumScreenBufferSize.Width = DisplayFrameBuffer->Size.Width / FontWidth;
+    MaximumScreenBufferSize.Height = DisplayFrameBuffer->Size.Height / FontHeight;
 
-    if (DestinationCoordinate.X >= MaximumScreenBufferSize.X ||
-        DestinationCoordinate.Y >= MaximumScreenBufferSize.Y)
+    if (DestinationCoordinate.X >= MaximumScreenBufferSize.Width ||
+        DestinationCoordinate.Y >= MaximumScreenBufferSize.Height)
     {
         return;
     }
@@ -132,43 +140,36 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreDrawCharacter(
         }
     }
 
-    // Use 'volatile MO_UINT32*' to ensure the compiler treats the data pointed
+    // Use 'volatile MO_UINT8*' to ensure the compiler treats the data pointed
     // to as volatile, forcing actual memory writes to the framebuffer.
-    // Using 'volatile PMO_UINT32' would only make the pointer variable itself
+    // Using 'volatile PMO_UINT8' would only make the pointer variable itself
     // volatile.
-    volatile MO_UINT32* FrameBufferBase = (volatile MO_UINT32*)(
-        DisplayFrameBuffer->FrameBufferBase);
+    volatile MO_UINT8* FrameBufferBase = (volatile MO_UINT8*)(
+        DisplayFrameBuffer->Base);
 
     MO_UINT32 ScreenX = DestinationCoordinate.X * FontWidth;
     MO_UINT32 ScreenY = DestinationCoordinate.Y * FontHeight;
     for (MO_UINT8 GlyphY = 0; GlyphY < FontHeight; ++GlyphY)
     {
-        MO_UINTN PixelStartOffset = ScreenY + GlyphY;
-        PixelStartOffset *= DisplayFrameBuffer->PixelsPerScanLine;
-        PixelStartOffset += ScreenX;
+        volatile MO_UINT32* ScanLine = (volatile MO_UINT32*)(
+            FrameBufferBase +
+            (MO_UINTN)(ScreenY + GlyphY) * DisplayFrameBuffer->Pitch) +
+            ScreenX;
         MO_UINT8 GlyphDataLow = GlyphData[GlyphY] & 0x0F;
         MO_UINT8 GlyphDataHigh = (GlyphData[GlyphY] & 0xF0) >> 4;
-        FrameBufferBase[PixelStartOffset + 0] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][0];
-        FrameBufferBase[PixelStartOffset + 1] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][1];
-        FrameBufferBase[PixelStartOffset + 2] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][2];
-        FrameBufferBase[PixelStartOffset + 3] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][3];
-        FrameBufferBase[PixelStartOffset + 4] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][0];
-        FrameBufferBase[PixelStartOffset + 5] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][1];
-        FrameBufferBase[PixelStartOffset + 6] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][2];
-        FrameBufferBase[PixelStartOffset + 7] =
-            ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][3];
+        ScanLine[0] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][0];
+        ScanLine[1] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][1];
+        ScanLine[2] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][2];
+        ScanLine[3] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataHigh][3];
+        ScanLine[4] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][0];
+        ScanLine[5] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][1];
+        ScanLine[6] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][2];
+        ScanLine[7] = ConsoleScreenBuffer->ColorLookupTable[GlyphDataLow][3];
     }
 }
 
 MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreRefreshScreen(
-    _Mo_Out_ PMO_DISPLAY_BGRA32_FRAMEBUFFER DisplayFrameBuffer,
+    _Mo_Out_ PMO_GRAPHICS_FRAMEBUFFER DisplayFrameBuffer,
     _Mo_In_ PMO_CONSOLE_SCREEN_BUFFER ConsoleScreenBuffer)
 {
     if (!DisplayFrameBuffer || !ConsoleScreenBuffer)
@@ -179,21 +180,34 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreRefreshScreen(
     MO_UINT32 MaximumSize = ConsoleScreenBuffer->CharacterBufferMaximumSize;
     MO_UINT32 StartOffset = ConsoleScreenBuffer->CharacterBufferStartOffset;
 
-    for (MO_UINT32 i = 0; i < MaximumSize; ++i)
+    if (!MaximumSize ||
+        ConsoleScreenBuffer->ScreenBufferSize.Width <= 0 ||
+        ConsoleScreenBuffer->ScreenBufferSize.Height <= 0)
     {
-        MO_CONSOLE_COORDINATE CurrentCoordinate;
-        CurrentCoordinate.X = (MO_UINT16)(
-            i % ConsoleScreenBuffer->ScreenBufferSize.X);
-        CurrentCoordinate.Y = (MO_UINT16)(
-            i / ConsoleScreenBuffer->ScreenBufferSize.X);
+        return;
+    }
 
-        MO_UINT32 CurrentOffset = (StartOffset + i) % MaximumSize;
+    MO_UINT32 CurrentOffset = StartOffset;
 
-        MoConsoleCoreDrawCharacter(
-            DisplayFrameBuffer,
-            ConsoleScreenBuffer,
-            CurrentCoordinate,
-            ConsoleScreenBuffer->CharacterBuffer[CurrentOffset]);
+    for (MO_INT16 Y = 0; Y < ConsoleScreenBuffer->ScreenBufferSize.Height; ++Y)
+    {
+        for (MO_INT16 X = 0; X < ConsoleScreenBuffer->ScreenBufferSize.Width; ++X)
+        {
+            MO_GRAPHICS_POINT CurrentCoordinate = { X, Y };
+
+            if (CurrentOffset >= MaximumSize)
+            {
+                CurrentOffset %= MaximumSize;
+            }
+
+            MoConsoleCoreDrawCharacter(
+                DisplayFrameBuffer,
+                ConsoleScreenBuffer,
+                CurrentCoordinate,
+                ConsoleScreenBuffer->CharacterBuffer[CurrentOffset]);
+
+            ++CurrentOffset;
+        }
     }
 }
 
@@ -202,20 +216,32 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreWriteString(
     _Mo_In_ MO_CONSTANT_STRING String,
     _Mo_In_ MO_UINT32 StringLength)
 {
-    if (!ConsoleScreenBuffer || !String || !StringLength)
+    if (!ConsoleScreenBuffer ||
+        ConsoleScreenBuffer->ScreenBufferSize.Width <= 0 ||
+        ConsoleScreenBuffer->ScreenBufferSize.Height <= 0 ||
+        !String ||
+        !StringLength)
     {
         return;
     }
 
-    const MO_UINT16 TabSize = 4;
+    const MO_INT16 TabSize = 4;
 
-    MO_UINT16 ScreenWidth = ConsoleScreenBuffer->ScreenBufferSize.X;
-    MO_UINT16 ScreenHeight = ConsoleScreenBuffer->ScreenBufferSize.Y;
+    MO_INT16 ScreenWidth = ConsoleScreenBuffer->ScreenBufferSize.Width;
+    MO_INT16 ScreenHeight = ConsoleScreenBuffer->ScreenBufferSize.Height;
 
     MO_UINT32 MaximumSize = ConsoleScreenBuffer->CharacterBufferMaximumSize;
     MO_UINT32 StartOffset = ConsoleScreenBuffer->CharacterBufferStartOffset;
 
-    MO_CONSOLE_COORDINATE FinalPosition = ConsoleScreenBuffer->CursorPosition;
+    MO_GRAPHICS_POINT FinalPosition = ConsoleScreenBuffer->CursorPosition;
+    if (FinalPosition.X < 0 || FinalPosition.X >= ScreenWidth)
+    {
+        FinalPosition.X = 0;
+    }
+    if (FinalPosition.Y < 0 || FinalPosition.Y >= ScreenHeight)
+    {
+        FinalPosition.Y = 0;
+    }
 
     for (MO_UINT32 i = 0; i < StringLength;)
     {
@@ -246,10 +272,10 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreWriteString(
         }
         else if ('\t' == CurrentCharacter)
         {
-            MO_UINT16 NewX = (FinalPosition.X + TabSize) & ~(TabSize - 1);
+            MO_INT32 NewX = (FinalPosition.X + TabSize) & ~(TabSize - 1);
             if (NewX < ScreenWidth)
             {
-                FinalPosition.X = NewX;
+                FinalPosition.X = (MO_INT16)NewX;
             }
             else
             {
@@ -311,10 +337,11 @@ MO_EXTERN_C MO_VOID MOAPI MoConsoleCoreWriteString(
             StartOffset = ConsoleScreenBuffer->CharacterBufferStartOffset;
 
             // Clear the last row of the screen buffer.
-            for (MO_UINT32 Column = 0; Column < ScreenWidth; ++Column)
+            for (MO_INT16 Column = 0; Column < ScreenWidth; ++Column)
             {
                 MO_UINT32 ClearOffset = StartOffset;
-                ClearOffset += ((ScreenHeight - 1) * ScreenWidth) + Column;
+                ClearOffset +=
+                    (MO_UINT32)((ScreenHeight - 1) * ScreenWidth + Column);
                 ClearOffset %= MaximumSize;
                 ConsoleScreenBuffer->CharacterBuffer[ClearOffset] = '\0';
             }
